@@ -1,0 +1,236 @@
+export const API_ROUTES: ApiRoutes = {
+  BASE_URL: import.meta.env.VITE_BE_API,
+  PAYMENT_BASE_URL: import.meta.env.VITE_API_PAYMENT_URL,
+  TIMEOUT: 10000,
+  HEADERS: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+};
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    REFRESH: "/auth/refresh",
+    PROFILE: "/me",
+    ME: "/auth/me",
+    PASSWORD_CHANGE: "/auth/change-password",
+    PASSWORD_RESET_REQUEST: "/auth/password-reset/request",
+    PASSWORD_RESET_CONFIRM: "/auth/password-reset/confirm",
+  },
+  OAUTH: {
+    GOOGLE: "/oauth2/authorization/google", // Spring Security default
+    CALLBACK: "/oauth/callback", // Your frontend callback route
+  },
+  USER: {
+    PAGINATION: "/admin/users/pagination",
+    GET_ALL: "/admin/users",
+    CREATE: "/admin/users",
+    UPDATE: (id: string) => `/admin/users/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/users/${id}`,
+    GET_ROLES: (id: string) => `/admin/users/${id}/roles`,
+    SELECT: "/admin/users/select",
+    DEACTIVATE: (id: string) => `/admin/users/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/users/activate/${id}`,
+  },
+  EMPLOYEE: {
+    PAGINATION: "/admin/employees/pagination",
+    GET_ALL: "/admin/employees",
+    CREATE: "/admin/employees",
+    UPDATE: (id: string) => `/admin/employees/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/employees/${id}`,
+    SELECT: "/admin/employees/select",
+    DEACTIVATE: (id: string) => `/admin/employees/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/employees/activate/${id}`,
+  },
+
+  CUSTOMER: {
+    PAGINATION: "/admin/customers/pagination",
+    GET_ALL: "/admin/customers",
+    CREATE: "/admin/customers",
+    UPDATE: (id: string) => `/admin/customers/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/customers/${id}`,
+    SELECT: "/admin/customers/select",
+    DEACTIVATE: (id: string) => `/admin/customers/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/customers/activate/${id}`,
+  },
+
+  CUSTOMER_TYPE: {
+    PAGINATION: "/admin/customer-types/pagination",
+    GET_ALL: "/admin/customer-types",
+    CREATE: "/admin/customer-types",
+    UPDATE: (id: string) => `/admin/customer-types/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/customer-types/${id}`,
+    SELECT: "/admin/customer-types/select",
+    DEACTIVATE: (id: string) => `/admin/customer-types/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/customer-types/activate/${id}`,
+  },
+  ROLE: {
+    PAGINATION: "/admin/roles/pagination",
+    CREATE: "/admin/roles",
+    UPDATE: (id: string) => `/admin/roles/${id}`,
+    DETAIL: (id: string) => `/admin/roles/${id}`,
+    LIST_ALL: "/admin/roles",
+    DEACTIVATE: (id: string) => `/admin/roles/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/roles/activate/${id}`,
+    SELECT: "/admin/roles/select",
+  },
+  CAR: {
+    PAGINATION: "/admin/cars/pagination",
+    GET_ALL: "/admin/cars",
+    CREATE: "/admin/cars",
+    UPDATE: (id: string) => `/admin/cars/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/cars/${id}`,
+    SELECT: "/admin/cars/select",
+    DEACTIVATE: (id: string) => `/admin/cars/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/cars/activate/${id}`,
+  },
+  ACTION_LOG: {
+    PAGINATION: "/api/action-logs/pagination",
+  },
+  ROUTE: {
+    PAGINATION: "/admin/routes/pagination",
+    GET_ALL: "/admin/routes",
+    CREATE: "/admin/routes",
+    UPDATE: (id: string) => `/admin/routes/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/routes/${id}`,
+    SELECT: "/admin/routes/select",
+    DEACTIVATE: (id: string) => `/admin/routes/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/routes/activate/${id}`,
+  },
+  CAR_TYPE: {
+    PAGINATION: "/admin/car-types/pagination",
+    CREATE: "/admin/car-types",
+    UPDATE: (id: string) => `/admin/car-types/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/car-types/${id}`,
+    GET_ALL: "/admin/car-types",
+    SELECT: "/admin/car-types/select",
+    DEACTIVATE: (id: string) => `/admin/car-types/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/car-types/activate/${id}`,
+  },
+  CAR_SEAT: {
+    PAGINATION: "/admin/car-seats/pagination",
+    GET_ALL: "/admin/car-seats",
+    CREATE: "/admin/car-seats",
+    UPDATE: (id: string) => `/admin/car-seats/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/car-seats/${id}`,
+    GET_BY_CAR: (carId: string) => `/admin/cars/${carId}/seats`,
+    SELECT: "/admin/car-seats/select",
+    DEACTIVATE: (id: string) => `/admin/car-seats/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/carr-seats/activate/${id}`,
+  },
+  CAR_EMPLOYEE: {
+    PAGINATION: "/admin/car-employees/pagination",
+    GET_ALL: "/admin/car-employees",
+    CREATE: "/admin/car-employees",
+    UPDATE: (id: string) => `/admin/car-employees/${id}`,
+    DELETE: (id: string) => `/admin/car-employees/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/car-employees/${id}`,
+    SELECT: "/admin/car-employees/select",
+    DEACTIVATE: (id: string) => `/admin/car-employees/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/car-employees/activate/${id}`,
+  },
+  TRIP: {
+    PAGINATION: "/admin/trips/pagination",
+    GET_ALL: "/admin/trips",
+    CREATE: "/admin/trips",
+    UPDATE: (id: string) => `/admin/trips/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/trips/${id}`,
+    SELECT: "/admin/trips/upcoming",
+    DEACTIVATE: (id: string) => `/admin/trips/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/trips/activate/${id}`,
+  },
+  TRIP_STOP: {
+    PAGINATION: "/admin/trip-stops/pagination",
+    GET_ALL: "/admin/trip-stops",
+    CREATE: "/admin/trip-stops",
+    UPDATE: (id: string) => `/admin/trip-stops/${id}`,
+    DELETE: (id: string) => `/admin/trip-stops/delete/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/trip-stops/${id}`,
+    SELECT: "/admin/trip-stops/select",
+    SELECT_BY_TRIP: (tripId: string) => `/admin/trip-stops/select/${tripId}`,
+    DEACTIVATE: (id: string) => `/admin/trip-stops/deactivate/${id}`,
+    ACTIVATE: (id: string) => `/admin/trip-stops/activate/${id}`,
+  },
+  BOOKING: {
+    GET_ALL: "/admin/bookings",
+    PAGINATION: "/admin/bookings/pagination",
+    CREATE: "/admin/bookings",
+    UPDATE: (id: string) => `/admin/bookings/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/bookings/${id}`,
+    ACTIVATE: (id: string) => `/admin/bookings/${id}/activate`,
+    DEACTIVATE: (id: string) => `/admin/bookings/${id}/deactivate`,
+    SELECT: "/admin/bookings/select",
+    CONFIRM: (id: string) => `/admin/bookings/confirm/${id}`,
+    COMPLETE_TRIP: (id: string) => `/admin/bookings/complete-trip/${id}`,
+    UPDATE_STATUS_BY_DATE: (id: string) =>
+      `/admin/bookings/update-status-by-date/${id}`,
+  },
+  BOOKING_SEAT: {
+    GET_ALL: "/admin/booking-seats",
+    PAGINATION: "/admin/booking-seats/pagination",
+    CREATE: "/admin/booking-seats",
+    UPDATE: (id: string) => `/admin/booking-seats/${id}`,
+    FIND_BY_ID: (id: string) => `/admin/booking-seats/${id}`,
+    ACTIVATE: (id: string) => `/admin/booking-seats/${id}/activate`,
+    DEACTIVATE: (id: string) => `/admin/booking-seats/${id}/deactivate`,
+    SELECT: "/admin/booking-seats/select",
+  },
+  PAYMENT: {
+    GET_ALL: "/admin/payments",
+    FIND_BY_ID: (id: string) => `/admin/payments/${id}`,
+    PAGINATION: "/admin/payments/pagination",
+    CREATE: "/admin/payments",
+    UPDATE: (id: string) => `/admin/payments/${id}`,
+    DELETE: (id: string) => `/admin/payments/${id}`,
+    ACTIVATE: (id: string) => `/admin/payments/activate/${id}`,
+    DEACTIVATE: (id: string) => `/admin/payments/deactivate/${id}`,
+    SELECT: "/admin/payments/select",
+  },
+  PAYMENT_METHOD: {
+    GET_ALL: "/admin/payment-methods",
+    FIND_BY_ID: (id: string) => `/admin/payment-methods/${id}`,
+    PAGINATION: "/admin/payment-methods/pagination",
+    CREATE: "/admin/payment-methods",
+    UPDATE: (id: string) => `/admin/payment-methods/${id}`,
+    DELETE: (id: string) => `/admin/payment-methods/${id}`,
+    ACTIVATE: (id: string) => `/admin/payment-methods/activate/${id}`,
+    DEACTIVATE: (id: string) => `/admin/payment-methods/deactivate/${id}`,
+    SELECT: "/admin/payment-methods/select",
+  },
+  PERMISSION: {
+    GET_ALL: "/admin/permissions",
+    GET_BY_ROLE: (roleId: string) => `/admin/permissions/by-role/${roleId}`,
+    ASSIGN: (roleId: string) => `/admin/permissions/assign-to-role/${roleId}`,
+  },
+  REPORTS: {
+    REVENUE_TIME: "/admin/reports/revenue-time",
+    REVENUE_BY_METHOD: "/admin/reports/revenue-by-method",
+    BOOKINGS_BY_ROUTE: "/admin/reports/bookings-by-route",
+    BOOKINGS_STATUS_BY_ROUTE: "/admin/reports/bookings-status-by-route",
+    TRIPS_STATUS: "/admin/reports/trips-status",
+    TRIPS_STATUS_TREND: "/admin/reports/trips-status-trend",
+    PRINT: {
+      REVENUE_TIME: "/admin/reports/print/revenue-time",
+      REVENUE_BY_METHOD: "/admin/reports/print/revenue-by-method",
+      BOOKINGS_BY_ROUTE: "/admin/reports/print/bookings-by-route",
+      BOOKINGS_STATUS_BY_ROUTE: "/admin/reports/print/bookings-status-by-route",
+      TRIPS_STATUS: "/admin/reports/print/trips-status",
+      TRIPS_STATUS_TREND: "/admin/reports/print/trips-status-trend",
+    },
+  },
+};
+
+interface ApiRoutes {
+  BASE_URL: string;
+  PAYMENT_BASE_URL: string;
+  TIMEOUT: number;
+  HEADERS: {
+    "Content-Type": string;
+    Accept: string;
+    Authorization?: string;
+  };
+}
+
+export default API_ENDPOINTS;
