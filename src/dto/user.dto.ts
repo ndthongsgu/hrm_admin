@@ -1,42 +1,40 @@
 import type { BaseDto } from "./base.dto";
-import type { CustomerDto } from "./customer.dto";
-import type { EmployeeDto } from "./employee.dto";
 import type { RoleDto } from "./role.dto";
 
 export interface UserDto extends BaseDto {
-  userId: number;
-  userUuid: string;
-  fullName: string;
+  username: string;
   email: string;
-  phoneNumber: string;
+  fullName?: string;
+  phoneNumber?: string;
   isActive: boolean;
-  roles: RoleUserDto[];
-  customer: CustomerDto;
-  employee: EmployeeDto;
-}
-
-export interface RoleUserDto {
-  id: number;
-  role: RoleDto;
-  isActive: boolean;
+  roles: RoleDto[];
+  employeeId?: string;
 }
 
 export interface UserFilter {
-  name?: string;
+  username?: string;
   email?: string;
+  fullName?: string;
   phoneNumber?: string;
-  includeRoles?: string[];
-  excludeRoles?: string[];
-  active?: boolean;
+  isActive?: boolean;
+  roleIds?: string[];
 }
 
-export interface UserCreateUpdateDto {
-  fullName: string;
+export interface UserCreateDto {
+  username: string;
   email: string;
-  phoneNumber: string;
-  password?: string;
+  password: string;
+  fullName?: string;
+  phoneNumber?: string;
+  roleIds: string[];
+}
+
+export interface UserUpdateDto {
+  email?: string;
+  fullName?: string;
+  phoneNumber?: string;
+  roleIds?: string[];
   isActive?: boolean;
-  roleIds: number[];
 }
 
 export interface UserPageRequest extends UserFilter {
@@ -49,4 +47,6 @@ export interface UserPageRequest extends UserFilter {
 export interface UserSelectDto {
   id: string;
   username: string;
+  email: string;
+  fullName?: string;
 }

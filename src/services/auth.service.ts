@@ -14,26 +14,37 @@ export const authService = {
       API_ENDPOINTS.AUTH.LOGIN,
       credentials
     );
-    return response.data;
+    // Store token from the new JWT response format
+    const authData = response.data;
+    localStorage.setItem("token", authData.token);
+    // Store user info for later use
+    localStorage.setItem("userId", authData.id);
+    localStorage.setItem("username", authData.username);
+    return authData;
   },
 
   logout: async (): Promise<void> => {
     await apiRequest.post(API_ENDPOINTS.AUTH.LOGOUT);
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
   },
 
   getProfile: async (): Promise<UserProfile> => {
-    const response = await apiRequest.get<UserProfile>(
-      API_ENDPOINTS.AUTH.PROFILE
-    );
-    return response.data;
+    // Backend doesn't have /me endpoint, throw error
+    throw new Error("Backend doesn't have /me endpoint");
+    // const response = await apiRequest.get<UserProfile>(
+    //   API_ENDPOINTS.AUTH.PROFILE
+    // );
+    // return response.data;
   },
 
   getUserInfo: async (): Promise<UserInfo> => {
-    // Use rootApiService which uses the correct Zustand store
-    const response = await rootApiService.get<UserInfo>(API_ENDPOINTS.AUTH.ME);
-    return response;
+    // Backend doesn't have /auth/me endpoint, throw error
+    throw new Error("Backend doesn't have /auth/me endpoint");
+    // const response = await rootApiService.get<UserInfo>(API_ENDPOINTS.AUTH.ME);
+    // return response;
   },
 
   refreshToken: async (refreshToken: string): Promise<{ token: string }> => {

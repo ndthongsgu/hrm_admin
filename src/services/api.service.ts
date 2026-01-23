@@ -31,19 +31,24 @@ const refreshAccessToken = async (): Promise<string> => {
     throw new Error("No refresh token available");
   }
 
-  refreshPromise = request<{ accessToken: string; refreshToken: string }>(
+  console.log("[Token Refresh] Attempting to refresh token via fetch API...");
+  refreshPromise = request<{ accessToken: string; refreshToken: string; token?: string }>(
     API_ENDPOINTS.AUTH.REFRESH,
     "POST",
     {
       skipAuth: true,
-      headers: {
-        Authorization: `Bearer ${refreshToken}`,
-      },
+      body: { refreshToken },
     }
   )
     .then((response) => {
-      authStore.setTokens(response.accessToken, response.refreshToken);
-      return response.accessToken;
+      console.log("[Token Refresh] Token refreshed successfully via fetch API");
+      const accessToken = response.accessToken || response.token;
+      authStore.setTokens(accessToken, response.refreshToken || "");
+      return accessToken;
+    })
+    .catch((error) => {
+      console.error("[Token Refresh] Failed to refresh token via fetch API:", error);
+      throw error;
     })
     .finally(() => {
       refreshPromise = null;
@@ -90,11 +95,28 @@ const request = async <T>(
     body: body ? JSON.stringify(body) : undefined,
   }).then(async (res) => {
     if (!res.ok) {
+      // Log failed request for debugging
+      console.error(`[API Error] ${method} ${url}`, {
+        status: res.status,
+        statusText: res.statusText,
+      });
+
       // Handle 401 Unauthorized - try to refresh token
       if (res.status === 401 && !skipAuth && !url.includes('/auth/refresh')) {
+        const authStore = useAuthStore.getState();
+        const refreshToken = authStore.refreshToken;
+        
+        if (!refreshToken || refreshToken === "") {
+          authStore.clearTokens();
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = `/login?message=${encodeURIComponent('Session expired. Please login again.')}`;
+          }
+          throw new Error('Unauthorized: Token expired and no refresh token');
+        }
         try {
           const newToken = await refreshAccessToken();
           // Retry the original request with new token
+          console.log(`[API Retry] Retrying ${method} ${url} with new token`);
           return request<T>(url, method, {
             ...options,
             headers: {
@@ -102,13 +124,13 @@ const request = async <T>(
               Authorization: `Bearer ${newToken}`,
             },
           });
-        } catch (refreshError) {
-          // Refresh failed, redirect to login but only if we're not already on login page
-          useAuthStore.getState().clearTokens();
+        } catch (refreshError: any) {
+          console.error(`[Token Refresh] Failed for ${method} ${url}:`, refreshError);
+          authStore.clearTokens();
           if (!window.location.pathname.includes('/login')) {
             window.location.href = `/login?message=${encodeURIComponent('Session expired. Please login again.')}`;
           }
-          throw new Error('Session expired');
+          throw new Error('Unauthorized: Token refresh failed');
         }
       }
 

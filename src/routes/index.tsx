@@ -58,6 +58,10 @@ import RevenueReportPage from "@/pages/main/reports/revenue";
 import DetailRoleScreen from "@/pages/main/role-manager/detail";
 import AddRoleScreen from "@/pages/main/role-manager/add";
 import EditRoleScreen from "@/pages/main/role-manager/edit";
+import UserManager from "@/pages/main/user-manager";
+import AddUserScreen from "@/pages/main/user-manager/add";
+import EditUserScreen from "@/pages/main/user-manager/edit";
+import DetailUserScreen from "@/pages/main/user-manager/detail";
 
 export default function AppRoutes() {
   return (
@@ -100,6 +104,23 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.ROLE_MANAGER.Children.DETAIL_ROLE.path}
             element={<DetailRoleScreen />}
+          />
+          {/* Quản lý người dùng */}
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.path}
+            element={<UserManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.ADD_USER.path}
+            element={<AddUserScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.EDIT_USER.path}
+            element={<EditUserScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.DETAIL_USER.path}
+            element={<DetailUserScreen />}
           />
           {/* Quản lý nhân viên */}
           <Route

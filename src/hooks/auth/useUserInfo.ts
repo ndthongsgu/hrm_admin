@@ -18,19 +18,21 @@ export function useLoadUserInfo() {
   const { isAuthenticated, userInfo, setUserInfo } = useAuthStore();
 
   useEffect(() => {
-    const loadUserInfo = async () => {
-      // Only load if authenticated AND userInfo is not loaded yet
-      if (isAuthenticated && !userInfo) {
-        try {
-          const fetchedUserInfo = await authService.getUserInfo();
-          setUserInfo(fetchedUserInfo);
-        } catch (error) {
-          console.error("[useLoadUserInfo] Failed to load user info:", error);
-        }
-      }
-    };
+    // Disabled because backend doesn't have /auth/me endpoint
+    // User info will be loaded from JWT token response when login
+    // const loadUserInfo = async () => {
+    //   // Only load if authenticated AND userInfo is not loaded yet
+    //   if (isAuthenticated && !userInfo) {
+    //     try {
+    //       const fetchedUserInfo = await authService.getUserInfo();
+    //       setUserInfo(fetchedUserInfo);
+    //     } catch (error) {
+    //       console.error("[useLoadUserInfo] Failed to load user info:", error);
+    //     }
+    //   }
+    // };
 
-    loadUserInfo();
+    // loadUserInfo();
   }, [isAuthenticated, userInfo, setUserInfo]);
 }
 

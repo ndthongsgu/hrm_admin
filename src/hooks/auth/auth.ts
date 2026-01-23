@@ -23,20 +23,27 @@ export const useLogin = () => {
     },
     onSuccess: async (data) => {
       try {
-        // Set tokens first
-        setTokens(data.accessToken, data.refreshToken);
-        
-        // Load user info immediately after login
-        const userInfo = await authService.getUserInfo();
-        setUserInfo(userInfo);
-        
+        setTokens(data.accessToken, data.refreshToken || "");
+        // const userInfo: UserInfo = {
+        //   userId: data.id,
+        //   username: data.username,
+        //   email: data.email,
+        //   name: data.username,
+        //   isAdmin: data.roles?.includes('ROLE_ADMIN') || false,
+        //   isGoogle: false,
+        //   permissions: {},
+        // };
+        // setUserInfo(userInfo);
+
         queryClient.clear();
-        navigate('/');
+        // Redirect to dashboard/home page, replace history to prevent back button to login
+        navigate('/', { replace: true });
       } catch (error) {
-        console.error("[useLogin] Failed to load user info:", error);
-        // Still navigate even if userInfo fails, will be loaded by AuthInitializer
+        console.error("[useLogin] Failed to process login:", error);
+        // Still navigate even if processing fails
         queryClient.clear();
-        navigate('/');
+        // Redirect to dashboard/home page, replace history to prevent back button to login
+        navigate('/', { replace: true });
       }
     },
     onError: (error: any) => {
@@ -47,11 +54,12 @@ export const useLogin = () => {
 };
 
 export const useProfile = () => {
+  // Backend doesn't have /me endpoint, disable this query
   return useQuery({
-    queryKey: [API_ENDPOINTS.AUTH.PROFILE],
-    queryFn: () => rootApiService.get<UserProfile>(API_ENDPOINTS.AUTH.PROFILE),
-    retry: false, // Don't retry on 401
-    enabled: useAuthStore.getState().isAuthenticated, // Only run if we think we're authenticated
+    queryKey: ["profile"],
+    queryFn: () => Promise.resolve(null as UserProfile | null),
+    retry: false,
+    enabled: false, // Disable query because backend doesn't have endpoint
   });
 };
 

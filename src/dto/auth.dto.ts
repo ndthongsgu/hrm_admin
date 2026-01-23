@@ -8,9 +8,14 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresIn: number;
+  refreshToken?: string;
+  type: string;
+  id: string;
+  username: string;
+  email: string;
+  roles: string[];
+  // Backward compatibility: also support token
+  token?: string;
 }
 
 export interface ChangePasswordRequest {

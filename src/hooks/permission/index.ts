@@ -1,5 +1,4 @@
 import type { ModulePermission } from "@/dto/auth.dto";
-import type { RolePermissionCreateDto } from "@/dto/role.dto";
 import { API_ENDPOINTS } from "@/services";
 import rootApiService from "@/services/api.service";
 import { useQuery } from "@tanstack/react-query";
@@ -32,8 +31,10 @@ export const useGetPermissionByRole = (roleId: string) => {
     refetch,
   };
 };
+
 export const useAssignPermissionToRole = (roleId: string) => {
-  const assignPermissionToRole = async (permissions: RolePermissionCreateDto[]) => {
+  // Updated to use permissionsJson format: {"EMPLOYEE": ["READ", "CREATE"], ...}
+  const assignPermissionToRole = async (permissions: Record<string, string[]>) => {
     return rootApiService.post(API_ENDPOINTS.PERMISSION.ASSIGN(roleId), permissions);
   };
 

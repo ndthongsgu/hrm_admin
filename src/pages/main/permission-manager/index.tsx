@@ -206,19 +206,24 @@ export default function PermissionManager() {
   }
 
   try {
-    // Build payload theo BE yêu cầu
-    const payload = Object.values(selectedPermissions).map((perm) => ({
-      roleId: filter.roleId,
-      module: perm.code,
-      isCanRead: !!perm.isCanRead,
-      isCanCreate: !!perm.isCanCreate,
-      isCanUpdate: !!perm.isCanUpdate,
-      isCanDelete: !!perm.isCanDelete,
-      isCanActivate: !!perm.isCanActivate,
-      isCanDeactivate: !!perm.isCanDeactivate,
-      isCanImport: !!perm.isCanImport,
-      isCanExport: !!perm.isCanExport,
-    }));
+    // Transform to new JSON format: {"EMPLOYEE": ["READ", "CREATE"], ...}
+    const payload: Record<string, string[]> = {};
+
+    Object.values(selectedPermissions).forEach((perm) => {
+      const actions: string[] = [];
+      if (perm.isCanRead) actions.push("READ");
+      if (perm.isCanCreate) actions.push("CREATE");
+      if (perm.isCanUpdate) actions.push("UPDATE");
+      if (perm.isCanDelete) actions.push("DELETE");
+      if (perm.isCanActivate) actions.push("ACTIVATE");
+      if (perm.isCanDeactivate) actions.push("DEACTIVATE");
+      if (perm.isCanImport) actions.push("IMPORT");
+      if (perm.isCanExport) actions.push("EXPORT");
+
+      if (actions.length > 0) {
+        payload[perm.code] = actions;
+      }
+    });
 
     await assignPermissionToRole(payload);
 

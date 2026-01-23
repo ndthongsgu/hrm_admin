@@ -140,6 +140,21 @@ export const ROUTES = {
             },
           },
         },
+        ADD_USER: {
+          key: "ADD_USER",
+          label: "Thêm người dùng",
+          path: "/user_manager/add",
+        },
+        EDIT_USER: {
+          key: "EDIT_USER",
+          label: "Chỉnh sửa người dùng",
+          path: "/user_manager/edit/:id",
+        },
+        DETAIL_USER: {
+          key: "DETAIL_USER",
+          label: "Chi tiết người dùng",
+          path: "/user_manager/detail/:id",
+        },
       },
     },
 

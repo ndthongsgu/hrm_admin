@@ -44,6 +44,20 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const authStore = useAuthStore.getState();
 
+    // Log failed API calls for debugging
+    if (error.response) {
+      console.error(`[API Error] ${originalRequest.method?.toUpperCase()} ${originalRequest.url}`, {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+      });
+    } else {
+      console.error(`[API Error] ${originalRequest.method?.toUpperCase()} ${originalRequest.url}`, {
+        message: error.message,
+        code: error.code,
+      });
+    }
+
     // Don't try to refresh token for these cases:
     // 1. Auth-related endpoints (login, refresh, password reset)
     // 2. Requests that explicitly skip auth
@@ -59,30 +73,39 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+      const refreshToken = authStore.refreshToken;
+      
+      if (!refreshToken || refreshToken === "") {
+        console.warn("[Token Refresh] No refresh token available");
+        authStore.clearTokens();
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = `/login?message=${encodeURIComponent(
+            "Session expired. Please login again."
+          )}`;
+        }
+        return Promise.reject(error);
+      }
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const refreshToken = authStore.refreshToken;
-          if (!refreshToken) {
-            throw new Error("No refresh token available");
-          }
-
+          console.log("[Token Refresh] Attempting to refresh token...");
           const { data } = await axios.post(
             `${API_ROUTES.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-            {},
+            { refreshToken },
             {
               headers: {
-                Authorization: `Bearer ${refreshToken}`,
+                "Content-Type": "application/json",
               },
             }
           );
 
-          authStore.setTokens(data.accessToken, data.refreshToken);
-          onRefreshed(data.accessToken);
+          console.log("[Token Refresh] Token refreshed successfully");
+          authStore.setTokens(data.accessToken || data.token, data.refreshToken || "");
+          onRefreshed(data.accessToken || data.token);
           return axiosInstance(originalRequest);
-        } catch (err) {
+        } catch (err: any) {
+          console.error("[Token Refresh] Failed to refresh token:", err);
           authStore.clearTokens();
-          // Only redirect if not already on login page
           if (!window.location.pathname.includes("/login")) {
             window.location.href = `/login?message=${encodeURIComponent(
               "Session expired. Please login again."

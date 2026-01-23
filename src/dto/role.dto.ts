@@ -1,16 +1,25 @@
 import type { BaseDto } from "./base.dto";
 
-export interface RoleCreateUpdateDto {
+export interface RoleDto extends BaseDto {
   code: string;
   name: string;
   description?: string;
+  permissionsJson?: Record<string, string[]>; // JSON format: {"EMPLOYEE": ["READ", "CREATE"], ...}
+  isActive: boolean;
+}
+
+export interface RoleCreateDto {
+  code: string;
+  name: string;
+  description?: string;
+  permissionsJson?: Record<string, string[]>;
 }
 
 export interface RoleUpdateDto {
-  code: string;
-  name: string;
+  code?: string;
+  name?: string;
   description?: string;
-  permissions: RolePermissionCreateDto[];
+  permissionsJson?: Record<string, string[]>;
 }
 
 export interface RolePageRequest {
@@ -18,22 +27,19 @@ export interface RolePageRequest {
   size: number;
   sortBy?: string;
   sortDirection?: string;
+  code?: string;
+  name?: string;
+  isActive?: boolean;
 }
 
-export interface RoleDto extends BaseDto {
+export interface RoleSelectDto {
+  id: string;
   code: string;
   name: string;
-  description: string;
 }
 
-export interface RolePermissionCreateDto {
+// Permission structure for frontend use
+export interface RolePermission {
   module: string;
-  isCanRead: boolean;
-  isCanCreate: boolean;
-  isCanUpdate: boolean;
-  isCanDelete: boolean;
-  isCanActivate: boolean;
-  isCanDeactivate: boolean;
-  isCanExport: boolean;
-  isCanImport: boolean;
+  actions: string[];
 }

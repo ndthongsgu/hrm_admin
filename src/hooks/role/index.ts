@@ -1,6 +1,6 @@
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
-import type { RoleCreateUpdateDto, RoleDto } from "@/dto/role.dto";
+import type { RoleCreateDto, RoleUpdateDto, RoleDto } from "@/dto/role.dto";
 import API_ENDPOINTS from "@/services/api-route";
 import rootApiService from "@/services/api.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -65,7 +65,7 @@ export const useCreateRole = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
   const { mutateAsync: onCreateRole, isPending: isLoading } = useMutation({
-    mutationFn: (body: RoleCreateUpdateDto) =>
+    mutationFn: (body: RoleCreateDto) =>
       rootApiService.post<SuccessResponse>(API_ENDPOINTS.ROLE.CREATE, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
@@ -94,10 +94,10 @@ export const useCreateRole = () => {
 
 export const useUpdateRole = (id: string) => {
   const queryClient = useQueryClient();
-  const url = API_ENDPOINTS.ROLE.UPDATE(id.toString());
+  const url = API_ENDPOINTS.ROLE.UPDATE(id);
   const showToast = useToast();
   const { mutateAsync: onUpdateRole, isPending: isLoading } = useMutation({
-    mutationFn: (body: RoleCreateUpdateDto) =>
+    mutationFn: (body: RoleUpdateDto) =>
       rootApiService.put<SuccessResponse>(url, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({

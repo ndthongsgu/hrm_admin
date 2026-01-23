@@ -40,7 +40,7 @@ apiClient.interceptors.response.use(
         const refreshToken = localStorage.getItem("refreshToken");
         if (refreshToken) {
           const response = await axios.post(
-            `${API_ROUTES.BASE_URL}/api/auth/refresh`,
+            `${API_ROUTES.BASE_URL}/auth/refresh`,
             {
               refreshToken,
             }
@@ -52,11 +52,13 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        if (!BYPASS_AUTH) {
-          window.location.href = "/login";
-        }
+        console.error("[api-client] Token refresh failed:", refreshError);
+        // Don't auto-redirect, let the component handle the error
+        // localStorage.removeItem("token");
+        // localStorage.removeItem("refreshToken");
+        // if (!BYPASS_AUTH) {
+        //   window.location.href = "/login";
+        // }
       }
     }
 
