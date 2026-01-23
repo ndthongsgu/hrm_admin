@@ -1,0 +1,26 @@
+.app-sidebar-menu {
+  // item hover
+  .ant-menu-item:hover,
+  .ant-menu-submenu-title:hover {
+    background: rgba(37, 99, 235, 0.08) !important;
+  }
+
+  // selected menu item
+  .ant-menu-item-selected {
+    background: rgba(37, 99, 235, 0.14) !important;
+    color: #2563eb !important;
+    font-weight: 600;
+  }
+
+  // selected submenu title (when a child is active)
+  .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: #2563eb !important;
+    font-weight: 600;
+  }
+
+  // left indicator bar for selected item
+  .ant-menu-item-selected::after {
+    border-right: 3px solid #2563eb !important;
+  }
+}
+

@@ -13,8 +13,7 @@ export const API_ENDPOINTS = {
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     REFRESH: "/auth/refresh",
-    // PROFILE: "/me", // Backend doesn't have this endpoint
-    // ME: "/auth/me", // Backend doesn't have this endpoint 
+    ME: "/auth/me", // Get current user info with permissions
     PASSWORD_CHANGE: "/auth/change-password",
     PASSWORD_RESET_REQUEST: "/auth/password-reset/request",
     PASSWORD_RESET_CONFIRM: "/auth/password-reset/confirm",

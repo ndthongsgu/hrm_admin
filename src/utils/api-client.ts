@@ -1,6 +1,7 @@
 import { API_ROUTES } from "@/services";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import axios from "axios";
+import { useAuthStore } from "@/hooks/auth/useAuthStore";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_ROUTES.BASE_URL,
@@ -37,7 +38,9 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
+        // Use Zustand store instead of localStorage
+        const authStore = useAuthStore.getState();
+        const refreshToken = authStore.refreshToken;
         if (refreshToken) {
           const response = await axios.post(
             `${API_ROUTES.BASE_URL}/auth/refresh`,
@@ -46,19 +49,21 @@ apiClient.interceptors.response.use(
             }
           );
 
-          const { token } = response.data;
-          localStorage.setItem("token", token);
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiClient(originalRequest);
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          const token = accessToken || response.data.token;
+          
+          // Update Zustand store
+          if (token) {
+            authStore.setTokens(token, newRefreshToken || refreshToken);
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          }
         }
       } catch (refreshError) {
         console.error("[api-client] Token refresh failed:", refreshError);
+        // Clear tokens from Zustand store
+        useAuthStore.getState().clearTokens();
         // Don't auto-redirect, let the component handle the error
-        // localStorage.removeItem("token");
-        // localStorage.removeItem("refreshToken");
-        // if (!BYPASS_AUTH) {
-        //   window.location.href = "/login";
-        // }
       }
     }
 

@@ -1,41 +1,82 @@
 import type { BaseDto } from "./base.dto";
-import type { RoleDto } from "./role.dto";
 
 export interface EmployeeDto extends BaseDto {
   code: string;
-  name: string;
-  email: string;
-  phone: string;
-  description?: string;
-  roles: RoleDto[];
+  fullName: string;
+  email?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  address?: string;
+  taxCode?: string;
+  socialInsuranceNumber?: string;
+  healthInsuranceNumber?: string;
+  bankAccount?: string;
+  bankName?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  departmentId?: string;
+  departmentName?: string;
+  positionId?: string;
+  positionName?: string;
+  hireDate?: string;
+  terminationDate?: string;
+  isActive: boolean;
+  userId?: string;
+  notes?: string;
 }
 
 export interface EmployeeCreateDto {
   code: string;
-  name: string;
-  email: string;
-  phone: string;
-  description?: string;
-  roles: RoleDto[];
+  fullName: string;
+  email?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  address?: string;
+  taxCode?: string;
+  socialInsuranceNumber?: string;
+  healthInsuranceNumber?: string;
+  bankAccount?: string;
+  bankName?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  departmentId?: string;
+  positionId?: string;
+  hireDate?: string;
+  userId?: string;
+  notes?: string;
 }
 
 export interface EmployeeUpdateDto {
-  code: string;
-  name: string;
-  email: string;
-  phone: string;
-  description?: string;
-  roles: RoleDto[];
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  address?: string;
+  taxCode?: string;
+  socialInsuranceNumber?: string;
+  healthInsuranceNumber?: string;
+  bankAccount?: string;
+  bankName?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  departmentId?: string;
+  positionId?: string;
+  hireDate?: string;
+  terminationDate?: string;
+  notes?: string;
 }
 
 export interface EmployeeFilter {
   code?: string;
-  name?: string;
+  fullName?: string;
   email?: string;
-  phone?: string;
-  isDeleted?: boolean;
-  roleIds?: string[]; // role filter
-  roleFilterMode?: "OR" | "AND" | "EXCLUDE"; // filter mode
+  phoneNumber?: string;
+  departmentId?: string;
+  positionId?: string;
+  isActive?: boolean;
 }
 
 export interface EmployeePageRequest extends EmployeeFilter {
@@ -43,4 +84,12 @@ export interface EmployeePageRequest extends EmployeeFilter {
   size: number;
   sortBy?: string;
   sortDirection?: string;
+}
+
+export interface EmployeeSelectDto {
+  id: string;
+  code: string;
+  fullName: string;
+  departmentName?: string;
+  positionName?: string;
 }

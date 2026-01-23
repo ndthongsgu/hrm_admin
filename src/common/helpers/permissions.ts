@@ -14,10 +14,29 @@ export function isAdmin(userInfo: UserInfo | null): boolean {
 }
 
 /**
+ * Map PermissionAction to backend action string
+ */
+function mapActionToBackend(action: PermissionAction): string {
+  const actionMap: Record<PermissionAction, string> = {
+    isCanRead: "READ",
+    isCanCreate: "CREATE",
+    isCanUpdate: "UPDATE",
+    isCanDelete: "DELETE",
+    isCanActivate: "ACTIVATE",
+    isCanDeactivate: "DEACTIVATE",
+    isCanImport: "IMPORT",
+    isCanExport: "EXPORT",
+  };
+  return actionMap[action] || action;
+}
+
+/**
  * Check if user has permission for a specific module and action
  * 
  * IMPORTANT: Admin users (isAdmin = true) automatically have ALL permissions
  * and this function will always return true for them.
+ * 
+ * Permissions format: {"EMPLOYEE": ["READ","CREATE"], "PAYROLL": ["READ"]}
  */
 export function hasPermission(
   moduleCode: ModuleCodeType,
@@ -33,12 +52,14 @@ export function hasPermission(
     return false;
   }
 
-  const modulePermission = userInfo.permissions[moduleCode];
-  if (!modulePermission) {
+  const moduleActions = userInfo.permissions[moduleCode];
+  if (!moduleActions || !Array.isArray(moduleActions)) {
     return false;
   }
 
-  return modulePermission[action] === true;
+  // Map frontend action to backend action string
+  const backendAction = mapActionToBackend(action);
+  return moduleActions.includes(backendAction);
 }
 
 /**
@@ -62,22 +83,26 @@ export function canAccessModule(
  * Get all accessible modules for user
  * 
  * IMPORTANT: Admin users get access to ALL modules in their permissions object
+ * 
+ * Permissions format: {"EMPLOYEE": ["READ","CREATE"], "PAYROLL": ["READ"]}
  */
 export function getAccessibleModules(
   userInfo: UserInfo | null
-): ModulePermission[] {
-  if (!userInfo) {
+): string[] {
+  if (!userInfo || !userInfo.permissions) {
     return [];
   }
 
   // ⚠️ ADMIN BYPASS: Admin can access all modules
   if (isAdmin(userInfo)) {
-    return Object.values(userInfo.permissions || {});
+    return Object.keys(userInfo.permissions);
   }
 
-  return Object.values(userInfo.permissions || {}).filter(
-    (permission) => permission.isCanRead
-  );
+  // Return modules that have READ permission
+  return Object.keys(userInfo.permissions).filter((moduleCode) => {
+    const actions = userInfo.permissions[moduleCode];
+    return actions && Array.isArray(actions) && actions.includes("READ");
+  });
 }
 
 /**
@@ -85,7 +110,7 @@ export function getAccessibleModules(
  */
 export function getAccessibleRoutes(userInfo: UserInfo | null): string[] {
   const accessibleModules = getAccessibleModules(userInfo);
-  return accessibleModules.map((module) => module.urlPageView);
+  return accessibleModules.map((module) => `/${module.toLowerCase()}`);
 }
 
 /**
@@ -125,12 +150,13 @@ export function hasAllPermissions(
 }
 
 /**
- * Get permission for a specific module
+ * Get permission actions for a specific module
+ * Returns array of action strings like ["READ", "CREATE", "UPDATE"]
  */
 export function getModulePermission(
   moduleCode: ModuleCodeType,
   userInfo: UserInfo | null
-): ModulePermission | null {
+): string[] | null {
   if (!userInfo || !userInfo.permissions) {
     return null;
   }

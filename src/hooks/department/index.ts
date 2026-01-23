@@ -1,0 +1,225 @@
+import type { PaginationDto } from "@/dto/base.dto";
+import type {
+  DepartmentCreateDto,
+  DepartmentDto,
+  DepartmentFilter,
+  DepartmentPageRequest,
+  DepartmentUpdateDto,
+  DepartmentSelectDto,
+} from "@/dto/department.dto";
+import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
+import { useRouter } from "@/routes/hooks";
+import { API_ENDPOINTS } from "@/services";
+import rootApiService from "@/services/api.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../layout/useToast";
+
+export const usePaginationDepartment = (
+  params: PaginationDto<DepartmentFilter>
+) => {
+  const requestParams: DepartmentPageRequest = {
+    page: Math.floor(params.skip / params.take),
+    size: params.take,
+    sortBy: params.sortBy || "createdDate",
+    sortDirection: params.sortDirection || "DESC",
+    ...params.where,
+  };
+
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION, params],
+    queryFn: () =>
+      rootApiService.get<PaginationResponse<DepartmentDto>>(
+        `${API_ENDPOINTS.DEPARTMENT.PAGINATION}?${new URLSearchParams(
+          Object.entries(requestParams).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+              acc[key] = String(value);
+            }
+            return acc;
+          }, {} as Record<string, string>)
+        )}`
+      ),
+  });
+
+  return {
+    data: data?.content || [],
+    total: data?.totalElements || 0,
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+export const useAllDepartments = () => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [API_ENDPOINTS.DEPARTMENT.GET_ALL],
+    queryFn: () =>
+      rootApiService.get<DepartmentDto[]>(API_ENDPOINTS.DEPARTMENT.GET_ALL),
+  });
+
+  return {
+    data: data || [],
+    isLoading,
+    refetch,
+  };
+};
+
+export const useDetailDepartment = (id: string) => {
+  const url = API_ENDPOINTS.DEPARTMENT.FIND_BY_ID(id);
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [url],
+    queryFn: () => rootApiService.get<DepartmentDto>(url),
+    enabled: !!id,
+  });
+
+  return {
+    data: data,
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+export const useCreateDepartment = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+  const router = useRouter();
+  const { mutateAsync: onCreateDepartment, isPending: isLoading } = useMutation({
+    mutationFn: (body: DepartmentCreateDto) =>
+      rootApiService.post<SuccessResponse>(API_ENDPOINTS.DEPARTMENT.CREATE, body),
+    onSuccess: (res: SuccessResponse) => {
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.DEPARTMENT.SELECT],
+      });
+      showToast({
+        type: "success",
+        message: res.message || "Tạo phòng ban thành công!",
+        title: "Thành công",
+      });
+      router.back();
+    },
+    onError: (error: any) => {
+      showToast({
+        type: "error",
+        message: error?.message || "Tạo phòng ban thất bại!",
+        title: "Thất bại",
+      });
+    },
+  });
+
+  return { onCreateDepartment, isLoading };
+};
+
+export const useUpdateDepartment = (id: string) => {
+  const queryClient = useQueryClient();
+  const url = API_ENDPOINTS.DEPARTMENT.UPDATE(id);
+  const router = useRouter();
+  const showToast = useToast();
+  const { mutateAsync: onUpdateDepartment, isPending: isLoading } = useMutation({
+    mutationFn: (body: DepartmentUpdateDto) =>
+      rootApiService.put<SuccessResponse>(url, body),
+    onSuccess: (res: SuccessResponse) => {
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.DEPARTMENT.FIND_BY_ID(id)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.DEPARTMENT.SELECT],
+      });
+      showToast({
+        type: "success",
+        message: res.message || "Cập nhật phòng ban thành công!",
+        title: "Thành công",
+      });
+      router.back();
+    },
+    onError: (error: any) => {
+      showToast({
+        type: "error",
+        message: error?.message || "Cập nhật phòng ban thất bại!",
+        title: "Thất bại",
+      });
+    },
+  });
+
+  return { onUpdateDepartment, isLoading };
+};
+
+export const useDeActivateDepartment = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onDeActivateDepartment, isPending: isLoading } =
+    useMutation({
+      mutationFn: (id: string) =>
+        rootApiService.put<PaginationResponse<DepartmentDto>>(
+          API_ENDPOINTS.DEPARTMENT.DEACTIVATE(id), {}
+        ),
+      onSuccess: (res) => {
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION],
+        });
+        showToast({
+          type: "success",
+          title: "Thành công",
+          message: res.message || "Ngưng hoạt động phòng ban thành công!",
+        });
+      },
+      onError: (error: any) => {
+        showToast({
+          type: "error",
+          title: "Lỗi",
+          message: error?.message || "Ngưng hoạt động phòng ban thất bại!",
+        });
+      },
+    });
+
+  return { onDeActivateDepartment, isLoading };
+};
+
+export const useActivateDepartment = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onActivateDepartment, isPending: isLoading } = useMutation(
+    {
+      mutationFn: (id: string) =>
+        rootApiService.put<PaginationResponse<DepartmentDto>>(
+          API_ENDPOINTS.DEPARTMENT.ACTIVATE(id), {}
+        ),
+      onSuccess: (res) => {
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION],
+        });
+        showToast({
+          type: "success",
+          title: "Thành công",
+          message: res.message || "Kích hoạt phòng ban thành công!",
+        });
+      },
+      onError: (error: any) => {
+        showToast({
+          type: "error",
+          title: "Lỗi",
+          message: error?.message || "Kích hoạt phòng ban thất bại!",
+        });
+      },
+    }
+  );
+
+  return { onActivateDepartment, isLoading };
+};
+
+export const useSelectBoxDepartments = () => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [API_ENDPOINTS.DEPARTMENT.SELECT],
+    queryFn: () =>
+      rootApiService.get<DepartmentSelectDto[]>(API_ENDPOINTS.DEPARTMENT.SELECT),
+  });
+
+  return { data: data || [], isLoading, refetch };
+};

@@ -9,13 +9,11 @@ import { CommonActions } from "@/components/row-action/CommonAction";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { EmployeeDto, EmployeeFilter } from "@/dto/employee.dto";
-import type { RoleDto } from "@/dto/role.dto";
 import {
   useActivateEmployee,
   useDeActivateEmployee,
   usePaginationEmployee,
 } from "@/hooks/employee";
-import { useSelectBoxRoles } from "@/hooks/role";
 import { useRouter } from "@/routes/hooks";
 import {
   EditOutlined,
@@ -28,17 +26,14 @@ import { useState } from "react";
 
 const initFilter: EmployeeFilter = {
   code: "",
-  name: "",
+  fullName: "",
   email: "",
-  phone: "",
-  isDeleted: undefined,
-  roleIds: [],
-  roleFilterMode: "OR",
+  phoneNumber: "",
+  isActive: undefined,
 };
 
 export default function EmployeeManager() {
   const router = useRouter();
-  const { data: roles = [] } = useSelectBoxRoles();
   const [filter, setFilter] = useState<EmployeeFilter>(initFilter);
   const [pagination, setPagination] = useState<PaginationDto<EmployeeFilter>>({
     skip: 0,
@@ -64,7 +59,6 @@ export default function EmployeeManager() {
   };
 
   const filterFields: FilterField[] = [
-    // ... existing fields ...
     {
       key: "code",
       label: "Mã nhân viên",
@@ -73,7 +67,7 @@ export default function EmployeeManager() {
       col: 6,
     },
     {
-      key: "name",
+      key: "fullName",
       label: "Tên nhân viên",
       type: "input",
       placeholder: "Nhập tên nhân viên",
@@ -87,44 +81,21 @@ export default function EmployeeManager() {
       col: 6,
     },
     {
-      key: "phone",
+      key: "phoneNumber",
       label: "Số điện thoại",
       type: "input",
       placeholder: "Nhập số điện thoại",
       col: 6,
     },
     {
-      key: "roleIds",
-      label: "Vai trò",
-      type: "multiSelect",
-      placeholder: "Chọn vai trò",
-      options: roles.map((role) => ({
-        label: role.name,
-        value: role.id,
-      })),
-      col: 6,
-    },
-    {
-      key: "roleFilterMode",
-      label: "Loại lọc vai trò",
-      type: "select",
-      placeholder: "Chọn loại lọc",
-      options: [
-        { label: "Có bất kỳ vai trò (OR)", value: "OR" },
-        { label: "Có tất cả vai trò (AND)", value: "AND" },
-        { label: "Không có vai trò (EXCLUDE)", value: "EXCLUDE" },
-      ],
-      col: 6,
-    },
-    {
-      key: "isDeleted",
+      key: "isActive",
       label: "Trạng thái",
       type: "select",
       placeholder: "Chọn trạng thái",
       options: [
         { label: "Tất cả", value: undefined },
-        { label: "Hoạt động", value: false },
-        { label: "Không hoạt động", value: true },
+        { label: "Hoạt động", value: true },
+        { label: "Không hoạt động", value: false },
       ],
       col: 6,
     },
@@ -139,15 +110,16 @@ export default function EmployeeManager() {
 
   const [columnWidths] = useState<Record<string, number>>({
     code: 120,
-    name: 200,
+    fullName: 200,
     email: 200,
-    phone: 150,
-    isDeleted: 120,
+    phoneNumber: 150,
+    departmentName: 150,
+    positionName: 150,
+    isActive: 120,
     actions: 120,
   });
 
   const columns = [
-    // ... existing columns ...
     {
       title: "Mã",
       dataIndex: "code",
@@ -156,9 +128,9 @@ export default function EmployeeManager() {
     },
     {
       title: "Tên nhân viên",
-      dataIndex: "name",
-      key: "name",
-      width: columnWidths.name,
+      dataIndex: "fullName",
+      key: "fullName",
+      width: columnWidths.fullName,
     },
     {
       title: "Email",
@@ -168,46 +140,42 @@ export default function EmployeeManager() {
     },
     {
       title: "Số điện thoại",
-      dataIndex: "phone",
-      key: "phone",
-      width: columnWidths.phone,
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      width: columnWidths.phoneNumber,
     },
     {
-      title: "Vai trò",
-      dataIndex: "roles",
-      key: "roles",
-      width: 200,
-      render: (roles: RoleDto[]) => (
-        <div>
-          {roles?.slice(0, 2).map((role) => (
-            <Tag key={role.id} color="blue" style={{ marginBottom: "2px" }}>
-              {role.name}
-            </Tag>
-          ))}
-          {roles && roles.length > 2 && <Tag>+{roles.length - 2} more</Tag>}
-        </div>
-      ),
+      title: "Phòng ban",
+      dataIndex: "departmentName",
+      key: "departmentName",
+      width: columnWidths.departmentName,
+    },
+    {
+      title: "Chức vụ",
+      dataIndex: "positionName",
+      key: "positionName",
+      width: columnWidths.positionName,
     },
     {
       title: "Trạng thái",
-      dataIndex: "isDeleted",
-      key: "isDeleted",
-      width: columnWidths.isDeleted,
-      render: (isDeleted: boolean) => {
+      dataIndex: "isActive",
+      key: "isActive",
+      width: columnWidths.isActive,
+      render: (isActive: boolean) => {
         const colorMap = {
-          true: "red",
-          false: "green",
+          true: "green",
+          false: "red",
         };
         const textMap = {
-          true: "Không hoạt động",
-          false: "Hoạt động",
+          true: "Hoạt động",
+          false: "Không hoạt động",
         };
         return (
           <Row justify={"center"}>
             <Tag
-              color={colorMap[isDeleted as unknown as keyof typeof colorMap]}
+              color={colorMap[isActive as unknown as keyof typeof colorMap]}
             >
-              {textMap[isDeleted as unknown as keyof typeof textMap]}
+              {textMap[isActive as unknown as keyof typeof textMap]}
             </Tag>
           </Row>
         );

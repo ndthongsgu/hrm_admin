@@ -64,7 +64,8 @@ export interface UserInfo {
   name: string;
   isAdmin: boolean;
   isGoogle: boolean;
-  permissions: Record<string, ModulePermission>;
+  // Permissions in JSON format from backend: {"EMPLOYEE": ["READ","CREATE"], "PAYROLL": ["READ"]}
+  permissions: Record<string, string[]>;
 }
 
 // Module Codes

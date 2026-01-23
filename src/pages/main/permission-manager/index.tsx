@@ -2,13 +2,9 @@ import BaseView from "@/components/base-view/BaseView";
 import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
-import type { ModulePermission } from "@/dto/auth.dto";
-import {
-  useAssignPermissionToRole,
-  useGetPermissionByRole,
-} from "@/hooks/permission";
 import { useSelectBoxRoles } from "@/hooks/role";
 import { useToast } from "@/hooks/layout/useToast";
+import { useUpdateRole, useRoleDetail } from "@/hooks/role";
 import { SaveOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -34,44 +30,44 @@ const initFilter: PermissionFilter = {};
 
 export default function PermissionManager() {
   const [filter, setFilter] = useState<PermissionFilter>(initFilter);
+  // Permissions JSON format: {"EMPLOYEE":["READ","CREATE"], ...}
   const [selectedPermissions, setSelectedPermissions] = useState<
-    Record<string, ModulePermission>
+    Record<string, string[]>
   >({});
   const [hasChanges, setHasChanges] = useState(false);
 
   const { data: roles, isLoading: isLoadingRoles } = useSelectBoxRoles();
-  const {
-    data: rolePermissions,
-    isLoading: isLoadingRolePermissions,
-    refetch: refetchRolePermissions,
-  } = useGetPermissionByRole(filter.roleId || "");
-  const { assignPermissionToRole } = useAssignPermissionToRole(
-    filter.roleId || ""
-  );
+  const { data: roleDetail, isLoading: isLoadingRoleDetail, refetch: refetchRoleDetail } =
+    useRoleDetail(filter.roleId || "");
+  const { onUpdateRole, isLoading: isSaving } = useUpdateRole(filter.roleId || "");
   const showToast = useToast();
 
-  // Load permissions when role changes
+  // Load role detail when role changes
   useEffect(() => {
     if (filter.roleId) {
-      refetchRolePermissions();
+      refetchRoleDetail();
     }
-  }, [filter.roleId, refetchRolePermissions]);
+  }, [filter.roleId, refetchRoleDetail]);
 
-  // Update selected permissions when role permissions load
+  // Update selected permissions when role detail loads
   useEffect(() => {
-    if (rolePermissions && rolePermissions.length > 0) {
-      const permissionMap: Record<string, ModulePermission> = {};
-      rolePermissions.forEach((perm) => {
-        permissionMap[perm.code] = perm;
-      });
-      setSelectedPermissions(permissionMap);
+    if (!filter.roleId) return;
+
+    try {
+      const raw = roleDetail?.permissionsJson;
+      if (!raw) {
+        setSelectedPermissions({});
+      } else if (typeof raw === "string") {
+        setSelectedPermissions(JSON.parse(raw));
+      } else {
+        setSelectedPermissions({});
+      }
       setHasChanges(false);
-    } else if (filter.roleId) {
-      // Reset to empty permissions when role has no permissions
+    } catch {
       setSelectedPermissions({});
       setHasChanges(false);
     }
-  }, [filter.roleId]);
+  }, [filter.roleId, roleDetail?.permissionsJson]);
 
   const handleSearch = (isReset?: boolean) => {
     if (isReset) {
@@ -101,39 +97,12 @@ export default function PermissionManager() {
     setHasChanges(false);
   };
 
-  const handlePermissionChange = (
-    code: string,
-    permission: keyof Omit<
-      ModulePermission,
-      "code" | "name" | "description" | "urlPageView"
-    >,
-    value: boolean
-  ) => {
+  const toggleAction = (moduleCode: string, action: string, checked: boolean) => {
     setSelectedPermissions((prev) => {
-      const currentModule = prev[code] || {
-        code,
-        name: rolePermissions?.find((p) => p.code === code)?.name || code,
-        description:
-          rolePermissions?.find((p) => p.code === code)?.description || "",
-        urlPageView:
-          rolePermissions?.find((p) => p.code === code)?.urlPageView || "",
-        isCanRead: false,
-        isCanCreate: false,
-        isCanUpdate: false,
-        isCanDelete: false,
-        isCanActivate: false,
-        isCanDeactivate: false,
-        isCanImport: false,
-        isCanExport: false,
-      };
-
-      return {
-        ...prev,
-        [code]: {
-          ...currentModule,
-          [permission]: value,
-        },
-      };
+      const current = new Set(prev[moduleCode] || []);
+      if (checked) current.add(action);
+      else current.delete(action);
+      return { ...prev, [moduleCode]: Array.from(current) };
     });
     setHasChanges(true);
   };
@@ -142,53 +111,20 @@ export default function PermissionManager() {
     const moduleConfig = module_show_map[code]; // lấy config module từ map
 
     setSelectedPermissions((prev) => {
-      const currentModule = prev[code] || {
-        code,
-        name: rolePermissions?.find((p) => p.code === code)?.name || code,
-        description:
-          rolePermissions?.find((p) => p.code === code)?.description || "",
-        urlPageView:
-          rolePermissions?.find((p) => p.code === code)?.urlPageView || "",
-        isCanRead: false,
-        isCanCreate: false,
-        isCanUpdate: false,
-        isCanDelete: false,
-        isCanActivate: false,
-        isCanDeactivate: false,
-        isCanImport: false,
-        isCanExport: false,
-      };
-
-      // chỉ gán những quyền được phép (module_show_map = true)
+      const actions: string[] = [];
+      if (checked) {
+        if (moduleConfig?.isCanRead) actions.push("READ");
+        if (moduleConfig?.isCanCreate) actions.push("CREATE");
+        if (moduleConfig?.isCanUpdate) actions.push("UPDATE");
+        if (moduleConfig?.isCanDelete) actions.push("DELETE");
+        if (moduleConfig?.isCanActivate) actions.push("ACTIVATE");
+        if (moduleConfig?.isCanDeactivate) actions.push("DEACTIVATE");
+        if (moduleConfig?.isCanImport) actions.push("IMPORT");
+        if (moduleConfig?.isCanExport) actions.push("EXPORT");
+      }
       return {
         ...prev,
-        [code]: {
-          ...currentModule,
-          isCanRead: moduleConfig?.isCanRead
-            ? checked
-            : currentModule.isCanRead,
-          isCanCreate: moduleConfig?.isCanCreate
-            ? checked
-            : currentModule.isCanCreate,
-          isCanUpdate: moduleConfig?.isCanUpdate
-            ? checked
-            : currentModule.isCanUpdate,
-          isCanDelete: moduleConfig?.isCanDelete
-            ? checked
-            : currentModule.isCanDelete,
-          isCanActivate: moduleConfig?.isCanActivate
-            ? checked
-            : currentModule.isCanActivate,
-          isCanDeactivate: moduleConfig?.isCanDeactivate
-            ? checked
-            : currentModule.isCanDeactivate,
-          isCanImport: moduleConfig?.isCanImport
-            ? checked
-            : currentModule.isCanImport,
-          isCanExport: moduleConfig?.isCanExport
-            ? checked
-            : currentModule.isCanExport,
-        },
+        [code]: actions,
       };
     });
 
@@ -206,26 +142,10 @@ export default function PermissionManager() {
   }
 
   try {
-    // Transform to new JSON format: {"EMPLOYEE": ["READ", "CREATE"], ...}
-    const payload: Record<string, string[]> = {};
-
-    Object.values(selectedPermissions).forEach((perm) => {
-      const actions: string[] = [];
-      if (perm.isCanRead) actions.push("READ");
-      if (perm.isCanCreate) actions.push("CREATE");
-      if (perm.isCanUpdate) actions.push("UPDATE");
-      if (perm.isCanDelete) actions.push("DELETE");
-      if (perm.isCanActivate) actions.push("ACTIVATE");
-      if (perm.isCanDeactivate) actions.push("DEACTIVATE");
-      if (perm.isCanImport) actions.push("IMPORT");
-      if (perm.isCanExport) actions.push("EXPORT");
-
-      if (actions.length > 0) {
-        payload[perm.code] = actions;
-      }
+    // Persist to Role.permissionsJson (backend expects string)
+    await onUpdateRole({
+      permissionsJson: JSON.stringify(selectedPermissions),
     });
-
-    await assignPermissionToRole(payload);
 
     showToast({
       title: "Thành công!",
@@ -233,7 +153,7 @@ export default function PermissionManager() {
       type: "success",
     });
     setHasChanges(false);
-    refetchRolePermissions();
+    refetchRoleDetail();
   } catch (error: any) {
     showToast({
       title: "Thất bại!",
@@ -247,13 +167,13 @@ export default function PermissionManager() {
   const columns = [
     {
       title: "Module",
-      dataIndex: "name",
+      dataIndex: "code",
       key: "name",
       width: 200,
       fixed: "left" as const,
-      render: (text: string, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Space direction="vertical" size={0}>
-          <Text strong>{text}</Text>
+          <Text strong>{module_show_map[record.code]?.name || record.code}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             {record.code}
           </Text>
@@ -265,18 +185,22 @@ export default function PermissionManager() {
       key: "selectAll",
       width: 100,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => {
-        const currentPerm = selectedPermissions[record.code];
+      render: (_: any, record: { code: string }) => {
+        const moduleConfig = module_show_map[record.code];
+        const selected = new Set(selectedPermissions[record.code] || []);
+        const allActions = [
+          moduleConfig?.isCanRead ? "READ" : null,
+          moduleConfig?.isCanCreate ? "CREATE" : null,
+          moduleConfig?.isCanUpdate ? "UPDATE" : null,
+          moduleConfig?.isCanDelete ? "DELETE" : null,
+          moduleConfig?.isCanActivate ? "ACTIVATE" : null,
+          moduleConfig?.isCanDeactivate ? "DEACTIVATE" : null,
+          moduleConfig?.isCanImport ? "IMPORT" : null,
+          moduleConfig?.isCanExport ? "EXPORT" : null,
+        ].filter(Boolean) as string[];
+
         const allSelected =
-          currentPerm &&
-          currentPerm.isCanRead &&
-          currentPerm.isCanCreate &&
-          currentPerm.isCanUpdate &&
-          currentPerm.isCanDelete &&
-          currentPerm.isCanActivate &&
-          currentPerm.isCanDeactivate &&
-          currentPerm.isCanImport &&
-          currentPerm.isCanExport;
+          allActions.length > 0 && allActions.every((a) => selected.has(a));
 
         return (
           <Checkbox
@@ -291,16 +215,14 @@ export default function PermissionManager() {
     },
     {
       title: "Xem",
-      dataIndex: "isCanRead",
+      dataIndex: "READ",
       key: "isCanRead",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanRead || false}
-          onChange={(e) =>
-            handlePermissionChange(record.code, "isCanRead", e.target.checked)
-          }
+          checked={(selectedPermissions[record.code] || []).includes("READ")}
+          onChange={(e) => toggleAction(record.code, "READ", e.target.checked)}
           disabled={!filter.roleId || !module_show_map[record.code]?.isCanRead}
         />
       ),
@@ -311,11 +233,11 @@ export default function PermissionManager() {
       key: "isCanCreate",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanCreate || false}
+          checked={(selectedPermissions[record.code] || []).includes("CREATE")}
           onChange={(e) =>
-            handlePermissionChange(record.code, "isCanCreate", e.target.checked)
+            toggleAction(record.code, "CREATE", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanCreate
@@ -329,11 +251,11 @@ export default function PermissionManager() {
       key: "isCanUpdate",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanUpdate || false}
+          checked={(selectedPermissions[record.code] || []).includes("UPDATE")}
           onChange={(e) =>
-            handlePermissionChange(record.code, "isCanUpdate", e.target.checked)
+            toggleAction(record.code, "UPDATE", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanUpdate
@@ -347,11 +269,11 @@ export default function PermissionManager() {
       key: "isCanDelete",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanDelete || false}
+          checked={(selectedPermissions[record.code] || []).includes("DELETE")}
           onChange={(e) =>
-            handlePermissionChange(record.code, "isCanDelete", e.target.checked)
+            toggleAction(record.code, "DELETE", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanDelete
@@ -365,15 +287,11 @@ export default function PermissionManager() {
       key: "isCanActivate",
       width: 100,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanActivate || false}
+          checked={(selectedPermissions[record.code] || []).includes("ACTIVATE")}
           onChange={(e) =>
-            handlePermissionChange(
-              record.code,
-              "isCanActivate",
-              e.target.checked
-            )
+            toggleAction(record.code, "ACTIVATE", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanActivate
@@ -387,15 +305,11 @@ export default function PermissionManager() {
       key: "isCanDeactivate",
       width: 120,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanDeactivate || false}
+          checked={(selectedPermissions[record.code] || []).includes("DEACTIVATE")}
           onChange={(e) =>
-            handlePermissionChange(
-              record.code,
-              "isCanDeactivate",
-              e.target.checked
-            )
+            toggleAction(record.code, "DEACTIVATE", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanDeactivate
@@ -409,11 +323,11 @@ export default function PermissionManager() {
       key: "isCanImport",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanImport || false}
+          checked={(selectedPermissions[record.code] || []).includes("IMPORT")}
           onChange={(e) =>
-            handlePermissionChange(record.code, "isCanImport", e.target.checked)
+            toggleAction(record.code, "IMPORT", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanImport
@@ -427,11 +341,11 @@ export default function PermissionManager() {
       key: "isCanExport",
       width: 80,
       align: "center" as const,
-      render: (_: any, record: ModulePermission) => (
+      render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={selectedPermissions[record.code]?.isCanExport || false}
+          checked={(selectedPermissions[record.code] || []).includes("EXPORT")}
           onChange={(e) =>
-            handlePermissionChange(record.code, "isCanExport", e.target.checked)
+            toggleAction(record.code, "EXPORT", e.target.checked)
           }
           disabled={
             !filter.roleId || !module_show_map[record.code]?.isCanExport
@@ -441,7 +355,9 @@ export default function PermissionManager() {
     },
   ];
 
-  const isLoading = isLoadingRolePermissions || isLoadingRoles;
+  const isLoading = isLoadingRoleDetail || isLoadingRoles || isSaving;
+
+  const moduleRows = Object.keys(module_show_map).map((code) => ({ code }));
 
   return (
     <BaseView>
@@ -482,7 +398,7 @@ export default function PermissionManager() {
             <Spin spinning={isLoading}>
               <Table
                 columns={columns}
-                dataSource={rolePermissions || []}
+                dataSource={moduleRows}
                 rowKey="code"
                 pagination={false}
                 scroll={{ x: 1200 }}
