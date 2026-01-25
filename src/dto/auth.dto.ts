@@ -14,6 +14,7 @@ export interface AuthResponse {
   username: string;
   email: string;
   roles: string[];
+  isAdmin?: boolean;
   // Backward compatibility: also support token
   token?: string;
 }

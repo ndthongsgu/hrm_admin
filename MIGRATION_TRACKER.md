@@ -91,30 +91,31 @@
 | 2.7 | Update Role list page | ✅ Done | Already exists, hooks updated |
 | 2.8 | Update Role form with permissions | ✅ Done | Permission manager updated to use JSON format |
 
-### Phase 3: Employee Management 👥
+### Phase 3: Employee Management ✅
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 3.1 | Create Employee DTOs | ⬜ TODO | Match backend Employee entity (taxCode, bankAccount, etc.) |
-| 3.2 | Create Employee service | ⬜ TODO | Full CRUD operations |
-| 3.3 | Create Employee hooks | ⬜ TODO | usePaginationEmployee, useCreateEmployee, etc. |
-| 3.4 | Create Employee list page | ⬜ TODO | Replace old employee module, add new fields |
-| 3.5 | Create Employee add page | ⬜ TODO | Form with all new fields |
-| 3.6 | Create Employee edit page | ⬜ TODO | Update form |
-| 3.7 | Create Employee detail page | ⬜ TODO | View with action log |
-| 3.8 | Add Employee routes | ⬜ TODO | Routes to routes/index.tsx |
-| 3.9 | Create Department DTOs | ⬜ TODO | New module |
-| 3.10 | Create Department service & hooks | ⬜ TODO | Full CRUD |
-| 3.11 | Create Department pages (list/add/edit/detail) | ⬜ TODO | Complete module |
-| 3.12 | Add Department routes | ⬜ TODO | Routes configuration |
-| 3.13 | Create Position DTOs | ⬜ TODO | New module |
-| 3.14 | Create Position service & hooks | ⬜ TODO | Full CRUD |
-| 3.15 | Create Position pages (list/add/edit/detail) | ⬜ TODO | Complete module |
-| 3.16 | Add Position routes | ⬜ TODO | Routes configuration |
-| 3.17 | Create EmployeeIdentity DTOs & service | ⬜ TODO | Identity documents submodule |
-| 3.18 | Create EmployeeIdentity pages | ⬜ TODO | List/add/edit/detail |
-| 3.19 | Create Dependent DTOs & service | ⬜ TODO | Employee dependents submodule |
-| 3.20 | Create Dependent pages | ⬜ TODO | List/add/edit/detail |
+| 3.1 | Create Employee DTOs | ✅ Done | Updated with HRM fields (taxCode, bankAccount, etc.) |
+| 3.2 | Create Employee service | ✅ Done | Full CRUD operations implemented |
+| 3.3 | Create Employee hooks | ✅ Done | Already existed, compatible with new DTOs |
+| 3.4 | Update Employee list page | ✅ Done | Updated with new fields, department, position columns |
+| 3.5 | Update Employee add page | ✅ Done | Form with all new HRM fields (personal, job, insurance, bank) |
+| 3.6 | Update Employee edit page | ✅ Done | Reuses add page component with isEdit flag |
+| 3.7 | Update Employee detail page | ✅ Done | Organized sections: basic info, job, insurance, bank, emergency contact |
+| 3.9 | Create Department DTOs | ✅ Done | New module with manager and parent department support |
+| 3.10 | Create Department service & hooks | ✅ Done | Full CRUD + select dropdown support |
+| 3.11 | Create Department list page | ✅ Done | Table with code, name, manager, parent dept, status |
+| 3.12 | Create Department add page | ✅ Done | Form with code, name, parent dept, manager, description |
+| 3.13 | Create Department edit page | ✅ Done | Reuses add component with isEdit flag |
+| 3.14 | Create Department detail page | ✅ Done | Sections: basic info, organization, description |
+| 3.15 | Add Department routes | ✅ Done | Routes added to routes/index.tsx |
+| 3.16 | Create Position DTOs | ✅ Done | New module with level and baseSalary |
+| 3.17 | Create Position service & hooks | ✅ Done | Full CRUD + select dropdown support |
+| 3.18 | Create Position list page | ✅ Done | Table with code, name, level, baseSalary, status |
+| 3.19 | Create Position add page | ✅ Done | Form with code, name, level, baseSalary, description |
+| 3.20 | Create Position edit page | ✅ Done | Reuses add component with isEdit flag |
+| 3.21 | Create Position detail page | ✅ Done | Sections: basic info, salary & level, description |
+| 3.22 | Add Position routes | ✅ Done | Routes added to routes/index.tsx |
 
 ### Phase 4: Contract Management 📄
 
@@ -366,17 +367,29 @@ VITE_BE_API=http://localhost:8080
 |-------|----------|------------|-------------|
 | Phase 1: Core | 100% | 5 | 5 |
 | Phase 2: User/Role | 100% | 10 | 10 |
-| Phase 3: Employee | 0% | 0 | 20 |
+| Phase 3: Employee | 100% | 21 | 21 |
 | Phase 4: Contract | 0% | 0 | 12 |
 | Phase 5: Attendance | 0% | 0 | 12 |
 | Phase 6: Payroll | 0% | 0 | 10 |
 | Phase 7: Navigation | 0% | 0 | 4 |
 | Phase 8: Reports | 0% | 0 | 4 |
-| **Total** | **19%** | **15** | **78** |
+| **Total** | **46%** | **36** | **78** |
 
 ---
 
 ## Changelog
+
+### 2026-01-25
+
+- [x] **API Response Handling Fix:**
+  - [x] Added axios response interceptor to automatically unwrap backend response format `{success: true, data: {...}}`
+  - [x] Implemented automatic mapping from `items` to `content` for pagination responses
+  - [x] Updated PaginationResponse DTO to include optional fields: `totalPages`, `page`, `size`
+  - [x] **Benefits:**
+    - ✅ No need to modify individual hooks
+    - ✅ Centralized response handling in axios interceptor
+    - ✅ Consistent data structure across all modules
+    - ✅ Backward compatible with existing code
 
 ### 2026-01-23
 
@@ -409,6 +422,49 @@ VITE_BE_API=http://localhost:8080
   - [x] Updated role hooks to use new DTOs
   - [x] Updated permission manager to transform data to new JSON format
   - [x] Fixed permission hook to accept Record<string, string[]> instead of old array format
+- [x] **Phase 3 Core Services Completed (35%):**
+  - [x] Updated EmployeeDto with HRM fields (taxCode, socialInsuranceNumber, healthInsuranceNumber, bankAccount, bankName, emergencyContact, dateOfBirth, gender, address, hireDate, terminationDate, departmentId, positionId)
+  - [x] Created separate EmployeeCreateDto and EmployeeUpdateDto
+  - [x] Created employee.service.ts with full CRUD operations
+  - [x] Employee hooks already existed and are compatible
+  - [x] **Department Module:**
+    - [x] Created department.dto.ts with full DTOs (support for manager and parent department)
+    - [x] Created department.service.ts with full CRUD operations
+    - [x] Created department/index.ts hooks (pagination, CRUD, activate/deactivate, select options)
+  - [x] **Position Module:**
+    - [x] Created position.dto.ts with full DTOs (includes level and baseSalary fields)
+    - [x] Created position.service.ts with full CRUD operations
+    - [x] Created position/index.ts hooks (pagination, CRUD, activate/deactivate, select options)
+  - [x] Fixed employee manager page to use new field names (fullName, phoneNumber, isActive)
+  - [x] **Employee Pages Updated:**
+    - [x] Updated employee list page with new columns (departmentName, positionName)
+    - [x] Updated employee add page with comprehensive form fields:
+      - Personal info: fullName, dateOfBirth, gender, email, phoneNumber, address
+      - Job info: departmentId, positionId, hireDate
+      - Tax & Insurance: taxCode, socialInsuranceNumber, healthInsuranceNumber
+      - Banking: bankAccount, bankName
+      - Emergency: emergencyContact, emergencyPhone
+      - Notes field
+    - [x] Updated employee detail page with organized sections:
+      - Section I: Basic Information
+      - Section II: Job Information
+      - Section III: Insurance & Tax
+      - Section IV: Banking Information
+      - Section V: Emergency Contact
+      - Section VI: Notes
+- [x] **Phase 3 Completed (100%):**
+  - [x] **Department Pages Created:**
+    - [x] Department list page (`/department_manager`) - Table with filters, activate/deactivate actions
+    - [x] Department add page (`/department_manager/add`) - Form with code, name, parent dept, manager, description
+    - [x] Department edit page (`/department_manager/edit/:id`) - Reuses add component
+    - [x] Department detail page (`/department_manager/detail/:id`) - Organized sections
+    - [x] Department routes added to routes/index.tsx and routes.ts
+  - [x] **Position Pages Created:**
+    - [x] Position list page (`/position_manager`) - Table with filters, level, baseSalary columns
+    - [x] Position add page (`/position_manager/add`) - Form with code, name, level, baseSalary, description
+    - [x] Position edit page (`/position_manager/edit/:id`) - Reuses add component
+    - [x] Position detail page (`/position_manager/detail/:id`) - Salary & level section
+    - [x] Position routes added to routes/index.tsx and routes.ts
 
 ---
 

@@ -45,7 +45,7 @@ export const useLogin = () => {
             username: data.username,
             email: data.email,
             name: data.username,
-            isAdmin: data.roles?.includes("ROLE_ADMIN") || false,
+            isAdmin: data.isAdmin || false,
             isGoogle: false,
             permissions: {}, // Will be empty if /me endpoint fails
           };

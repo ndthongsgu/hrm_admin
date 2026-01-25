@@ -7,10 +7,7 @@ import type { PaginationDto } from "@/dto/base.dto";
 import type { RoleDto } from "@/dto/role.dto";
 import { usePaginationRole } from "@/hooks/role";
 import { useRouter } from "@/routes/hooks";
-import {
-  EditOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Row, Tag } from "antd";
 import { useState } from "react";
 
@@ -25,10 +22,7 @@ export default function RoleManager() {
   const { data, total, isLoading } = usePaginationRole(pagination);
 
   const handleCreate = () => {
-    router.push(
-      ROUTES.MAIN.ROLE_MANAGER.Children.ADD_ROLE
-        .path
-    );
+    router.push(ROUTES.MAIN.ROLE_MANAGER.Children.ADD_ROLE.path);
   };
 
   const [columnWidths] = useState<Record<string, number>>({
@@ -92,8 +86,8 @@ export default function RoleManager() {
         router.push(
           ROUTES.MAIN.ROLE_MANAGER.Children.DETAIL_ROLE.path.replace(
             ":id",
-            record.id
-          )
+            record.id,
+          ),
         );
       },
     },
@@ -108,8 +102,8 @@ export default function RoleManager() {
         router.push(
           ROUTES.MAIN.ROLE_MANAGER.Children.EDIT_ROLE.path.replace(
             ":id",
-            record.id
-          )
+            record.id,
+          ),
         );
       },
     },

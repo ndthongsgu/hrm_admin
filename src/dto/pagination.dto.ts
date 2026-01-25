@@ -7,6 +7,9 @@ export interface PaginationDto<T> {
 export interface PaginationResponse<T> {
   content: T[];
   totalElements: number;
+  totalPages?: number;
+  page?: number;
+  size?: number;
   message?: string;
 }
 

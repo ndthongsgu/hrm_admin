@@ -40,7 +40,35 @@ axiosInstance.interceptors.request.use((config) => {
 
 // Response interceptor: handle 401 and refresh
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Unwrap backend response format: {success: true, data: {...}, timestamp: "..."}
+    // and map pagination items to content for consistency
+    const responseData = response.data;
+    
+    // Check if response has the wrapped format: {success: true, data: {...}}
+    if (responseData && typeof responseData === 'object' && 'success' in responseData && 'data' in responseData) {
+      const innerData = responseData.data;
+      
+      // Check if this is a pagination response with items array
+      if (innerData && typeof innerData === 'object' && 'items' in innerData && Array.isArray(innerData.items)) {
+        // Map items to content for frontend consistency
+        response.data = {
+          content: innerData.items,
+          totalElements: innerData.totalElements || 0,
+          totalPages: innerData.totalPages,
+          page: innerData.page,
+          size: innerData.size,
+          message: responseData.message,
+        };
+      } else if (innerData) {
+        // For non-pagination responses, just unwrap the data
+        response.data = innerData;
+      }
+    }
+    // If response doesn't have wrapped format, return as-is (backward compatibility)
+    
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const authStore = useAuthStore.getState();
@@ -123,7 +151,7 @@ axiosInstance.interceptors.response.use(
               username: data.username,
               email: data.email || "",
               name: data.username,
-              isAdmin: data.roles?.includes("ROLE_ADMIN") || false,
+              isAdmin: data.isAdmin || false,
               isGoogle: false,
               permissions: authStore.getUserInfo()?.permissions || {}, // Preserve existing permissions
             };

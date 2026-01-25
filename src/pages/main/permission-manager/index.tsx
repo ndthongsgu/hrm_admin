@@ -2,9 +2,8 @@ import BaseView from "@/components/base-view/BaseView";
 import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
-import { useSelectBoxRoles } from "@/hooks/role";
+import { useSelectBoxRoles, useRoleDetail, useUpdateRole } from "@/hooks/role";
 import { useToast } from "@/hooks/layout/useToast";
-import { useUpdateRole, useRoleDetail } from "@/hooks/role";
 import { SaveOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -30,44 +29,30 @@ const initFilter: PermissionFilter = {};
 
 export default function PermissionManager() {
   const [filter, setFilter] = useState<PermissionFilter>(initFilter);
-  // Permissions JSON format: {"EMPLOYEE":["READ","CREATE"], ...}
+  // Permissions format: {"EMPLOYEE":["READ","CREATE"], "PAYROLL":["READ"]}
   const [selectedPermissions, setSelectedPermissions] = useState<
     Record<string, string[]>
   >({});
   const [hasChanges, setHasChanges] = useState(false);
 
   const { data: roles, isLoading: isLoadingRoles } = useSelectBoxRoles();
-  const { data: roleDetail, isLoading: isLoadingRoleDetail, refetch: refetchRoleDetail } =
-    useRoleDetail(filter.roleId || "");
-  const { onUpdateRole, isLoading: isSaving } = useUpdateRole(filter.roleId || "");
+  const {
+    data: roleDetail,
+    isLoading: isLoadingRoleDetail,
+    refetch: refetchRoleDetail,
+  } = useRoleDetail(filter.roleId || "");
+  const { onUpdateRole, isLoading: isSaving } = useUpdateRole(
+    filter.roleId || ""
+  );
   const showToast = useToast();
-
-  // Load role detail when role changes
-  useEffect(() => {
-    if (filter.roleId) {
-      refetchRoleDetail();
-    }
-  }, [filter.roleId, refetchRoleDetail]);
 
   // Update selected permissions when role detail loads
   useEffect(() => {
     if (!filter.roleId) return;
-
-    try {
-      const raw = roleDetail?.permissionsJson;
-      if (!raw) {
-        setSelectedPermissions({});
-      } else if (typeof raw === "string") {
-        setSelectedPermissions(JSON.parse(raw));
-      } else {
-        setSelectedPermissions({});
-      }
-      setHasChanges(false);
-    } catch {
-      setSelectedPermissions({});
-      setHasChanges(false);
-    }
-  }, [filter.roleId, roleDetail?.permissionsJson]);
+    // roleDetail.permissions is already parsed as Record<string, string[]> from service
+    setSelectedPermissions(roleDetail?.permissions || {});
+    setHasChanges(false);
+  }, [filter.roleId, roleDetail?.permissions]);
 
   const handleSearch = (isReset?: boolean) => {
     if (isReset) {
@@ -108,7 +93,7 @@ export default function PermissionManager() {
   };
 
   const handleSelectAllModule = (code: string, checked: boolean) => {
-    const moduleConfig = module_show_map[code]; // lấy config module từ map
+    const moduleConfig = module_show_map[code];
 
     setSelectedPermissions((prev) => {
       const actions: string[] = [];
@@ -132,37 +117,36 @@ export default function PermissionManager() {
   };
 
   const handleSavePermissions = async () => {
-  if (!filter.roleId) {
-    showToast({
-      title: "Lỗi!",
-      message: "Vui lòng chọn vai trò",
-      type: "error",
-    });
-    return;
-  }
+    if (!filter.roleId) {
+      showToast({
+        title: "Lỗi!",
+        message: "Vui lòng chọn vai trò",
+        type: "error",
+      });
+      return;
+    }
 
-  try {
-    // Persist to Role.permissionsJson (backend expects string)
-    await onUpdateRole({
-      permissionsJson: JSON.stringify(selectedPermissions),
-    });
+    try {
+      // Send permissions as object, service layer will transform to permissionsJson string
+      await onUpdateRole({
+        permissions: selectedPermissions,
+      });
 
-    showToast({
-      title: "Thành công!",
-      message: "Phân quyền thành công!",
-      type: "success",
-    });
-    setHasChanges(false);
-    refetchRoleDetail();
-  } catch (error: any) {
-    showToast({
-      title: "Thất bại!",
-      message: error?.message || "Phân quyền thất bại!",
-      type: "error",
-    });
-  }
-};
-
+      showToast({
+        title: "Thành công!",
+        message: "Phân quyền thành công!",
+        type: "success",
+      });
+      setHasChanges(false);
+      refetchRoleDetail();
+    } catch (error: any) {
+      showToast({
+        title: "Thất bại!",
+        message: error?.message || "Phân quyền thất bại!",
+        type: "error",
+      });
+    }
+  };
 
   const columns = [
     {
@@ -229,7 +213,7 @@ export default function PermissionManager() {
     },
     {
       title: "Thêm",
-      dataIndex: "isCanCreate",
+      dataIndex: "CREATE",
       key: "isCanCreate",
       width: 80,
       align: "center" as const,
@@ -247,7 +231,7 @@ export default function PermissionManager() {
     },
     {
       title: "Sửa",
-      dataIndex: "isCanUpdate",
+      dataIndex: "UPDATE",
       key: "isCanUpdate",
       width: 80,
       align: "center" as const,
@@ -265,7 +249,7 @@ export default function PermissionManager() {
     },
     {
       title: "Xóa",
-      dataIndex: "isCanDelete",
+      dataIndex: "DELETE",
       key: "isCanDelete",
       width: 80,
       align: "center" as const,
@@ -283,7 +267,7 @@ export default function PermissionManager() {
     },
     {
       title: "Kích hoạt",
-      dataIndex: "isCanActivate",
+      dataIndex: "ACTIVATE",
       key: "isCanActivate",
       width: 100,
       align: "center" as const,
@@ -301,7 +285,7 @@ export default function PermissionManager() {
     },
     {
       title: "Vô hiệu hóa",
-      dataIndex: "isCanDeactivate",
+      dataIndex: "DEACTIVATE",
       key: "isCanDeactivate",
       width: 120,
       align: "center" as const,
@@ -319,7 +303,7 @@ export default function PermissionManager() {
     },
     {
       title: "Nhập",
-      dataIndex: "isCanImport",
+      dataIndex: "IMPORT",
       key: "isCanImport",
       width: 80,
       align: "center" as const,
@@ -337,7 +321,7 @@ export default function PermissionManager() {
     },
     {
       title: "Xuất",
-      dataIndex: "isCanExport",
+      dataIndex: "EXPORT",
       key: "isCanExport",
       width: 80,
       align: "center" as const,

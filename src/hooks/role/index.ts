@@ -1,5 +1,5 @@
 import type { PaginationDto } from "@/dto/base.dto";
-import type { SuccessResponse } from "@/dto/pagination.dto";
+import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
 import type { RoleCreateDto, RoleUpdateDto, RoleDto } from "@/dto/role.dto";
 import API_ENDPOINTS from "@/services/api-route";
 import rootApiService from "@/services/api.service";
@@ -7,23 +7,24 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../layout/useToast";
 
 export const usePaginationRole = (params: PaginationDto<object>) => {
-  const page = Math.floor(params.skip / params.take);
-  const size = params.take;
+  const requestParams = {
+    page: Math.floor(params.skip / params.take),
+    size: params.take,
+    sortBy: params.sortBy || "createdDate",
+    sortDirection: params.sortDirection || "ASC",
+  };
 
   const { data, isLoading, refetch, error } = useQuery({
-    queryKey: [API_ENDPOINTS.ROLE.PAGINATION, page, size],
-    queryFn: async () => {
-      // Backend: GET /api/roles?page=0&size=20 -> BaseResponse<PageResponse<Role>>
-      const res = await rootApiService.get<{
-        success: boolean;
-        data: { items: RoleDto[]; totalElements: number; page: number; size: number };
-      }>(`${API_ENDPOINTS.ROLE.PAGINATION}?page=${page}&size=${size}`);
-      return res.data;
-    },
+    queryKey: [API_ENDPOINTS.ROLE.PAGINATION, requestParams],
+    queryFn: () =>
+      rootApiService.post<PaginationResponse<RoleDto>>(
+        API_ENDPOINTS.ROLE.PAGINATION,
+        requestParams,
+      ),
   });
 
   return {
-    data: data?.items || [],
+    data: data?.content || [],
     total: data?.totalElements || 0,
     isLoading,
     refetch,
@@ -125,17 +126,72 @@ export const useUpdateRole = (id: string) => {
 
 export const useSelectBoxRoles = () => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["roles_select_box"],
-    queryFn: async () => {
-      const res = await rootApiService.get<{
-        success: boolean;
-        data: { items: RoleDto[] };
-      }>(`${API_ENDPOINTS.ROLE.LIST_ALL}?page=0&size=1000`);
-      return res.data.items || [];
-    },
+    queryKey: [API_ENDPOINTS.ROLE.SELECT],
+    queryFn: () => rootApiService.get<RoleDto[]>(API_ENDPOINTS.ROLE.SELECT),
   });
 
   return { data, isLoading, refetch };
 };
 
-// Note: Backend currently does not implement activate/deactivate endpoints for roles.
+export const useDeActivateRole = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onDeActivateRole, isPending: isLoading } = useMutation({
+    mutationFn: (id: string) =>
+      rootApiService.post<PaginationResponse<RoleDto>>(
+        API_ENDPOINTS.ROLE.DEACTIVATE(id),
+      ),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.ROLE.PAGINATION],
+      });
+      showToast({
+        type: "success",
+        title: "Thành công",
+        message: res.message || "Ngưng hoạt động vai trò thành công!",
+      });
+    },
+    onError: (error: any) => {
+      showToast({
+        type: "error",
+        title: "Lỗi",
+        message: error?.message || "Ngưng hoạt động vai trò thất bại!",
+      });
+    },
+  });
+
+  return { onDeActivateRole, isLoading };
+};
+
+// Active
+export const useActivateRole = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onActivateRole, isPending: isLoading } = useMutation({
+    mutationFn: (id: string) =>
+      rootApiService.post<PaginationResponse<RoleDto>>(
+        API_ENDPOINTS.ROLE.ACTIVATE(id),
+      ),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.ROLE.PAGINATION],
+      });
+      showToast({
+        type: "success",
+        title: "Thành công",
+        message: res.message || "Kích hoạt vai trò thành công!",
+      });
+    },
+    onError: (error: any) => {
+      showToast({
+        type: "error",
+        title: "Lỗi",
+        message: error?.message || "Kích hoạt vai trò thất bại!",
+      });
+    },
+  });
+
+  return { onActivateRole, isLoading };
+};

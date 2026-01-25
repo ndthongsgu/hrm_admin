@@ -55,7 +55,7 @@ const refreshAccessToken = async (): Promise<string> => {
           username: response.username,
           email: response.email || "",
           name: response.username,
-          isAdmin: response.roles?.includes("ROLE_ADMIN") || false,
+          isAdmin: response.isAdmin || false,
           isGoogle: false,
           permissions: authStore.getUserInfo()?.permissions || {}, // Preserve existing permissions
         };
