@@ -84,6 +84,8 @@ export const ModuleCode = {
   CAR_TYPE: "CAR_TYPE",
   PAYMENT_METHOD: "PAYMENT_METHOD",
   PERMISSION: "PERMISSION",
+  DEPARTMENT: "DEPARTMENT",
+  POSITION: "POSITION",
 } as const;
 
 export type ModuleCodeType = (typeof ModuleCode)[keyof typeof ModuleCode];

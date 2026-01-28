@@ -3,6 +3,8 @@ import {
   LockOutlined,
   SafetyOutlined,
   UserOutlined,
+  ApartmentOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
@@ -42,7 +44,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       label: ROUTES.MAIN.HOME.label,
     },
 
-    // HRM: User Manager (Employee / Customer)
+    // HRM: User Manager (Employee)
     {
       key: ROUTES.MAIN.USER_MANAGER.key,
       path: ROUTES.MAIN.USER_MANAGER.path,
@@ -54,12 +56,6 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           path: ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.path,
           label: ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.label,
           moduleCode: ModuleCode.EMPLOYEE,
-        },
-        {
-          key: ROUTES.MAIN.USER_MANAGER.children.CUSTOMER_MANAGER.key,
-          path: ROUTES.MAIN.USER_MANAGER.children.CUSTOMER_MANAGER.path,
-          label: ROUTES.MAIN.USER_MANAGER.children.CUSTOMER_MANAGER.label,
-          moduleCode: ModuleCode.CUSTOMER,
         },
       ],
     },
@@ -78,6 +74,24 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       icon: <LockOutlined />,
       label: ROUTES.MAIN.PERMISSION_MANAGER.label,
       moduleCode: ModuleCode.PERMISSION,
+    },
+
+    // Department Manager
+    {
+      key: ROUTES.MAIN.DEPARTMENT_MANAGER.key,
+      path: ROUTES.MAIN.DEPARTMENT_MANAGER.path,
+      icon: <ApartmentOutlined />,
+      label: ROUTES.MAIN.DEPARTMENT_MANAGER.label,
+      moduleCode: ModuleCode.DEPARTMENT,
+    },
+
+    // Position Manager
+    {
+      key: ROUTES.MAIN.POSITION_MANAGER.key,
+      path: ROUTES.MAIN.POSITION_MANAGER.path,
+      icon: <TeamOutlined />,
+      label: ROUTES.MAIN.POSITION_MANAGER.label,
+      moduleCode: ModuleCode.POSITION,
     },
   ];
 
@@ -168,12 +182,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
   const renderMenuItems = (items: MenuItem[]) =>
     items.map((item) =>
       item.children ? (
-        <Menu.SubMenu
-          key={item.key}
-          icon={item.icon}
-          title={item.label}
-          onTitleClick={() => navigate(item.path)}
-        >
+        <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
           {item.children.map((child) => (
             <Menu.Item key={child.key} onClick={() => navigate(child.path)}>
               {child.label}

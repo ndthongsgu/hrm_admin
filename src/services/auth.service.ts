@@ -38,9 +38,12 @@ export const authService = {
   },
 
   getUserInfo: async (): Promise<UserInfo> => {
-    const response = await rootApiService.get<{ data: UserInfo }>(API_ENDPOINTS.AUTH.ME);
-    return response.data;
+    // Note: `axiosInstance` unwraps backend format { success, data } -> data in its response interceptor,
+    // so rootApiService.get<UserInfo> returns the inner UserInfo directly.
+    const response = await rootApiService.get<UserInfo>(API_ENDPOINTS.AUTH.ME);
+    return response;
   },
+
 
   refreshToken: async (refreshToken: string): Promise<{ token: string }> => {
     const response = await apiRequest.post<{ token: string }>(
