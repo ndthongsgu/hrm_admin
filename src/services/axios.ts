@@ -1,6 +1,7 @@
 import axios from "axios";
 import API_ENDPOINTS, { API_ROUTES } from "./api-route";
 import { useAuthStore } from "@/hooks/auth/useAuthStore";
+import type { AuthResponse, UserInfo } from "@/dto/auth.dto";
 
 const axiosInstance = axios.create({
   baseURL: API_ROUTES.BASE_URL,
@@ -39,10 +40,58 @@ axiosInstance.interceptors.request.use((config) => {
 
 // Response interceptor: handle 401 and refresh
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Unwrap backend response format: {success: true, data: {...}, timestamp: "..."}
+    // and map pagination items to content for consistency
+    const responseData = response.data;
+    
+    // Check if response has the wrapped format: {success: true, data: {...}}
+    if (responseData && typeof responseData === 'object' && 'success' in responseData && 'data' in responseData) {
+      const innerData = responseData.data;
+      
+      // Check if this is a pagination response with items array
+      if (innerData && typeof innerData === 'object' && 'items' in innerData && Array.isArray(innerData.items)) {
+        // Map items to content for frontend consistency
+        response.data = {
+          content: innerData.items,
+          totalElements: innerData.totalElements || 0,
+          totalPages: innerData.totalPages,
+          page: innerData.page,
+          size: innerData.size,
+          message: responseData.message,
+        };
+      } else if (innerData) {
+        // For non-pagination responses, just unwrap the data
+        response.data = innerData;
+      }
+    }
+    // If response doesn't have wrapped format, return as-is (backward compatibility)
+    
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const authStore = useAuthStore.getState();
+
+    // Log failed API calls for debugging
+    if (error.response) {
+      console.error(
+        `[API Error] ${originalRequest.method?.toUpperCase()} ${originalRequest.url}`,
+        {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+        },
+      );
+    } else {
+      console.error(
+        `[API Error] ${originalRequest.method?.toUpperCase()} ${originalRequest.url}`,
+        {
+          message: error.message,
+          code: error.code,
+        },
+      );
+    }
 
     // Don't try to refresh token for these cases:
     // 1. Auth-related endpoints (login, refresh, password reset)
@@ -59,33 +108,64 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+      const refreshToken = authStore.refreshToken;
+
+      if (!refreshToken || refreshToken === "") {
+        console.warn("[Token Refresh] No refresh token available");
+        authStore.clearTokens();
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = `/login?message=${encodeURIComponent(
+            "Session expired. Please login again.",
+          )}`;
+        }
+        return Promise.reject(error);
+      }
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const refreshToken = authStore.refreshToken;
-          if (!refreshToken) {
-            throw new Error("No refresh token available");
-          }
-
-          const { data } = await axios.post(
+          console.log("[Token Refresh] Attempting to refresh token...");
+          const { data } = await axios.post<AuthResponse>(
             `${API_ROUTES.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-            {},
+            { refreshToken },
             {
               headers: {
-                Authorization: `Bearer ${refreshToken}`,
+                "Content-Type": "application/json",
               },
-            }
+            },
           );
 
-          authStore.setTokens(data.accessToken, data.refreshToken);
-          onRefreshed(data.accessToken);
+          console.log("[Token Refresh] Token refreshed successfully");
+
+          // Ensure accessToken exists (it's required in AuthResponse)
+          const accessToken = data.accessToken || data.token;
+          if (!accessToken) {
+            throw new Error("No access token in refresh response");
+          }
+
+          authStore.setTokens(accessToken, data.refreshToken || "");
+
+          // Update userInfo from refresh response if available
+          if (data.id && data.username) {
+            const userInfo: UserInfo = {
+              userId: data.id,
+              username: data.username,
+              email: data.email || "",
+              name: data.username,
+              isAdmin: data.isAdmin || false,
+              isGoogle: false,
+              permissions: authStore.getUserInfo()?.permissions || {}, // Preserve existing permissions
+            };
+            authStore.setUserInfo(userInfo);
+          }
+
+          onRefreshed(accessToken);
           return axiosInstance(originalRequest);
-        } catch (err) {
+        } catch (err: any) {
+          console.error("[Token Refresh] Failed to refresh token:", err);
           authStore.clearTokens();
-          // Only redirect if not already on login page
           if (!window.location.pathname.includes("/login")) {
             window.location.href = `/login?message=${encodeURIComponent(
-              "Session expired. Please login again."
+              "Session expired. Please login again.",
             )}`;
           }
           return Promise.reject(err);
@@ -104,7 +184,7 @@ axiosInstance.interceptors.response.use(
 
     // For auth endpoints or other 401 errors, just reject with the original error
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

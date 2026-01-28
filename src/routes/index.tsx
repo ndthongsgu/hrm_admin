@@ -58,6 +58,18 @@ import RevenueReportPage from "@/pages/main/reports/revenue";
 import DetailRoleScreen from "@/pages/main/role-manager/detail";
 import AddRoleScreen from "@/pages/main/role-manager/add";
 import EditRoleScreen from "@/pages/main/role-manager/edit";
+import UserManager from "@/pages/main/user-manager";
+import AddUserScreen from "@/pages/main/user-manager/add";
+import EditUserScreen from "@/pages/main/user-manager/edit";
+import DetailUserScreen from "@/pages/main/user-manager/detail";
+import DepartmentManager from "@/pages/main/department-manager";
+import AddDepartmentScreen from "@/pages/main/department-manager/add";
+import EditDepartmentScreen from "@/pages/main/department-manager/edit";
+import DetailDepartmentScreen from "@/pages/main/department-manager/detail";
+import PositionManager from "@/pages/main/position-manager";
+import AddPositionScreen from "@/pages/main/position-manager/add";
+import EditPositionScreen from "@/pages/main/position-manager/edit";
+import DetailPositionScreen from "@/pages/main/position-manager/detail";
 
 export default function AppRoutes() {
   return (
@@ -101,6 +113,23 @@ export default function AppRoutes() {
             path={ROUTES.MAIN.ROLE_MANAGER.Children.DETAIL_ROLE.path}
             element={<DetailRoleScreen />}
           />
+          {/* Quản lý người dùng */}
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.path}
+            element={<UserManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.ADD_USER.path}
+            element={<AddUserScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.EDIT_USER.path}
+            element={<EditUserScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.USER_MANAGER.children.DETAIL_USER.path}
+            element={<DetailUserScreen />}
+          />
           {/* Quản lý nhân viên */}
           <Route
             path={ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.path}
@@ -126,6 +155,40 @@ export default function AppRoutes() {
                 .DETAIL_EMPLOYEE.path
             }
             element={<DetailEmployeeScreen />}
+          />
+          {/* Quản lý phòng ban */}
+          <Route
+            path={ROUTES.MAIN.DEPARTMENT_MANAGER.path}
+            element={<DepartmentManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.DEPARTMENT_MANAGER.children.ADD_DEPARTMENT.path}
+            element={<AddDepartmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.DEPARTMENT_MANAGER.children.EDIT_DEPARTMENT.path}
+            element={<EditDepartmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.DEPARTMENT_MANAGER.children.DETAIL_DEPARTMENT.path}
+            element={<DetailDepartmentScreen />}
+          />
+          {/* Quản lý chức vụ */}
+          <Route
+            path={ROUTES.MAIN.POSITION_MANAGER.path}
+            element={<PositionManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.POSITION_MANAGER.children.ADD_POSITION.path}
+            element={<AddPositionScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.POSITION_MANAGER.children.EDIT_POSITION.path}
+            element={<EditPositionScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.POSITION_MANAGER.children.DETAIL_POSITION.path}
+            element={<DetailPositionScreen />}
           />
           {/* Quản lý khách hàng */}
           <Route

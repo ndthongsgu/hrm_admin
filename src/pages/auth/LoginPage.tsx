@@ -1,22 +1,22 @@
 import { useEffect } from "react";
 import LoginForm from "@/components/auth/LoginForm";
 import { Spin } from "antd";
-import { useProfile } from "@/hooks/auth/auth";
+// import { useProfile } from "@/hooks/auth/auth"; // Disabled because backend doesn't have /me endpoint
 import { useAuthHydrationStore, useAuthStore } from "@/hooks/auth/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const { isAuthenticated } = useAuthStore();
   const { _hasHydrated } = useAuthHydrationStore();
-  const profileQuery = useProfile();
+  // const profileQuery = useProfile(); // Disabled because backend doesn't have /me endpoint
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If we have tokens and profile query is successful, redirect to home
-    if (isAuthenticated && profileQuery.isSuccess) {
-      navigate("/");
+    // Simplified: only check isAuthenticated from token, no need to call /me API
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
     }
-  }, [isAuthenticated, profileQuery.isSuccess, navigate]);
+  }, [isAuthenticated, navigate]);
 
   // Show loading while checking hydration
   if (!_hasHydrated) {
@@ -37,44 +37,8 @@ export default function LoginPage() {
     );
   }
 
-  // Show loading while checking authentication
-  if (isAuthenticated && profileQuery.isLoading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundImage: "url('/background.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "top",
-        }}
-      >
-        <Spin size="large" tip="Đang kiểm tra phiên đăng nhập..." />
-      </div>
-    );
-  }
-
-  // If authenticated and profile loaded successfully, we'll redirect in useEffect
-  // But show loading until redirect happens
-  if (isAuthenticated && profileQuery.isSuccess) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundImage: "url('/background.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "top",
-        }}
-      >
-        <Spin size="large" tip="Đang chuyển hướng..." />
-      </div>
-    );
-  }
+  // Simplified: nếu đã authenticated thì redirect (trong useEffect)
+  // Không cần check profile query nữa
 
   // Show login form if not authenticated or token is invalid
   return (

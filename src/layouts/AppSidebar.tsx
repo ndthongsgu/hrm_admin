@@ -1,12 +1,7 @@
 import {
-  BarChartOutlined,
-  CarOutlined,
-  CreditCardOutlined,
   DashboardOutlined,
   LockOutlined,
   SafetyOutlined,
-  ScheduleOutlined,
-  SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
@@ -17,7 +12,8 @@ import { ROUTES } from "../common/constants/routes";
 import { useUserInfo } from "@/hooks/auth/useUserInfo";
 import { canAccessModule, isAdmin } from "@/common/helpers/permissions";
 import { ModuleCode, type ModuleCodeType } from "@/dto/auth.dto";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "./AppSidebar.less";
 
 type AppSidebarProps = {
   collapsed: boolean;
@@ -38,88 +34,15 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
   const userInfo = useUserInfo();
 
   const allMenuItems: MenuItem[] = [
+    // Home (always visible)
     {
       key: ROUTES.MAIN.HOME.key,
       path: ROUTES.MAIN.HOME.path,
       icon: <DashboardOutlined />,
       label: ROUTES.MAIN.HOME.label,
     },
-    {
-      key: ROUTES.MAIN.REPORTS.key,
-      path: ROUTES.MAIN.REPORTS.path,
-      icon: <BarChartOutlined />,
-      label: ROUTES.MAIN.REPORTS.label,
-      children: [
-        {
-          key: ROUTES.MAIN.REPORTS.children.REVENUE_TIME.key,
-          path: ROUTES.MAIN.REPORTS.children.REVENUE_TIME.path,
-          label: ROUTES.MAIN.REPORTS.children.REVENUE_TIME.label,
-        },
-        {
-          key: ROUTES.MAIN.REPORTS.children.BOOKINGS_BY_ROUTE.key,
-          path: ROUTES.MAIN.REPORTS.children.BOOKINGS_BY_ROUTE.path,
-          label: ROUTES.MAIN.REPORTS.children.BOOKINGS_BY_ROUTE.label,
-        },
-        {
-          key: ROUTES.MAIN.REPORTS.children.TRIPS_STATUS.key,
-          path: ROUTES.MAIN.REPORTS.children.TRIPS_STATUS.path,
-          label: ROUTES.MAIN.REPORTS.children.TRIPS_STATUS.label,
-        },
-      ],
-    },
-    {
-      key: ROUTES.MAIN.CAR_TRIP_MANAGER.key,
-      path: ROUTES.MAIN.CAR_TRIP_MANAGER.path,
-      icon: <CarOutlined />,
-      label: ROUTES.MAIN.CAR_TRIP_MANAGER.label,
-      children: [
-        {
-          key: ROUTES.MAIN.CAR_TRIP_MANAGER.children.CAR_MANAGER.key,
-          path: ROUTES.MAIN.CAR_TRIP_MANAGER.children.CAR_MANAGER.path,
-          label: ROUTES.MAIN.CAR_TRIP_MANAGER.children.CAR_MANAGER.label,
-          moduleCode: ModuleCode.CAR,
-        },
-        {
-          key: ROUTES.MAIN.CAR_TRIP_MANAGER.children.TRIP_MANAGER.key,
-          path: ROUTES.MAIN.CAR_TRIP_MANAGER.children.TRIP_MANAGER.path,
-          label: ROUTES.MAIN.CAR_TRIP_MANAGER.children.TRIP_MANAGER.label,
-          moduleCode: ModuleCode.TRIP,
-        },
-        {
-          key: ROUTES.MAIN.CAR_TRIP_MANAGER.children.ROUTE_MANAGER.key,
-          path: ROUTES.MAIN.CAR_TRIP_MANAGER.children.ROUTE_MANAGER.path,
-          label: ROUTES.MAIN.CAR_TRIP_MANAGER.children.ROUTE_MANAGER.label,
-          moduleCode: ModuleCode.ROUTE,
-        },
-      ],
-    },
-    {
-      key: ROUTES.MAIN.BOOKING_MANAGER.key,
-      path: ROUTES.MAIN.BOOKING_MANAGER.path,
-      icon: <ScheduleOutlined />,
-      label: ROUTES.MAIN.BOOKING_MANAGER.label,
-      moduleCode: ModuleCode.BOOKING,
-    },
-    {
-      key: ROUTES.MAIN.PAYMENT_MANAGER.key,
-      path: ROUTES.MAIN.PAYMENT_MANAGER.path,
-      icon: <CreditCardOutlined />,
-      label: ROUTES.MAIN.PAYMENT_MANAGER.label,
-      children: [
-        {
-          key: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_LIST.key,
-          path: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_LIST.path,
-          label: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_LIST.label,
-          moduleCode: ModuleCode.PAYMENT,
-        },
-        {
-          key: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_METHOD_MANAGER.key,
-          path: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_METHOD_MANAGER.path,
-          label: ROUTES.MAIN.PAYMENT_MANAGER.children.PAYMENT_METHOD_MANAGER.label,
-          moduleCode: ModuleCode.PAYMENT_METHOD,
-        }
-      ]
-    },
+
+    // HRM: User Manager (Employee / Customer)
     {
       key: ROUTES.MAIN.USER_MANAGER.key,
       path: ROUTES.MAIN.USER_MANAGER.path,
@@ -132,7 +55,6 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           label: ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.label,
           moduleCode: ModuleCode.EMPLOYEE,
         },
-
         {
           key: ROUTES.MAIN.USER_MANAGER.children.CUSTOMER_MANAGER.key,
           path: ROUTES.MAIN.USER_MANAGER.children.CUSTOMER_MANAGER.path,
@@ -142,6 +64,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       ],
     },
 
+    // HRM: Role / Permission
     {
       key: ROUTES.MAIN.ROLE_MANAGER.key,
       path: ROUTES.MAIN.ROLE_MANAGER.path,
@@ -155,12 +78,6 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       icon: <LockOutlined />,
       label: ROUTES.MAIN.PERMISSION_MANAGER.label,
       moduleCode: ModuleCode.PERMISSION,
-    },
-    {
-      key: "settings",
-      path: "/settings",
-      icon: <SettingOutlined />,
-      label: "Cài đặt",
     },
   ];
 
@@ -198,10 +115,65 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
     return filterItems(allMenuItems);
   }, [userInfo]);
 
+  const { selectedKeys, routeOpenKeys } = useMemo(() => {
+    const currentPath = location.pathname;
+
+    let bestMatch:
+      | { key: string; parents: string[]; pathLen: number }
+      | undefined;
+
+    const walk = (items: MenuItem[], parents: string[] = []) => {
+      for (const item of items) {
+        const isMatch =
+          currentPath === item.path || currentPath.startsWith(item.path + "/");
+        if (isMatch) {
+          const candidate = {
+            key: item.key,
+            parents,
+            pathLen: item.path.length,
+          };
+          if (!bestMatch || candidate.pathLen > bestMatch.pathLen) {
+            bestMatch = candidate;
+          }
+        }
+        if (item.children) {
+          walk(item.children, [...parents, item.key]);
+        }
+      }
+    };
+
+    walk(menuItems);
+
+    if (!bestMatch) {
+      return { selectedKeys: [], routeOpenKeys: [] };
+    }
+
+    const open = [...bestMatch.parents];
+    const selected = [bestMatch.key, ...bestMatch.parents];
+    return { selectedKeys: selected, routeOpenKeys: open };
+  }, [location.pathname, menuItems]);
+
+  // Keep submenu open state controllable by user interaction,
+  // but also auto-open the branch matching current route.
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (collapsed) {
+      setOpenKeys([]);
+      return;
+    }
+    setOpenKeys(routeOpenKeys);
+  }, [collapsed, routeOpenKeys]);
+
   const renderMenuItems = (items: MenuItem[]) =>
     items.map((item) =>
       item.children ? (
-        <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
+        <Menu.SubMenu
+          key={item.key}
+          icon={item.icon}
+          title={item.label}
+          onTitleClick={() => navigate(item.path)}
+        >
           {item.children.map((child) => (
             <Menu.Item key={child.key} onClick={() => navigate(child.path)}>
               {child.label}
@@ -257,7 +229,10 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       <Menu
         theme="light"
         mode="inline"
-        selectedKeys={[location.pathname]}
+        selectedKeys={selectedKeys}
+        openKeys={openKeys}
+        onOpenChange={(keys) => setOpenKeys(keys as string[])}
+        className="app-sidebar-menu"
         style={{
           position: "relative",
           zIndex: 1,

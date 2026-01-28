@@ -1,6 +1,6 @@
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
-import type { RoleCreateUpdateDto, RoleDto } from "@/dto/role.dto";
+import type { RoleCreateDto, RoleUpdateDto, RoleDto } from "@/dto/role.dto";
 import API_ENDPOINTS from "@/services/api-route";
 import rootApiService from "@/services/api.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ export const usePaginationRole = (params: PaginationDto<object>) => {
     queryFn: () =>
       rootApiService.post<PaginationResponse<RoleDto>>(
         API_ENDPOINTS.ROLE.PAGINATION,
-        requestParams
+        requestParams,
       ),
   });
 
@@ -65,7 +65,7 @@ export const useCreateRole = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
   const { mutateAsync: onCreateRole, isPending: isLoading } = useMutation({
-    mutationFn: (body: RoleCreateUpdateDto) =>
+    mutationFn: (body: RoleCreateDto) =>
       rootApiService.post<SuccessResponse>(API_ENDPOINTS.ROLE.CREATE, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
@@ -94,10 +94,10 @@ export const useCreateRole = () => {
 
 export const useUpdateRole = (id: string) => {
   const queryClient = useQueryClient();
-  const url = API_ENDPOINTS.ROLE.UPDATE(id.toString());
+  const url = API_ENDPOINTS.ROLE.UPDATE(id);
   const showToast = useToast();
   const { mutateAsync: onUpdateRole, isPending: isLoading } = useMutation({
-    mutationFn: (body: RoleCreateUpdateDto) =>
+    mutationFn: (body: RoleUpdateDto) =>
       rootApiService.put<SuccessResponse>(url, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
@@ -140,7 +140,7 @@ export const useDeActivateRole = () => {
   const { mutateAsync: onDeActivateRole, isPending: isLoading } = useMutation({
     mutationFn: (id: string) =>
       rootApiService.post<PaginationResponse<RoleDto>>(
-        API_ENDPOINTS.ROLE.DEACTIVATE(id)
+        API_ENDPOINTS.ROLE.DEACTIVATE(id),
       ),
     onSuccess: (res) => {
       queryClient.invalidateQueries({
@@ -172,7 +172,7 @@ export const useActivateRole = () => {
   const { mutateAsync: onActivateRole, isPending: isLoading } = useMutation({
     mutationFn: (id: string) =>
       rootApiService.post<PaginationResponse<RoleDto>>(
-        API_ENDPOINTS.ROLE.ACTIVATE(id)
+        API_ENDPOINTS.ROLE.ACTIVATE(id),
       ),
     onSuccess: (res) => {
       queryClient.invalidateQueries({

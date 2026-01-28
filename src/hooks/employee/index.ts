@@ -19,15 +19,15 @@ export const usePaginationEmployee = (
   const requestParams: EmployeePageRequest = {
     page: Math.floor(params.skip / params.take),
     size: params.take,
-    sortBy: "createdDate",
-    sortDirection: "DESC",
+    sortBy: params.sortBy || "createdDate",
+    sortDirection: params.sortDirection || "DESC",
     ...params.where,
   };
 
   const { data, isLoading, refetch, error } = useQuery({
-    queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION, params],
+    queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION, requestParams],
     queryFn: () =>
-      rootApiService.post<PaginationResponse<EmployeeDto>>(
+      rootApiService.get<PaginationResponse<EmployeeDto>>(
         API_ENDPOINTS.EMPLOYEE.PAGINATION,
         requestParams
       ),

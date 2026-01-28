@@ -9,11 +9,8 @@ import AuthInitializer from "./components/auth/AuthInitializer";
 
 export default function App() {
   const queryClient = new QueryClient();
-  if (import.meta.env.VITE_BYPASS_AUTH === "true") {
-    if (!localStorage.getItem("token")) {
-      localStorage.setItem("token", "dev-token");
-    }
-  }
+  // Note: Auth state is now managed by Zustand store (auth-storage)
+  // No need to set localStorage token manually
   return (
     <>
       <AuthInitializer />

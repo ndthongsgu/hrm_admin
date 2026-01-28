@@ -1,16 +1,35 @@
 import type { BaseDto } from "./base.dto";
 
-export interface RoleCreateUpdateDto {
+// Backend response format (permissionsJson as string)
+interface RoleBackendDto extends BaseDto {
   code: string;
   name: string;
   description?: string;
+  permissionsJson?: string; // Backend stores as JSON string in DB
+  isActive: boolean;
+}
+
+// Frontend DTO (permissions as object - type-safe, easy to use)
+export interface RoleDto extends BaseDto {
+  code: string;
+  name: string;
+  description?: string;
+  permissions?: Record<string, string[]>; // Frontend uses object format: {"EMPLOYEE": ["READ", "CREATE"], ...}
+  isActive: boolean;
+}
+
+export interface RoleCreateDto {
+  code: string;
+  name: string;
+  description?: string;
+  permissions?: Record<string, string[]>; // Frontend sends as object
 }
 
 export interface RoleUpdateDto {
-  code: string;
-  name: string;
+  code?: string;
+  name?: string;
   description?: string;
-  permissions: RolePermissionCreateDto[];
+  permissions?: Record<string, string[]>; // Frontend sends as object
 }
 
 export interface RolePageRequest {
@@ -18,22 +37,61 @@ export interface RolePageRequest {
   size: number;
   sortBy?: string;
   sortDirection?: string;
+  code?: string;
+  name?: string;
+  isActive?: boolean;
 }
 
-export interface RoleDto extends BaseDto {
+export interface RoleSelectDto {
+  id: string;
   code: string;
   name: string;
-  description: string;
 }
 
-export interface RolePermissionCreateDto {
+// Permission structure for frontend use
+export interface RolePermission {
   module: string;
-  isCanRead: boolean;
-  isCanCreate: boolean;
-  isCanUpdate: boolean;
-  isCanDelete: boolean;
-  isCanActivate: boolean;
-  isCanDeactivate: boolean;
-  isCanExport: boolean;
-  isCanImport: boolean;
+  actions: string[];
+}
+
+/**
+ * Transform backend response (permissionsJson: string) to frontend format (permissions: object)
+ */
+export function transformRoleFromBackend(backend: RoleBackendDto): RoleDto {
+  return {
+    ...backend,
+    permissions: backend.permissionsJson
+      ? parsePermissionsJson(backend.permissionsJson)
+      : undefined,
+  };
+}
+
+/**
+ * Transform frontend format (permissions: object) to backend request (permissionsJson: string)
+ */
+export function transformRoleToBackend(
+  frontend: RoleCreateDto | RoleUpdateDto
+): Omit<RoleBackendDto, keyof BaseDto> {
+  return {
+    code: frontend.code || "",
+    name: frontend.name || "",
+    description: frontend.description,
+    permissionsJson: frontend.permissions
+      ? JSON.stringify(frontend.permissions)
+      : undefined,
+    isActive: true, // Default, backend may override
+  };
+}
+
+/**
+ * Parse permissionsJson string to Record<string, string[]>
+ */
+function parsePermissionsJson(
+  jsonString: string
+): Record<string, string[]> {
+  try {
+    return JSON.parse(jsonString);
+  } catch {
+    return {};
+  }
 }

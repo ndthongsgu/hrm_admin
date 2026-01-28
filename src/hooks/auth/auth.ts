@@ -1,4 +1,12 @@
-import type { LoginRequest, AuthResponse, PasswordResetRequest, PasswordResetConfirmRequest, ChangePasswordRequest, UserProfile } from "@/dto/auth.dto";
+import type {
+  LoginRequest,
+  AuthResponse,
+  PasswordResetRequest,
+  PasswordResetConfirmRequest,
+  ChangePasswordRequest,
+  UserProfile,
+  UserInfo,
+} from "@/dto/auth.dto";
 import { API_ENDPOINTS } from "@/services/api-route";
 import rootApiService from "@/services/api.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,41 +25,58 @@ export const useLogin = () => {
         API_ENDPOINTS.AUTH.LOGIN,
         credentials,
         {}, // headers
-        { skipAuth: true } // This will prevent token refresh attempts
+        { skipAuth: true }, // This will prevent token refresh attempts
       );
       return response;
     },
     onSuccess: async (data) => {
       try {
-        // Set tokens first
-        setTokens(data.accessToken, data.refreshToken);
-        
-        // Load user info immediately after login
-        const userInfo = await authService.getUserInfo();
-        setUserInfo(userInfo);
-        
+        setTokens(data.accessToken, data.refreshToken || "");
+
+        // Load user info with permissions from backend
+        try {
+          const userInfo = await authService.getUserInfo();
+          setUserInfo(userInfo);
+        } catch (error) {
+          console.error("[useLogin] Failed to load user info, using basic info:", error);
+          // Fallback: Create basic userInfo from login response
+          const userInfo: UserInfo = {
+            userId: data.id,
+            username: data.username,
+            email: data.email,
+            name: data.username,
+            isAdmin: data.isAdmin || false,
+            isGoogle: false,
+            permissions: {}, // Will be empty if /me endpoint fails
+          };
+          setUserInfo(userInfo);
+        }
+
         queryClient.clear();
-        navigate('/');
+        // Redirect to dashboard/home page, replace history to prevent back button to login
+        navigate("/", { replace: true });
       } catch (error) {
-        console.error("[useLogin] Failed to load user info:", error);
-        // Still navigate even if userInfo fails, will be loaded by AuthInitializer
+        console.error("[useLogin] Failed to process login:", error);
+        // Still navigate even if processing fails
         queryClient.clear();
-        navigate('/');
+        // Redirect to dashboard/home page, replace history to prevent back button to login
+        navigate("/", { replace: true });
       }
     },
     onError: (error: any) => {
       // The error message will now be the actual server message
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.message || "Login failed");
     },
   });
 };
 
 export const useProfile = () => {
+  // Backend doesn't have /me endpoint, disable this query
   return useQuery({
-    queryKey: [API_ENDPOINTS.AUTH.PROFILE],
-    queryFn: () => rootApiService.get<UserProfile>(API_ENDPOINTS.AUTH.PROFILE),
-    retry: false, // Don't retry on 401
-    enabled: useAuthStore.getState().isAuthenticated, // Only run if we think we're authenticated
+    queryKey: ["profile"],
+    queryFn: () => Promise.resolve(null as UserProfile | null),
+    retry: false,
+    enabled: false, // Disable query because backend doesn't have endpoint
   });
 };
 
@@ -67,13 +92,13 @@ export const useLogout = () => {
     onSuccess: () => {
       clearTokens();
       queryClient.clear();
-      navigate('/login');
+      navigate("/login");
     },
     onError: () => {
       // Even if API call fails, clear local state
       clearTokens();
       queryClient.clear();
-      navigate('/login');
+      navigate("/login");
     },
   });
 };
@@ -85,19 +110,21 @@ export const useChangePassword = () => {
 
   return useMutation({
     mutationFn: async (data: ChangePasswordRequest) => {
-      await rootApiService.post(
-        API_ENDPOINTS.AUTH.PASSWORD_CHANGE,
-        data
-      );
+      await rootApiService.post(API_ENDPOINTS.AUTH.PASSWORD_CHANGE, data);
     },
     onSuccess: () => {
       // Clear tokens and redirect to login since all sessions are revoked
       clearTokens();
       queryClient.clear();
-      navigate('/login?message=' + encodeURIComponent('Password changed successfully. Please login again.'));
+      navigate(
+        "/login?message=" +
+          encodeURIComponent(
+            "Password changed successfully. Please login again.",
+          ),
+      );
     },
     onError: (error: any) => {
-      throw new Error(error.message || 'Failed to change password');
+      throw new Error(error.message || "Failed to change password");
     },
   });
 };

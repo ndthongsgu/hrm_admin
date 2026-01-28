@@ -62,6 +62,50 @@ export const ROUTES = {
       path: "/user_manager/permission",
     },
     /* Quản lý người dùng */
+    DEPARTMENT_MANAGER: {
+      key: "DEPARTMENT_MANAGER",
+      label: "Quản lý phòng ban",
+      path: "/department_manager",
+      children: {
+        ADD_DEPARTMENT: {
+          key: "ADD_DEPARTMENT",
+          label: "Thêm phòng ban",
+          path: "/department_manager/add",
+        },
+        EDIT_DEPARTMENT: {
+          key: "EDIT_DEPARTMENT",
+          label: "Chỉnh sửa phòng ban",
+          path: "/department_manager/edit/:id",
+        },
+        DETAIL_DEPARTMENT: {
+          key: "DETAIL_DEPARTMENT",
+          label: "Chi tiết phòng ban",
+          path: "/department_manager/detail/:id",
+        },
+      },
+    },
+    POSITION_MANAGER: {
+      key: "POSITION_MANAGER",
+      label: "Quản lý chức vụ",
+      path: "/position_manager",
+      children: {
+        ADD_POSITION: {
+          key: "ADD_POSITION",
+          label: "Thêm chức vụ",
+          path: "/position_manager/add",
+        },
+        EDIT_POSITION: {
+          key: "EDIT_POSITION",
+          label: "Chỉnh sửa chức vụ",
+          path: "/position_manager/edit/:id",
+        },
+        DETAIL_POSITION: {
+          key: "DETAIL_POSITION",
+          label: "Chi tiết chức vụ",
+          path: "/position_manager/detail/:id",
+        },
+      },
+    },
     USER_MANAGER: {
       key: "USER_MANAGER",
       label: "Quản lý người dùng",
@@ -139,6 +183,21 @@ export const ROUTES = {
               path: "/employee_manager/edit/:id",
             },
           },
+        },
+        ADD_USER: {
+          key: "ADD_USER",
+          label: "Thêm người dùng",
+          path: "/user_manager/add",
+        },
+        EDIT_USER: {
+          key: "EDIT_USER",
+          label: "Chỉnh sửa người dùng",
+          path: "/user_manager/edit/:id",
+        },
+        DETAIL_USER: {
+          key: "DETAIL_USER",
+          label: "Chi tiết người dùng",
+          path: "/user_manager/detail/:id",
         },
       },
     },

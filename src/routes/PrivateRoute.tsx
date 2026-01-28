@@ -1,12 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { Spin } from "antd";
-import { useProfile } from "@/hooks/auth/auth";
+// import { useProfile } from "@/hooks/auth/auth"; // Disabled because backend doesn't have /me endpoint
 import { useAuthStore, useAuthHydrationStore } from "@/hooks/auth/useAuthStore";
 
 export default function PrivateRoute() {
   const { isAuthenticated } = useAuthStore();
   const { _hasHydrated } = useAuthHydrationStore();
-  const profileQuery = useProfile();
+  // const profileQuery = useProfile(); // Disabled because backend doesn't have /me endpoint
 
   // Wait for hydration
   if (!_hasHydrated) {
@@ -24,28 +24,9 @@ export default function PrivateRoute() {
     );
   }
 
-  // If we think we're authenticated but profile query fails (401), clear tokens
-  if (isAuthenticated && profileQuery.isError) {
-    useAuthStore.getState().clearTokens();
-    return <Navigate to="/login" replace />;
-  }
-
-  // If we're authenticated and profile is loading or successful, show content
+  // Simplified: only check isAuthenticated from token, no need to call /me API
   if (isAuthenticated) {
-    return profileQuery.isLoading ? (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" tip="Đang xác thực..." />
-      </div>
-    ) : (
-      <Outlet />
-    );
+    return <Outlet />;
   }
 
   // Not authenticated

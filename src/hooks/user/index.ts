@@ -1,7 +1,8 @@
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
 import type {
-  UserCreateUpdateDto,
+  UserCreateDto,
+  UserUpdateDto,
   UserDto,
   UserFilter,
   UserPageRequest,
@@ -53,8 +54,8 @@ export const usePaginationUser = (params: PaginationDto<UserFilter>) => {
   };
 };
 
-export const useDetailUser = (id: number) => {
-  const url = API_ENDPOINTS.USER.FIND_BY_ID(id.toString());
+export const useDetailUser = (id: string) => {
+  const url = API_ENDPOINTS.USER.FIND_BY_ID(id);
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: [url],
     queryFn: () => rootApiService.get<UserDto>(url),
@@ -73,7 +74,7 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
   const { mutateAsync: onCreateUser, isPending: isLoading } = useMutation({
-    mutationFn: (body: UserCreateUpdateDto) =>
+    mutationFn: (body: UserCreateDto) =>
       rootApiService.post<SuccessResponse>(API_ENDPOINTS.USER.CREATE, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
@@ -97,21 +98,21 @@ export const useCreateUser = () => {
   return { onCreateUser, isLoading };
 };
 
-export const useUpdateUser = (id: number) => {
+export const useUpdateUser = (id: string) => {
   const queryClient = useQueryClient();
 
   const showToast = useToast();
-  const url = API_ENDPOINTS.USER.UPDATE(id.toString());
+  const url = API_ENDPOINTS.USER.UPDATE(id);
 
   const { mutateAsync: onUpdateUser, isPending: isLoading } = useMutation({
-    mutationFn: (body: UserCreateUpdateDto) =>
+    mutationFn: (body: UserUpdateDto) =>
       rootApiService.put<SuccessResponse>(url, body),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.USER.PAGINATION],
       });
       queryClient.invalidateQueries({
-        queryKey: [API_ENDPOINTS.USER.FIND_BY_ID(id.toString())],
+        queryKey: [API_ENDPOINTS.USER.FIND_BY_ID(id)],
       });
       showToast({
         title: "Thành công!",

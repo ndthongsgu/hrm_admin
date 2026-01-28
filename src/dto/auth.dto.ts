@@ -8,9 +8,15 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresIn: number;
+  refreshToken?: string;
+  type: string;
+  id: string;
+  username: string;
+  email: string;
+  roles: string[];
+  isAdmin?: boolean;
+  // Backward compatibility: also support token
+  token?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -59,7 +65,8 @@ export interface UserInfo {
   name: string;
   isAdmin: boolean;
   isGoogle: boolean;
-  permissions: Record<string, ModulePermission>;
+  // Permissions in JSON format from backend: {"EMPLOYEE": ["READ","CREATE"], "PAYROLL": ["READ"]}
+  permissions: Record<string, string[]>;
 }
 
 // Module Codes
