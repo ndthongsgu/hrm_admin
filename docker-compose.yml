@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_BE_API: ${VITE_BE_API}
+        VITE_BYPASS_AUTH: ${VITE_BYPASS_AUTH}
+    ports:
+      - "5174:80"
+    restart: unless-stopped
