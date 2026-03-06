@@ -32,6 +32,18 @@ export interface RoleUpdateDto {
   permissions?: Record<string, string[]>; // Frontend sends as object
 }
 
+export interface RoleFilter {
+  code?: string;
+  name?: string;
+  isActive?: boolean;
+}
+
+export interface RoleSearchRequest {
+  skip: number;
+  take: number;
+  where?: RoleFilter;
+}
+
 export interface RolePageRequest {
   page: number;
   size: number;

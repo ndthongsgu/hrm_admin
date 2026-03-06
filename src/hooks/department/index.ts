@@ -17,26 +17,18 @@ import { useToast } from "../layout/useToast";
 export const usePaginationDepartment = (
   params: PaginationDto<DepartmentFilter>
 ) => {
-  const requestParams: DepartmentPageRequest = {
-    page: Math.floor(params.skip / params.take),
-    size: params.take,
-    sortBy: params.sortBy || "createdDate",
-    sortDirection: params.sortDirection || "DESC",
-    ...params.where,
+  const requestParams = {
+    skip: params.skip,
+    take: params.take,
+    where: params.where,
   };
 
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: [API_ENDPOINTS.DEPARTMENT.PAGINATION, params],
     queryFn: () =>
-      rootApiService.get<PaginationResponse<DepartmentDto>>(
-        `${API_ENDPOINTS.DEPARTMENT.PAGINATION}?${new URLSearchParams(
-          Object.entries(requestParams).reduce((acc, [key, value]) => {
-            if (value !== undefined && value !== null) {
-              acc[key] = String(value);
-            }
-            return acc;
-          }, {} as Record<string, string>)
-        )}`
+      rootApiService.post<PaginationResponse<DepartmentDto>>(
+        API_ENDPOINTS.DEPARTMENT.PAGINATION,
+        requestParams
       ),
   });
 

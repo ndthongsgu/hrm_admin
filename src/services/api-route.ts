@@ -213,6 +213,11 @@ export const API_ENDPOINTS = {
     GET_BY_ROLE: (roleId: string) => `/admin/permissions/by-role/${roleId}`,
     ASSIGN: (roleId: string) => `/admin/permissions/assign-to-role/${roleId}`,
   },
+  ACTION_LOG: {
+    PAGINATION: "/api/action-logs",
+    GET_ALL: "/api/action-logs",
+    FIND_BY_ENTITY: (entityId: string) => `/api/action-logs/entity/${entityId}`,
+  },
 };
 
 interface ApiRoutes {

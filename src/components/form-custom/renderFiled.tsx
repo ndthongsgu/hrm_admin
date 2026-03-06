@@ -17,6 +17,7 @@ import type { FormField } from ".";
 import FileUpload from "../file-upload";
 import RichText from "../rich-text";
 
+const { RangePicker: DateRangePicker } = DatePicker;
 const { Option } = Select;
 
 function useRenderFormCustom(form: any, initialValues: any) {
@@ -249,6 +250,48 @@ function useRenderFormCustom(form: any, initialValues: any) {
           </Form.Item>
         );
 
+      /** ------------------------- DATERANGEPICKER ------------------------- */
+      case "dateRangePicker":
+        return (
+          <Form.Item
+            key={field.name}
+            label={field.label}
+            name={field.name}
+            rules={rules}
+            style={{ gridColumn: field.gridColumn, ...field.style }}
+            getValueProps={(value) => ({
+              value:
+                value && Array.isArray(value) && value.length === 2
+                  ? [
+                      value[0] && dayjs.isDayjs(value[0]) && value[0].isValid()
+                        ? value[0]
+                        : value[0]
+                        ? dayjs(value[0])
+                        : null,
+                      value[1] && dayjs.isDayjs(value[1]) && value[1].isValid()
+                        ? value[1]
+                        : value[1]
+                        ? dayjs(value[1])
+                        : null,
+                    ]
+                  : null,
+            })}
+          >
+            <DatePicker.RangePicker
+              placeholder={[field.placeholder || "Ngày bắt đầu", "Ngày kết thúc"]}
+              format={field.dateFormat || "DD/MM/YYYY"}
+              style={{ width: "100%", ...field.inputStyle }}
+              disabled={field.disabled}
+              onChange={(dates) => {
+                form.setFieldsValue({ [field.name]: dates });
+                field?.onChange?.(dates, form);
+              }}
+              size="large"
+              disabledDate={field.disabledDate}
+            />
+          </Form.Item>
+        );
+
       /** ------------------------- TIMERANGEPICKER ------------------------- */
       case "timeRangePicker":
         return (
@@ -435,7 +478,7 @@ function useRenderFormCustom(form: any, initialValues: any) {
               : field.customComponent}
           </Form.Item>
         );
-
+      
       /** ------------------------- DEFAULT ------------------------- */
       default:
         return null;

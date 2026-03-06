@@ -35,6 +35,12 @@ export interface DepartmentFilter {
   isActive?: boolean;
 }
 
+export interface DepartmentSearchRequest {
+  skip: number;
+  take: number;
+  where?: DepartmentFilter;
+}
+
 export interface DepartmentPageRequest extends DepartmentFilter {
   page: number;
   size: number;

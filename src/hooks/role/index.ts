@@ -8,10 +8,9 @@ import { useToast } from "../layout/useToast";
 
 export const usePaginationRole = (params: PaginationDto<object>) => {
   const requestParams = {
-    page: Math.floor(params.skip / params.take),
-    size: params.take,
-    sortBy: params.sortBy || "createdDate",
-    sortDirection: params.sortDirection || "ASC",
+    skip: params.skip,
+    take: params.take,
+    where: params.where,
   };
 
   const { data, isLoading, refetch, error } = useQuery({

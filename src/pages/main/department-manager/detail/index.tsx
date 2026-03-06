@@ -110,7 +110,7 @@ export default function DepartmentDetailScreen() {
           </Row>
         </Card>
 
-        <ActionLog entityId={id ?? ""} />
+        <ActionLog functionId={id ?? ""} functionType="DEPARTMENT" />
       </Space>
     </BaseView>
   );

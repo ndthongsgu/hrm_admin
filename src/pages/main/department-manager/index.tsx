@@ -5,7 +5,7 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import type { DepartmentDto, DepartmentFilter } from "@/dto/department.dto";
+import type { DepartmentFilter } from "@/dto/department.dto";
 import {
   useActivateDepartment,
   useDeActivateDepartment,
@@ -36,7 +36,7 @@ export default function DepartmentManager() {
     where: initFilter,
   });
 
-  const { data, total, isLoading, refetch } = usePaginationDepartment(pagination);
+  const { data, total, isLoading } = usePaginationDepartment(pagination);
   const { onDeActivateDepartment } = useDeActivateDepartment();
   const { onActivateDepartment } = useActivateDepartment();
 
@@ -80,10 +80,6 @@ export default function DepartmentManager() {
       col: 6,
     },
   ];
-
-  const handleCreate = () => {
-    router.push(ROUTES.MAIN.DEPARTMENT_MANAGER.children.ADD_DEPARTMENT.path);
-  };
 
   const [columnWidths] = useState<Record<string, number>>({
     code: 120,
@@ -214,18 +210,18 @@ export default function DepartmentManager() {
 
   return (
     <BaseView>
+      <h2 style={{ marginBottom: "16px" }}>Danh sách phòng ban</h2>
       <FilterComponent
         fields={filterFields}
-        values={filter}
-        onChange={setFilter}
+        filters={filter}
+        onFiltersChange={setFilter}
         onSearch={() => handleSearch(false)}
-        onReset={() => {
+        onClear={() => {
           setFilter(initFilter);
           handleSearch(true);
         }}
       />
       <TableCustom
-        title="Danh sách phòng ban"
         data={data}
         columns={columns}
         actions={actions}
@@ -234,10 +230,8 @@ export default function DepartmentManager() {
           current: Math.floor(pagination.skip / pagination.take) + 1,
           pageSize: pagination.take,
           total: total,
-          onChange: handlePageChange,
         }}
-        onCreate={handleCreate}
-        createText="Thêm phòng ban"
+        onPageChange={handlePageChange}
       />
     </BaseView>
   );

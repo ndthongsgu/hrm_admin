@@ -1,6 +1,6 @@
 export interface BaseDto {
   id: string;
-  createdDate: Date;
+  createdAt: Date;
   updatedDate: Date;
   createdBy: string | null;
   updatedBy: string | null;
@@ -31,7 +31,7 @@ export class PageResponse<T = any> {
 
 export interface PrimaryBaseEntity {
   id?: string;
-  createdDate?: Date;
+  createdAt?: Date;
   updatedDate?: Date;
   createdBy?: string | null;
   updatedBy?: string | null;

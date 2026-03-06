@@ -25,6 +25,11 @@ import PositionManager from "@/pages/main/position-manager";
 import AddPositionScreen from "@/pages/main/position-manager/add";
 import EditPositionScreen from "@/pages/main/position-manager/edit";
 import DetailPositionScreen from "@/pages/main/position-manager/detail";
+import PayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager";
+import AddPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/add";
+import EditPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/edit";
+import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/detail";
+
 
 export default function AppRoutes() {
   return (
@@ -128,6 +133,24 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.POSITION_MANAGER.children.DETAIL_POSITION.path}
             element={<DetailPositionScreen />}
+          />
+
+          {/* Quản lý tính lương */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.path}
+            element={<PayrollPeriodScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.ADD_PAYROLL_PERIOD.path}
+            element={<AddPayrollPeriodScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.EDIT_PAYROLL_PERIOD.path}
+            element={<EditPayrollPeriodScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.DETAIL_PAYROLL_PERIOD.path}
+            element={<DetailPayrollPeriodScreen />}
           />
         </Route>
       </Route>{" "}

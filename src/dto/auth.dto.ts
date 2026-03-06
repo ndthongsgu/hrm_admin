@@ -71,21 +71,12 @@ export interface UserInfo {
 
 // Module Codes
 export const ModuleCode = {
-  CUSTOMER: "CUSTOMER",
-  USER: "USER",
-  CAR: "CAR",
-  ROUTE: "ROUTE",
-  TRIP: "TRIP",
-  BOOKING: "BOOKING",
-  PAYMENT: "PAYMENT",
-  ROLE: "ROLE",
-  EMPLOYEE: "EMPLOYEE",
-  CUSTOMER_TYPE: "CUSTOMER_TYPE",
-  CAR_TYPE: "CAR_TYPE",
-  PAYMENT_METHOD: "PAYMENT_METHOD",
   PERMISSION: "PERMISSION",
   DEPARTMENT: "DEPARTMENT",
   POSITION: "POSITION",
+  PAYROLL: "PAYROLL",
+  EMPLOYEE: "EMPLOYEE",
+  ROLE: "ROLE",
 } as const;
 
 export type ModuleCodeType = (typeof ModuleCode)[keyof typeof ModuleCode];

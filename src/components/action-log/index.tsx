@@ -53,8 +53,8 @@ export default function ActionLogView({
     () => [
       {
         title: "Ngày cập nhật",
-        dataIndex: "createdDate",
-        key: "createdDate",
+        dataIndex: "createdAt",
+        key: "createdAt",
         render: (text: string) => formatDateTime(text),
         width: 160,
       },

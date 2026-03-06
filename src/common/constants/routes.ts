@@ -149,5 +149,39 @@ export const ROUTES = {
         },
       },
     },
+    PAYROLL_MANAGER: {
+      key: "PAYROLL_MANAGER",
+      label: "Quản lý tính lương",
+      path: "/payroll",
+      children: {
+        PAYROLL_PERIODS: {
+          key: "PAYROLL_PERIODS",
+          label: "Kỳ lương",
+          path: "/payroll/periods",
+          children: {
+            ADD_PAYROLL_PERIOD: {
+              key: "ADD_PAYROLL_PERIOD",
+              label: "Thêm kỳ lương",
+              path: "/payroll/periods/add",
+            },
+            EDIT_PAYROLL_PERIOD: {
+              key: "EDIT_PAYROLL_PERIOD",
+              label: "Chỉnh sửa kỳ lương",
+              path: "/payroll/periods/edit/:id",
+            },
+            DETAIL_PAYROLL_PERIOD: {
+              key: "DETAIL_PAYROLL_PERIOD",
+              label: "Chi tiết kỳ lương",
+              path: "/payroll/periods/detail/:id",
+            },
+          },
+        },
+        ATTENDANCE_SUMMARY: {
+          key: "ATTENDANCE_SUMMARY",
+          label: "Tổng hợp công",
+          path: "/payroll/attendance-summary",
+        },
+      },
+    },
   },
 };

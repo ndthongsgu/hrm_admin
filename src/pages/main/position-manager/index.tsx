@@ -5,7 +5,7 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import type { PositionDto, PositionFilter } from "@/dto/position.dto";
+import type { PositionFilter } from "@/dto/position.dto";
 import {
   useActivatePosition,
   useDeActivatePosition,
@@ -36,7 +36,7 @@ export default function PositionManager() {
     where: initFilter,
   });
 
-  const { data, total, isLoading, refetch } = usePaginationPosition(pagination);
+  const { data, total, isLoading } = usePaginationPosition(pagination);
   const { onDeActivatePosition } = useDeActivatePosition();
   const { onActivatePosition } = useActivatePosition();
 
@@ -80,10 +80,6 @@ export default function PositionManager() {
       col: 6,
     },
   ];
-
-  const handleCreate = () => {
-    router.push(ROUTES.MAIN.POSITION_MANAGER.children.ADD_POSITION.path);
-  };
 
   const [columnWidths] = useState<Record<string, number>>({
     code: 120,
@@ -215,18 +211,18 @@ export default function PositionManager() {
 
   return (
     <BaseView>
+      <h2 style={{ marginBottom: "16px" }}>Danh sách chức vụ</h2>
       <FilterComponent
         fields={filterFields}
-        values={filter}
-        onChange={setFilter}
+        filters={filter}
+        onFiltersChange={setFilter}
         onSearch={() => handleSearch(false)}
-        onReset={() => {
+        onClear={() => {
           setFilter(initFilter);
           handleSearch(true);
         }}
       />
       <TableCustom
-        title="Danh sách chức vụ"
         data={data}
         columns={columns}
         actions={actions}
@@ -235,10 +231,8 @@ export default function PositionManager() {
           current: Math.floor(pagination.skip / pagination.take) + 1,
           pageSize: pagination.take,
           total: total,
-          onChange: handlePageChange,
         }}
-        onCreate={handleCreate}
-        createText="Thêm chức vụ"
+        onPageChange={handlePageChange}
       />
     </BaseView>
   );

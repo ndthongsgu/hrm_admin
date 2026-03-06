@@ -1,6 +1,5 @@
 import type {
   ModuleCodeType,
-  ModulePermission,
   PermissionAction,
   UserInfo,
 } from "@/dto/auth.dto";

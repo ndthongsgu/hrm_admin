@@ -237,6 +237,7 @@ function FilterComponent({
             }
             style={fullWidth}
             disabled={field.disabled}
+            showTime={false}
             onChange={(dates) =>
               handleFilterChange(
                 field.key,

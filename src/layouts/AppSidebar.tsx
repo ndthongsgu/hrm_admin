@@ -5,6 +5,7 @@ import {
   UserOutlined,
   ApartmentOutlined,
   TeamOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
@@ -92,6 +93,29 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       icon: <TeamOutlined />,
       label: ROUTES.MAIN.POSITION_MANAGER.label,
       moduleCode: ModuleCode.POSITION,
+    },
+
+    // Payroll Manager
+    {
+      key: ROUTES.MAIN.PAYROLL_MANAGER.key,
+      path: ROUTES.MAIN.PAYROLL_MANAGER.path,
+      icon: <DollarOutlined />,
+      label: ROUTES.MAIN.PAYROLL_MANAGER.label,
+      moduleCode: ModuleCode.PAYROLL,
+      children: [
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
+      ],
     },
   ];
 

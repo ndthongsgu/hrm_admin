@@ -16,20 +16,16 @@ import { useToast } from "../layout/useToast";
 export const usePaginationEmployee = (
   params: PaginationDto<EmployeeFilter>
 ) => {
-  const requestParams: EmployeePageRequest = {
-    page: Math.floor(params.skip / params.take),
-    size: params.take,
-    sortBy: params.sortBy || "createdDate",
-    sortDirection: params.sortDirection || "DESC",
-    ...params.where,
-  };
-
   const { data, isLoading, refetch, error } = useQuery({
-    queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION, requestParams],
+    queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION, params],
     queryFn: () =>
-      rootApiService.get<PaginationResponse<EmployeeDto>>(
+      rootApiService.post<PaginationResponse<EmployeeDto>>(
         API_ENDPOINTS.EMPLOYEE.PAGINATION,
-        requestParams
+        {
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
+        }
       ),
   });
 

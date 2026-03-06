@@ -114,7 +114,7 @@ export default function PositionDetailScreen() {
           </Row>
         </Card>
 
-        <ActionLog entityId={id ?? ""} />
+        <ActionLog functionId={id ?? ""} functionType="POSITION" />
       </Space>
     </BaseView>
   );

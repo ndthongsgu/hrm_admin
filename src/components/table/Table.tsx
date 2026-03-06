@@ -34,6 +34,7 @@ export interface TableAction {
   showKey?: string;
   disabled?: boolean | ((record: any) => boolean);
   tooltip?: string;
+  hidden?: boolean | ((record: any) => boolean);
 }
 
 export interface PaginationConfig {
@@ -156,6 +157,10 @@ function TableCustom<T extends Record<string, any>>({
                 action.onClick?.(record, index);
               }
             };
+
+            if (typeof action.hidden === "function" && action.hidden(record)) {
+              return null;
+            }
 
             const button = action.render ? (
               <span

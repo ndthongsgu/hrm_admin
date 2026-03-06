@@ -30,7 +30,7 @@ export default function RoleManager() {
     name: 200,
     email: 200,
     phone: 150,
-    createdDate: 180,
+    createdAt: 180,
   });
 
   const columns = [

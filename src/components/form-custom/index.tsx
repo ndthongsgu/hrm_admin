@@ -32,7 +32,7 @@ export interface FormField {
     | "switch"
     | "datepicker"
     | "datetimepicker"
-    | "daterangepicker"
+    | "dateRangePicker"
     | "timePicker"
     | "number"
     | "image"
