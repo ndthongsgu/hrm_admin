@@ -219,7 +219,7 @@ export default function PayrollPeriodManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record) => record.isDeleted,
+      hidden: (record) => record.isDeleted || record.isLocked,
       onClick: (record) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.EDIT_PAYROLL_PERIOD.path.replace(
@@ -236,7 +236,7 @@ export default function PayrollPeriodManager() {
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record) => record.isDeleted,
+      hidden: (record) => record.isDeleted || record.isLocked,
       onClick: async (record) => {
         await onDeactivatePayrollPeriod(record.id);
       },

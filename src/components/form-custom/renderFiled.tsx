@@ -16,8 +16,6 @@ import React from "react";
 import type { FormField } from ".";
 import FileUpload from "../file-upload";
 import RichText from "../rich-text";
-
-const { RangePicker: DateRangePicker } = DatePicker;
 const { Option } = Select;
 
 function useRenderFormCustom(form: any, initialValues: any) {
@@ -352,9 +350,9 @@ function useRenderFormCustom(form: any, initialValues: any) {
             valuePropName="checked"
             rules={rules}
             style={{ gridColumn: field.gridColumn, ...field.style }}
+            initialValue={field.defaultValue}
           >
             <Switch
-              defaultChecked={true}
               onChange={(checked) => field?.onChange?.(checked, form)}
             />
           </Form.Item>

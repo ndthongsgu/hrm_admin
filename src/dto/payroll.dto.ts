@@ -1,3 +1,8 @@
+export interface SelectOptionDto {
+  id: string;
+  name: string;
+}
+
 export interface PayrollPeriodDto {
   id?: string;
   name: string;
@@ -23,6 +28,7 @@ export interface PayrollPeriodFilter {
 export interface AttendanceSummaryDto {
   id?: string;
   payrollPeriodId: string;
+  payrollPeriodName?: string;
   employeeId: string;
   employeeName?: string;
   employeeCode?: string;
@@ -31,6 +37,7 @@ export interface AttendanceSummaryDto {
   unpaidLeaveDays: number;
   overtimeHours: number;
   isApproved?: boolean;
+  isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -43,19 +50,29 @@ export interface AttendanceSummaryFilter {
 export interface SalaryAdjustmentDto {
   id?: string;
   payrollPeriodId: string;
+  payrollPeriodName?: string;
   employeeId: string;
   employeeName?: string;
   employeeCode?: string;
   amount: number;
   type: 'BONUS' | 'FINE' | 'ADVANCE' | 'BHXH_BENEFIT';
   reason?: string;
+  isTaxable?: boolean;
+  isNetOnly?: boolean;
+  isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface SalaryAdjustmentFilter {
   payrollPeriodId?: string;
+  employeeId?: string;
+  amount?: number;
   type?: string;
+  reason?: string;
+  isTaxable?: boolean;
+  isNetOnly?: boolean;
+  isDeleted?: boolean;
 }
 
 export interface PayslipDto {

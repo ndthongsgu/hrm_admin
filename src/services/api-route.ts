@@ -29,6 +29,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/employees/${id}`,
     FIND_BY_ID: (id: string) => `/api/employees/${id}`,
     SELECT: "/api/employees/select",
+    SELECT_OPTIONS: "/api/employees/select-options",
     DEACTIVATE: (id: string) => `/api/employees/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/employees/activate/${id}`,
   },
@@ -133,10 +134,11 @@ export const API_ENDPOINTS = {
   PAYROLL_PERIOD: {
     PAGINATION: "/api/payroll-periods",
     GET_ALL: "/api/payroll-periods",
-    CREATE: "/api/payroll-periods",
+    CREATE: "/api/payroll-periods/create",
     UPDATE: (id: string) => `/api/payroll-periods/${id}`,
     FIND_BY_ID: (id: string) => `/api/payroll-periods/${id}`,
     SELECT: "/api/payroll-periods/select",
+    SELECT_OPTIONS: "/api/payroll-periods/select-options",
     DEACTIVATE: (id: string) => `/api/payroll-periods/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/payroll-periods/activate/${id}`,
   },
@@ -150,10 +152,11 @@ export const API_ENDPOINTS = {
   SALARY_ADJUSTMENT: {
     PAGINATION: "/api/salary-adjustments",
     GET_ALL: "/api/salary-adjustments",
-    CREATE: "/api/salary-adjustments",
+    CREATE: "/api/salary-adjustments/create",
     UPDATE: (id: string) => `/api/salary-adjustments/${id}`,
     FIND_BY_ID: (id: string) => `/api/salary-adjustments/${id}`,
     DELETE: (id: string) => `/api/salary-adjustments/${id}`,
+    ACTIVATE: (id: string) => `/api/salary-adjustments/${id}/activate`,
   },
   TAX_BRACKET: {
     PAGINATION: "/api/tax-brackets",

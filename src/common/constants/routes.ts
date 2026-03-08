@@ -180,6 +180,40 @@ export const ROUTES = {
           key: "ATTENDANCE_SUMMARY",
           label: "Tổng hợp công",
           path: "/payroll/attendance-summary",
+          children: {
+            DETAIL_ATTENDANCE_SUMMARY: {
+              key: "DETAIL_ATTENDANCE_SUMMARY",
+              label: "Chi tiết tổng hợp công",
+              path: "/payroll/attendance-summary/detail/:id",
+            },
+            EDIT_ATTENDANCE_SUMMARY: {
+              key: "EDIT_ATTENDANCE_SUMMARY",
+              label: "Chỉnh sửa tổng hợp công",
+              path: "/payroll/attendance-summary/edit/:id",
+            },
+          },
+        },
+        SALARY_ADJUSTMENTS: {
+          key: "SALARY_ADJUSTMENTS",
+          label: "Điều chỉnh lương",
+          path: "/payroll/salary-adjustments",
+          children: {
+            ADD_SALARY_ADJUSTMENT: {
+              key: "ADD_SALARY_ADJUSTMENT",
+              label: "Thêm điều chỉnh lương",
+              path: "/payroll/salary-adjustments/add",
+            },
+            EDIT_SALARY_ADJUSTMENT: {
+              key: "EDIT_SALARY_ADJUSTMENT",
+              label: "Chỉnh sửa điều chỉnh lương",
+              path: "/payroll/salary-adjustments/edit/:id",
+            },
+            DETAIL_SALARY_ADJUSTMENT: {
+              key: "DETAIL_SALARY_ADJUSTMENT",
+              label: "Chi tiết điều chỉnh lương",
+              path: "/payroll/salary-adjustments/detail/:id",
+            },
+          },
         },
       },
     },

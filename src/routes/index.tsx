@@ -29,6 +29,13 @@ import PayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-mana
 import AddPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/add";
 import EditPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/edit";
 import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/detail";
+import SalaryAdjustmentManager from "@/pages/main/payroll-manager/salaryAdjustment-manager";
+import AddSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/add";
+import EditSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/edit";
+import DetailSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/detail";
+import AttendanceSummaryManager from "@/pages/main/payroll-manager/attendanceSummary-manager";
+import DetailAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/detail";
+import EditAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/edit";
 
 
 export default function AppRoutes() {
@@ -151,6 +158,38 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.DETAIL_PAYROLL_PERIOD.path}
             element={<DetailPayrollPeriodScreen />}
+          />
+
+          {/* Quản lý tổng hợp công */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.path}
+            element={<AttendanceSummaryManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.DETAIL_ATTENDANCE_SUMMARY.path}
+            element={<DetailAttendanceSummaryScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path}
+            element={<EditAttendanceSummaryScreen />}
+          />
+
+          {/* Quản lý điều chỉnh lương */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.path}
+            element={<SalaryAdjustmentManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.ADD_SALARY_ADJUSTMENT.path}
+            element={<AddSalaryAdjustmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path}
+            element={<EditSalaryAdjustmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.DETAIL_SALARY_ADJUSTMENT.path}
+            element={<DetailSalaryAdjustmentScreen />}
           />
         </Route>
       </Route>{" "}

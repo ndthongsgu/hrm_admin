@@ -3,7 +3,6 @@ import type {
   DepartmentCreateDto,
   DepartmentDto,
   DepartmentFilter,
-  DepartmentPageRequest,
   DepartmentUpdateDto,
   DepartmentSelectDto,
 } from "@/dto/department.dto";

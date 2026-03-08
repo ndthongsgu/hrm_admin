@@ -3,11 +3,11 @@ import type {
   PayrollPeriodDto,
   PayrollPeriodFilter,
   AttendanceSummaryDto,
-  AttendanceSummaryFilter,
   SalaryAdjustmentDto,
   SalaryAdjustmentFilter,
   PayslipDto,
   PayslipFilter,
+  SelectOptionDto,
 } from "@/dto/payroll.dto";
 import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
 import { useRouter } from "@/routes/hooks";
@@ -305,7 +305,7 @@ export const useActivatePayrollPeriod = () => {
 // ===== ATTENDANCE SUMMARY HOOKS =====
 
 export const usePaginationAttendanceSummaries = (
-  params: PaginationDto<AttendanceSummaryFilter>,
+  params: PaginationDto<Record<string, any>>,
 ) => {
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: [API_ENDPOINTS.ATTENDANCE_SUMMARY.PAGINATION, params],
@@ -322,9 +322,36 @@ export const usePaginationAttendanceSummaries = (
       ),
   });
 
+  const mappedData = (data?.content || []).map((item: any) => ({
+    ...item,
+    employeeId: item.employee?.id || item.employeeId,
+    employeeName: item.employee?.fullName || item.employeeName,
+    employeeCode: item.employee?.employeeCode || item.employeeCode,
+    payrollPeriodId: item.payrollPeriod?.id || item.payrollPeriodId,
+    payrollPeriodName: item.payrollPeriod?.name || item.payrollPeriodName,
+  }));
+
   return {
-    data: data?.content || [],
+    data: mappedData,
     total: data?.totalElements || 0,
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+export const useDetailAttendanceSummary = (id: string) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.ATTENDANCE_SUMMARY.FIND_BY_ID(id)],
+    queryFn: () =>
+      rootApiService.get<AttendanceSummaryDto>(
+        API_ENDPOINTS.ATTENDANCE_SUMMARY.FIND_BY_ID(id),
+      ),
+    enabled: !!id,
+  });
+
+  return {
+    data,
     isLoading,
     refetch,
     error,
@@ -417,8 +444,17 @@ export const usePaginationSalaryAdjustments = (
       ),
   });
 
+  const mappedData = (data?.content || []).map((item: any) => ({
+    ...item,
+    employeeId: item.employee?.id || item.employeeId,
+    employeeName: item.employee?.fullName || item.employeeName,
+    employeeCode: item.employee?.employeeCode || item.employeeCode,
+    payrollPeriodId: item.payrollPeriod?.id || item.payrollPeriodId,
+    payrollPeriodName: item.payrollPeriod?.name || item.payrollPeriodName,
+  }));
+
   return {
-    data: data?.content || [],
+    data: mappedData,
     total: data?.totalElements || 0,
     isLoading,
     refetch,
@@ -459,6 +495,122 @@ export const useCreateSalaryAdjustment = () => {
   return { onCreateSalaryAdjustment, isLoading };
 };
 
+export const useDetailSalaryAdjustment = (id: string) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id)],
+    queryFn: () =>
+      rootApiService.get<SalaryAdjustmentDto>(
+        API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id),
+      ),
+    enabled: !!id,
+  });
+
+  return {
+    data,
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+export const useUpdateSalaryAdjustment = (id: string) => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onUpdateSalaryAdjustment, isPending: isLoading } =
+    useMutation({
+      mutationFn: (body: SalaryAdjustmentDto) =>
+        rootApiService.put<SuccessResponse>(
+          API_ENDPOINTS.SALARY_ADJUSTMENT.UPDATE(id),
+          body,
+        ),
+      onSuccess: (res: SuccessResponse) => {
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION],
+        });
+        showToast({
+          type: "success",
+          message: res.message || "Cập nhật điều chỉnh lương thành công!",
+          title: "Thành công",
+        });
+      },
+      onError: (error: any) => {
+        showToast({
+          type: "error",
+          message: error?.message || "Cập nhật điều chỉnh lương thất bại!",
+          title: "Thất bại",
+        });
+      },
+    });
+
+  return { onUpdateSalaryAdjustment, isLoading };
+};
+
+export const useDeactivateSalaryAdjustment = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onDeactivateSalaryAdjustment, isPending: isLoading } =
+    useMutation({
+      mutationFn: (id: string) =>
+        rootApiService.delete<SuccessResponse>(
+          API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id),
+        ),
+      onSuccess: (res: SuccessResponse) => {
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION],
+        });
+        showToast({
+          type: "success",
+          message: res.message || "Ngừng hoạt động điều chỉnh lương thành công!",
+          title: "Thành công",
+        });
+      },
+      onError: (error: any) => {
+        showToast({
+          type: "error",
+          message: error?.message || "Ngừng hoạt động điều chỉnh lương thất bại!",
+          title: "Thất bại",
+        });
+      },
+    });
+
+  return { onDeactivateSalaryAdjustment, isLoading };
+};
+
+export const useActivateSalaryAdjustment = () => {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+
+  const { mutateAsync: onActivateSalaryAdjustment, isPending: isLoading } =
+    useMutation({
+      mutationFn: (id: string) =>
+        rootApiService.put<SuccessResponse>(
+          `${API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id)}/activate`,
+          {},
+        ),
+      onSuccess: (res: SuccessResponse) => {
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION],
+        });
+        showToast({
+          type: "success",
+          message: res.message || "Kích hoạt lại điều chỉnh lương thành công!",
+          title: "Thành công",
+        });
+      },
+      onError: (error: any) => {
+        showToast({
+          type: "error",
+          message: error?.message || "Kích hoạt lại điều chỉnh lương thất bại!",
+          title: "Thất bại",
+        });
+      },
+    });
+
+  return { onActivateSalaryAdjustment, isLoading };
+};
+
 // ===== PAYSLIP HOOKS =====
 
 export const usePaginationPayslips = (params: PaginationDto<PayslipFilter>) => {
@@ -477,8 +629,17 @@ export const usePaginationPayslips = (params: PaginationDto<PayslipFilter>) => {
       ),
   });
 
+  const mappedData = (data?.content || []).map((item: any) => ({
+    ...item,
+    employeeId: item.employee?.id || item.employeeId,
+    employeeName: item.employee?.fullName || item.employeeName,
+    employeeCode: item.employee?.employeeCode || item.employeeCode,
+    payrollPeriodId: item.payrollPeriod?.id || item.payrollPeriodId,
+    payrollPeriodName: item.payrollPeriod?.name || item.payrollPeriodName,
+  }));
+
   return {
-    data: data?.content || [],
+    data: mappedData,
     total: data?.totalElements || 0,
     isLoading,
     refetch,
@@ -496,6 +657,42 @@ export const useDetailPayslip = (id: string) => {
 
   return {
     data,
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+// ===== SELECTBOX OPTIONS HOOKS =====
+
+export const usePayrollPeriodSelectOptions = () => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.PAYROLL_PERIOD.SELECT_OPTIONS],
+    queryFn: () =>
+      rootApiService.get<SelectOptionDto[]>(
+        API_ENDPOINTS.PAYROLL_PERIOD.SELECT_OPTIONS,
+      ),
+  });
+
+  return {
+    data: data || [],
+    isLoading,
+    refetch,
+    error,
+  };
+};
+
+export const useEmployeeSelectOptions = () => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.EMPLOYEE.SELECT_OPTIONS],
+    queryFn: () =>
+      rootApiService.get<SelectOptionDto[]>(
+        API_ENDPOINTS.EMPLOYEE.SELECT_OPTIONS,
+      ),
+  });
+
+  return {
+    data: data || [],
     isLoading,
     refetch,
     error,
