@@ -29,7 +29,9 @@ import PayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-mana
 import AddPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/add";
 import EditPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/edit";
 import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/detail";
-
+import SysSettingsPage from "@/pages/main/settings-manager/sys-settings";
+import TaxBracketsPage from "@/pages/main/settings-manager/tax-brackets";
+import InsuranceConfigsPage from "@/pages/main/settings-manager/insurance-configs";
 
 export default function AppRoutes() {
   return (
@@ -114,7 +116,9 @@ export default function AppRoutes() {
             element={<EditDepartmentScreen />}
           />
           <Route
-            path={ROUTES.MAIN.DEPARTMENT_MANAGER.children.DETAIL_DEPARTMENT.path}
+            path={
+              ROUTES.MAIN.DEPARTMENT_MANAGER.children.DETAIL_DEPARTMENT.path
+            }
             element={<DetailDepartmentScreen />}
           />
           {/* Quản lý chức vụ */}
@@ -141,16 +145,39 @@ export default function AppRoutes() {
             element={<PayrollPeriodScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.ADD_PAYROLL_PERIOD.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children
+                .ADD_PAYROLL_PERIOD.path
+            }
             element={<AddPayrollPeriodScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.EDIT_PAYROLL_PERIOD.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children
+                .EDIT_PAYROLL_PERIOD.path
+            }
             element={<EditPayrollPeriodScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.DETAIL_PAYROLL_PERIOD.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children
+                .DETAIL_PAYROLL_PERIOD.path
+            }
             element={<DetailPayrollPeriodScreen />}
+          />
+
+          {/* Cấu hình hệ thống */}
+          <Route
+            path={ROUTES.MAIN.SETTINGS_MANAGER.children.SYS_SETTINGS.path}
+            element={<SysSettingsPage />}
+          />
+          <Route
+            path={ROUTES.MAIN.SETTINGS_MANAGER.children.TAX_BRACKETS.path}
+            element={<TaxBracketsPage />}
+          />
+          <Route
+            path={ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.path}
+            element={<InsuranceConfigsPage />}
           />
         </Route>
       </Route>{" "}

@@ -54,7 +54,7 @@ export const ROUTES = {
           label: "Chi tiết vai trò",
           path: "/role_manager/detail/:id",
         },
-      }
+      },
     },
     PERMISSION_MANAGER: {
       key: "PERMISSION_MANAGER",
@@ -146,6 +146,28 @@ export const ROUTES = {
           key: "DETAIL_USER",
           label: "Chi tiết người dùng",
           path: "/user_manager/detail/:id",
+        },
+      },
+    },
+    SETTINGS_MANAGER: {
+      key: "SETTINGS_MANAGER",
+      label: "Cấu hình hệ thống",
+      path: "/settings",
+      children: {
+        SYS_SETTINGS: {
+          key: "SYS_SETTINGS",
+          label: "Cài đặt chung",
+          path: "/settings/sys-settings",
+        },
+        TAX_BRACKETS: {
+          key: "TAX_BRACKETS",
+          label: "Bậc thuế TNCN",
+          path: "/settings/tax-brackets",
+        },
+        INSURANCE_CONFIGS: {
+          key: "INSURANCE_CONFIGS",
+          label: "Cấu hình bảo hiểm",
+          path: "/settings/insurance-configs",
         },
       },
     },

@@ -77,6 +77,7 @@ export const ModuleCode = {
   PAYROLL: "PAYROLL",
   EMPLOYEE: "EMPLOYEE",
   ROLE: "ROLE",
+  SETTINGS: "SETTINGS",
 } as const;
 
 export type ModuleCodeType = (typeof ModuleCode)[keyof typeof ModuleCode];
