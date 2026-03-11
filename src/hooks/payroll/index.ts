@@ -465,6 +465,7 @@ export const usePaginationSalaryAdjustments = (
 export const useCreateSalaryAdjustment = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
+  const router = useRouter();
 
   const { mutateAsync: onCreateSalaryAdjustment, isPending: isLoading } =
     useMutation({
@@ -482,6 +483,7 @@ export const useCreateSalaryAdjustment = () => {
           message: res.message || "Tạo điều chỉnh lương thành công!",
           title: "Thành công",
         });
+        router.back();
       },
       onError: (error: any) => {
         showToast({
