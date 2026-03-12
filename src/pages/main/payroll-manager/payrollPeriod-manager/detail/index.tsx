@@ -1,3 +1,4 @@
+import { PAYROLL_PERIOD_STATUS } from "@/common/constants/payrollPeriod";
 import ActionLog from "@/components/action-log";
 import BaseView from "@/components/base-view/BaseView";
 import Loading from "@/components/loading/Loading";
@@ -35,10 +36,10 @@ export default function PayrollPeriodDetailScreen() {
             </Col>
             <Col span={8}>
               <Space direction="vertical" size={0}>
-                <Text type="secondary">Trạng thái chốt</Text>
+                <Text type="secondary">Trạng thái</Text>
                 <Text>
-                  <Tag color={data?.isLocked ? "gold" : "green"}>
-                    {data?.isLocked ? "Đã chốt" : "Chưa chốt"}
+                  <Tag color={PAYROLL_PERIOD_STATUS[data?.status as keyof typeof PAYROLL_PERIOD_STATUS]?.color}>
+                    {PAYROLL_PERIOD_STATUS[data?.status as keyof typeof PAYROLL_PERIOD_STATUS]?.label}
                   </Tag>
                 </Text>
               </Space>

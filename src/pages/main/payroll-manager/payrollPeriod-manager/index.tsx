@@ -7,6 +7,7 @@ import FilterComponent, {
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PayrollPeriodFilter } from "@/dto/payroll.dto";
+import { useConfirm } from "@/hooks/layout/useConfirm";
 import { usePaginationPayrollPeriods } from "@/hooks/payroll";
 import {
   useDeactivatePayrollPeriod,
@@ -26,7 +27,7 @@ import {
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import { Button, Row, Space, Tag } from "antd";
+import { Button, Row, Space, Tag, Modal, Input } from "antd";
 import { useState } from "react";
 
 const initFilter: PayrollPeriodFilter = {
@@ -48,6 +49,10 @@ export default function PayrollPeriodManager() {
     take: 10,
     where: initFilter,
   });
+  const { confirm } = useConfirm();
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
   const { data, total, isLoading } = usePaginationPayrollPeriods(pagination);
   const { onDeactivatePayrollPeriod } = useDeactivatePayrollPeriod();
@@ -158,16 +163,24 @@ export default function PayrollPeriodManager() {
       width: columnWidths.status,
       render: (status: string) => {
         const colorMap = {
-          [PAYROLL_PERIOD_STATUS.APPROVED.value]: PAYROLL_PERIOD_STATUS.APPROVED.color,
-          [PAYROLL_PERIOD_STATUS.PENDING.value]: PAYROLL_PERIOD_STATUS.PENDING.color,
-          [PAYROLL_PERIOD_STATUS.REJECTED.value]: PAYROLL_PERIOD_STATUS.REJECTED.color,
-          [PAYROLL_PERIOD_STATUS.LOCKED.value]: PAYROLL_PERIOD_STATUS.LOCKED.color,
+          [PAYROLL_PERIOD_STATUS.APPROVED.value]:
+            PAYROLL_PERIOD_STATUS.APPROVED.color,
+          [PAYROLL_PERIOD_STATUS.PENDING.value]:
+            PAYROLL_PERIOD_STATUS.PENDING.color,
+          [PAYROLL_PERIOD_STATUS.REJECTED.value]:
+            PAYROLL_PERIOD_STATUS.REJECTED.color,
+          [PAYROLL_PERIOD_STATUS.LOCKED.value]:
+            PAYROLL_PERIOD_STATUS.LOCKED.color,
         };
         const textMap = {
-          [PAYROLL_PERIOD_STATUS.APPROVED.value]: PAYROLL_PERIOD_STATUS.APPROVED.label,
-          [PAYROLL_PERIOD_STATUS.PENDING.value]: PAYROLL_PERIOD_STATUS.PENDING.label,
-          [PAYROLL_PERIOD_STATUS.REJECTED.value]: PAYROLL_PERIOD_STATUS.REJECTED.label,
-          [PAYROLL_PERIOD_STATUS.LOCKED.value]: PAYROLL_PERIOD_STATUS.LOCKED.label,
+          [PAYROLL_PERIOD_STATUS.APPROVED.value]:
+            PAYROLL_PERIOD_STATUS.APPROVED.label,
+          [PAYROLL_PERIOD_STATUS.PENDING.value]:
+            PAYROLL_PERIOD_STATUS.PENDING.label,
+          [PAYROLL_PERIOD_STATUS.REJECTED.value]:
+            PAYROLL_PERIOD_STATUS.REJECTED.label,
+          [PAYROLL_PERIOD_STATUS.LOCKED.value]:
+            PAYROLL_PERIOD_STATUS.LOCKED.label,
         };
         return (
           <Row justify={"center"}>
@@ -246,7 +259,10 @@ export default function PayrollPeriodManager() {
       showKey: "isCanLock",
       type: "default",
       tooltip: "Chốt kỳ lương",
-      hidden: (record) => record.isDeleted || record.isLocked,
+      hidden: (record) =>
+        record.isDeleted ||
+        record.isLocked ||
+        record.status !== PAYROLL_PERIOD_STATUS.APPROVED.value,
       onClick: async (record) => {
         await onLockPayrollPeriod(record.id);
       },
@@ -258,9 +274,16 @@ export default function PayrollPeriodManager() {
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt kỳ lương",
-      hidden: (record) => record.isDeleted || record.isLocked || record.status === "APPROVED",
+      hidden: (record) =>
+        record.isDeleted ||
+        record.isLocked ||
+        record.status !== PAYROLL_PERIOD_STATUS.PENDING.value,
       onClick: async (record) => {
-        await onApprovePayrollPeriod(record.id);
+        confirm({
+          title: "Xác nhận duyệt kỳ lương",
+          content: `Bạn có chắc chắn muốn duyệt kỳ lương ${record.name}?`,
+          onOk: () => onApprovePayrollPeriod(record.id!),
+        });
       },
     },
     {
@@ -270,9 +293,14 @@ export default function PayrollPeriodManager() {
       showKey: "isCanReject",
       type: "default",
       tooltip: "Từ chối duyệt",
-      hidden: (record) => record.isDeleted || record.isLocked || record.status === "REJECTED",
+      hidden: (record) =>
+        record.isDeleted ||
+        record.isLocked ||
+        record.status !== PAYROLL_PERIOD_STATUS.PENDING.value,
       onClick: async (record) => {
-        await onRejectPayrollPeriod({ id: record.id });
+        setSelectedRecord(record);
+        setRejectReason("");
+        setRejectModalVisible(true);
       },
     },
     {
@@ -347,4 +375,35 @@ export default function PayrollPeriodManager() {
       </Space>
     </BaseView>
   );
+
+      <Modal
+        title="Xác nhận từ chối duyệt"
+        open={rejectModalVisible}
+        onOk={() => {
+          if (selectedRecord) {
+            onRejectPayrollPeriod({ id: selectedRecord.id, reason: rejectReason });
+            setRejectModalVisible(false);
+            setRejectReason("");
+            setSelectedRecord(null);
+          }
+        }}
+        onCancel={() => {
+          setRejectModalVisible(false);
+          setRejectReason("");
+          setSelectedRecord(null);
+        }}
+        okText="Từ chối"
+        cancelText="Hủy"
+      >
+        <div style={{ marginBottom: "12px" }}>
+          Bạn có chắc chắn muốn từ chối duyệt kỳ lương <strong>{selectedRecord?.name}</strong>?
+        </div>
+        <div style={{ marginBottom: "8px" }}>Lý do từ chối:</div>
+        <Input.TextArea
+          rows={4}
+          placeholder="Nhập lý do từ chối..."
+          value={rejectReason}
+          onChange={(e) => setRejectReason(e.target.value)}
+        />
+      </Modal>
 }

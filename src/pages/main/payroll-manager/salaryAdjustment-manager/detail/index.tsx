@@ -7,6 +7,7 @@ import { useRouter } from "@/routes/hooks";
 import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Space, Tag, Typography } from "antd";
 import { useParams } from "react-router-dom";
+import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
 
 const { Text } = Typography;
 
@@ -32,15 +33,6 @@ export default function SalaryAdjustmentDetailScreen() {
     router.back();
   };
 
-  const typeMap = {
-    BONUS: { text: "Thưởng", color: "green" },
-    FINE: { text: "Phạt", color: "red" },
-    ADVANCE: { text: "Tạm ứng", color: "orange" },
-    BHXH_BENEFIT: { text: "Trợ cấp BHXH", color: "blue" },
-  };
-
-  const typeConfig = typeMap[data?.type as keyof typeof typeMap] || { text: data?.type, color: "default" };
-
   return (
     <BaseView>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -49,19 +41,21 @@ export default function SalaryAdjustmentDetailScreen() {
             <Col span={8}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Nhân viên</Text>
-                <Text strong>{data?.employeeName} ({data?.employeeCode})</Text>
+                <Text strong>{data?.employee?.fullName} ({data?.employee?.employeeCode})</Text>
               </Space>
             </Col>
             <Col span={8}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Kỳ lương</Text>
-                <Text strong>{data?.payrollPeriodName}</Text>
+                <Text strong>{data?.payrollPeriod?.name}</Text>
               </Space>
             </Col>
             <Col span={8}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Loại điều chỉnh</Text>
-                <Tag color={typeConfig.color}>{typeConfig.text}</Tag>
+                <Tag color={SALARY_ADJUSTMENT_TYPE[data?.type as keyof typeof SALARY_ADJUSTMENT_TYPE]?.color}>
+                  {SALARY_ADJUSTMENT_TYPE[data?.type as keyof typeof SALARY_ADJUSTMENT_TYPE]?.label}
+                </Tag>
               </Space>
             </Col>
           </Row>

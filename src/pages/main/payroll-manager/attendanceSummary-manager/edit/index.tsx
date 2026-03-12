@@ -3,12 +3,16 @@ import { useDetailAttendanceSummary, useUpdateAttendanceSummary } from "@/hooks/
 import { useParams } from "react-router-dom";
 import AddAttendanceSummaryScreen from "../add";
 
+const handleUpdateWrapper = (onUpdate: any) => {
+  return (data: any) => {
+    return onUpdate(data);
+  };
+};
+
 export default function EditAttendanceSummaryScreen() {
   const { id } = useParams();
   const { data, isLoading } = useDetailAttendanceSummary(id ?? "");
-  const { onUpdateAttendanceSummary, isLoading: isLoadingUpdate } = useUpdateAttendanceSummary(
-    id ?? ""
-  );
+  const { onUpdateAttendanceSummary, isLoading: isLoadingUpdate } = useUpdateAttendanceSummary(id ?? "");
 
   if (isLoading) {
     return <Loading />;
@@ -19,7 +23,7 @@ export default function EditAttendanceSummaryScreen() {
       initData={data}
       title="Cập nhật tổng hợp công"
       isEdit={true}
-      handleUpdate={onUpdateAttendanceSummary}
+      handleUpdate={handleUpdateWrapper(onUpdateAttendanceSummary)}
       isLoadingUpdate={isLoadingUpdate}
     />
   );

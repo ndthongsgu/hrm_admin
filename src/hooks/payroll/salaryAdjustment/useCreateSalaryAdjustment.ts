@@ -9,13 +9,13 @@ import { useToast } from "../../layout/useToast";
 export const useCreateSalaryAdjustment = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
-  const { push } = useRouter();
+  const router = useRouter();
 
   const { mutateAsync: onCreateSalaryAdjustment, isPending: isLoading } =
     useMutation({
       mutationFn: (data: Partial<SalaryAdjustmentDto>) =>
         rootApiService.post<SuccessResponse>(
-          API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION,
+          API_ENDPOINTS.SALARY_ADJUSTMENT.CREATE,
           data,
         ),
       onSuccess: (res: SuccessResponse) => {
@@ -27,7 +27,7 @@ export const useCreateSalaryAdjustment = () => {
           message: res.message || "Tạo điều chỉnh lương thành công!",
           title: "Thành công",
         });
-        push("/salary-adjustment");
+        router.back();
       },
       onError: (error: any) => {
         showToast({

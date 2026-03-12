@@ -1,3 +1,5 @@
+import type { EmployeeDto } from "./employee.dto";
+
 export interface SelectOptionDto {
   id: string;
   name: string;
@@ -9,7 +11,7 @@ export interface PayrollPeriodDto {
   startDate: Date; // ISO date
   endDate: Date; // ISO date
   standardWorkingDays: number;
-  isLocked?: boolean;
+  status: string;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,15 +30,17 @@ export interface PayrollPeriodFilter {
 export interface AttendanceSummaryDto {
   id?: string;
   payrollPeriodId: string;
+  payrollPeriod: PayrollPeriodDto;
   payrollPeriodName?: string;
   employeeId: string;
+  employee: EmployeeDto;
   employeeName?: string;
   employeeCode?: string;
   actualWorkingDays: number;
   paidLeaveDays: number;
   unpaidLeaveDays: number;
   overtimeHours: number;
-  isApproved?: boolean;
+  status: string;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -50,8 +54,10 @@ export interface AttendanceSummaryFilter {
 export interface SalaryAdjustmentDto {
   id?: string;
   payrollPeriodId: string;
+  payrollPeriod: PayrollPeriodDto;
   payrollPeriodName?: string;
   employeeId: string;
+  employee: EmployeeDto;
   employeeName?: string;
   employeeCode?: string;
   amount: number;

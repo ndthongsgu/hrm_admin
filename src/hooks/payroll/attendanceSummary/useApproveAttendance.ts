@@ -4,15 +4,15 @@ import rootApiService from "@/services/api.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../layout/useToast";
 
-export const useApproveAttendance = (attendanceSummaryId: string) => {
+export const useApproveAttendance = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
 
   const { mutateAsync: onApproveAttendance, isPending: isLoading } =
     useMutation({
-      mutationFn: () =>
+      mutationFn: (id: string) =>
         rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.ATTENDANCE_SUMMARY.FIND_BY_ID(attendanceSummaryId)}/approve`,
+          `${API_ENDPOINTS.ATTENDANCE_SUMMARY.FIND_BY_ID(id)}/approve`,
           {},
         ),
       onSuccess: (res: SuccessResponse) => {

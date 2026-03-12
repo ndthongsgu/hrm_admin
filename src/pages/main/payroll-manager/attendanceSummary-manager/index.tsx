@@ -5,14 +5,16 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import { usePaginationAttendanceSummaries, useApproveAttendance, usePayrollPeriodSelectOptions } from "@/hooks/payroll";
+import { usePaginationAttendanceSummaries, useApproveAttendance, useRejectAttendance, usePayrollPeriodSelectOptions } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
 import {
   EditOutlined,
   EyeOutlined,
   CheckCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
-import { Row, Space, Tag } from "antd";
+import { Row, Space, Tag, Modal, Input } from "antd";
 import { useState } from "react";
 
 const initFilter = {
@@ -31,8 +33,13 @@ export default function AttendanceSummaryManager() {
     where: initFilter,
   });
 
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+
   const { data, total, isLoading } = usePaginationAttendanceSummaries(pagination);
-  const { onApproveAttendance } = useApproveAttendance("");
+  const { onApproveAttendance } = useApproveAttendance();
+  const { onRejectAttendance } = useRejectAttendance();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
 
   const handleSearch = (isReset?: boolean) => {
@@ -187,13 +194,27 @@ export default function AttendanceSummaryManager() {
     {
       key: "approve",
       label: "",
-      icon: <CheckCircleOutlined />,
+      icon: <CheckOutlined />,
       showKey: "isCanApprove",
       type: "default",
-      tooltip: "Tính lại",
+      tooltip: "Duyệt công",
       hidden: (record) => record.isApproved,
       onClick: async (record) => {
         await onApproveAttendance(record.id);
+      },
+    },
+    {
+      key: "reject",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanReject",
+      type: "default",
+      tooltip: "Từ chối duyệt",
+      hidden: (record) => record.isApproved,
+      onClick: async (record) => {
+        setSelectedRecord(record);
+        setRejectReason("");
+        setRejectModalVisible(true);
       },
     },
   ];
@@ -232,6 +253,37 @@ export default function AttendanceSummaryManager() {
           onPageChange={handlePageChange}
         />
       </Space>
+
+      <Modal
+        title="Xác nhận từ chối duyệt công"
+        open={rejectModalVisible}
+        onOk={() => {
+          if (selectedRecord) {
+            onRejectAttendance({ id: selectedRecord.id, reason: rejectReason });
+            setRejectModalVisible(false);
+            setRejectReason("");
+            setSelectedRecord(null);
+          }
+        }}
+        onCancel={() => {
+          setRejectModalVisible(false);
+          setRejectReason("");
+          setSelectedRecord(null);
+        }}
+        okText="Từ chối"
+        cancelText="Hủy"
+      >
+        <div style={{ marginBottom: "12px" }}>
+          Bạn có chắc chắn muốn từ chối duyệt công cho <strong>{selectedRecord?.employeeName}</strong> - Kỳ <strong>{selectedRecord?.payrollPeriodName}</strong>?
+        </div>
+        <div style={{ marginBottom: "8px" }}>Lý do từ chối:</div>
+        <Input.TextArea
+          rows={4}
+          placeholder="Nhập lý do từ chối..."
+          value={rejectReason}
+          onChange={(e) => setRejectReason(e.target.value)}
+        />
+      </Modal>
     </BaseView>
   );
 }

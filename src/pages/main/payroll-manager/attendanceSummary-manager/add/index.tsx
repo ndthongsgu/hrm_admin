@@ -3,6 +3,7 @@ import type { FormField } from "@/components/form-custom";
 import FormCustom from "@/components/form-custom";
 import type { AttendanceSummaryDto } from "@/dto/payroll.dto";
 import { useRouter } from "@/routes/hooks";
+import { usePayrollPeriodSelectOptions, useEmployeeSelectOptions } from "@/hooks/payroll";
 import { useMemo } from "react";
 
 export default function AddAttendanceSummaryScreen({
@@ -19,22 +20,26 @@ export default function AddAttendanceSummaryScreen({
   isLoadingUpdate?: boolean;
 }) {
   const router = useRouter();
+  const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
+  const { data: employeeOptions } = useEmployeeSelectOptions();
 
   const formFields = useMemo(() => {
     const fields: FormField[] = [
       {
         name: "payrollPeriodId",
-        label: "ID Kỳ lương",
-        type: "input",
+        label: "Kỳ lương",
+        type: "select",
         required: true,
-        placeholder: "Nhập ID kỳ lương",
+        placeholder: "Chọn kỳ lương",
+        options: payrollPeriodOptions || [],
       },
       {
         name: "employeeId",
-        label: "ID Nhân viên",
-        type: "input",
+        label: "Nhân viên",
+        type: "select",
         required: true,
-        placeholder: "Nhập ID nhân viên",
+        placeholder: "Chọn nhân viên",
+        options: employeeOptions|| [],
       },
       {
         name: "actualWorkingDays",
@@ -66,13 +71,11 @@ export default function AddAttendanceSummaryScreen({
       },
     ];
     return fields;
-  }, []);
+  }, [payrollPeriodOptions, employeeOptions]);
 
   const handleSubmit = (values: any) => {
-    if (isEdit) {
-      if (handleUpdate) {
-        handleUpdate(values);
-      }
+    if (isEdit && handleUpdate) {
+      handleUpdate(values);
     }
   };
 

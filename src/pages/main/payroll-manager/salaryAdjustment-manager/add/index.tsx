@@ -1,3 +1,4 @@
+import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
 import BaseView from "@/components/base-view/BaseView";
 import type { FormField } from "@/components/form-custom";
 import FormCustom from "@/components/form-custom";
@@ -49,6 +50,8 @@ export default function AddSalaryAdjustmentScreen({
         label: "Số tiền",
         type: "number",
         required: true,
+        min: 0,
+        step: 1000,
         placeholder: "Nhập số tiền (âm cho khấu trừ)",
       },
       {
@@ -57,12 +60,10 @@ export default function AddSalaryAdjustmentScreen({
         type: "select",
         required: true,
         placeholder: "Chọn loại điều chỉnh",
-        options: [
-          { id: "BONUS", name: "Thưởng" },
-          { id: "FINE", name: "Phạt" },
-          { id: "ADVANCE", name: "Tạm ứng" },
-          { id: "BHXH_BENEFIT", name: "Trợ cấp BHXH" },
-        ],
+        options: Object.values(SALARY_ADJUSTMENT_TYPE).map((v) => ({
+          name: v.label,
+          id: v.value,
+        })),
       },
       {
         name: "reason",
