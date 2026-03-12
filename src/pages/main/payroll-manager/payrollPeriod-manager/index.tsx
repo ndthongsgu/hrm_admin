@@ -1,3 +1,4 @@
+import { PAYROLL_PERIOD_STATUS } from "@/common/constants/payrollPeriod";
 import { ROUTES } from "@/common/constants/routes";
 import BaseView from "@/components/base-view/BaseView";
 import FilterComponent, {
@@ -10,6 +11,9 @@ import { usePaginationPayrollPeriods } from "@/hooks/payroll";
 import {
   useDeactivatePayrollPeriod,
   useActivatePayrollPeriod,
+  useApprovePayrollPeriod,
+  useRejectPayrollPeriod,
+  useLockPayrollPeriod,
 } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
 import {
@@ -18,6 +22,9 @@ import {
   PlusOutlined,
   CheckCircleOutlined,
   StopOutlined,
+  LockOutlined,
+  CheckOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { Button, Row, Space, Tag } from "antd";
 import { useState } from "react";
@@ -45,6 +52,9 @@ export default function PayrollPeriodManager() {
   const { data, total, isLoading } = usePaginationPayrollPeriods(pagination);
   const { onDeactivatePayrollPeriod } = useDeactivatePayrollPeriod();
   const { onActivatePayrollPeriod } = useActivatePayrollPeriod();
+  const { onApprovePayrollPeriod } = useApprovePayrollPeriod();
+  const { onRejectPayrollPeriod } = useRejectPayrollPeriod();
+  const { onLockPayrollPeriod } = useLockPayrollPeriod();
 
   const handleSearch = (isReset?: boolean) => {
     setPagination((prev) => ({
@@ -77,14 +87,10 @@ export default function PayrollPeriodManager() {
     },
     {
       key: "isLocked",
-      label: "Trạng thái chốt",
+      label: "Trạng thái",
       type: "select",
       placeholder: "Chọn trạng thái",
-      options: [
-        { label: "Tất cả", value: undefined },
-        { label: "Đã chốt", value: true },
-        { label: "Chưa chốt", value: false },
-      ],
+      options: Object.values(PAYROLL_PERIOD_STATUS),
       col: 6,
     },
     {
@@ -106,7 +112,7 @@ export default function PayrollPeriodManager() {
     startDate: 150,
     endDate: 150,
     standardWorkingDays: 150,
-    isLocked: 120,
+    status: 120,
     isDeleted: 120,
     actions: 200,
   });
@@ -146,23 +152,27 @@ export default function PayrollPeriodManager() {
       render: (days: number) => days || 0,
     },
     {
-      title: "Trạng thái chốt",
-      dataIndex: "isLocked",
-      key: "isLocked",
-      width: columnWidths.isLocked,
-      render: (isLocked: boolean) => {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: columnWidths.status,
+      render: (status: string) => {
         const colorMap = {
-          true: "gold",
-          false: "green",
+          [PAYROLL_PERIOD_STATUS.APPROVED.value]: PAYROLL_PERIOD_STATUS.APPROVED.color,
+          [PAYROLL_PERIOD_STATUS.PENDING.value]: PAYROLL_PERIOD_STATUS.PENDING.color,
+          [PAYROLL_PERIOD_STATUS.REJECTED.value]: PAYROLL_PERIOD_STATUS.REJECTED.color,
+          [PAYROLL_PERIOD_STATUS.LOCKED.value]: PAYROLL_PERIOD_STATUS.LOCKED.color,
         };
         const textMap = {
-          true: "Đã chốt",
-          false: "Chưa chốt",
+          [PAYROLL_PERIOD_STATUS.APPROVED.value]: PAYROLL_PERIOD_STATUS.APPROVED.label,
+          [PAYROLL_PERIOD_STATUS.PENDING.value]: PAYROLL_PERIOD_STATUS.PENDING.label,
+          [PAYROLL_PERIOD_STATUS.REJECTED.value]: PAYROLL_PERIOD_STATUS.REJECTED.label,
+          [PAYROLL_PERIOD_STATUS.LOCKED.value]: PAYROLL_PERIOD_STATUS.LOCKED.label,
         };
         return (
           <Row justify={"center"}>
-            <Tag color={colorMap[isLocked as unknown as keyof typeof colorMap]}>
-              {textMap[isLocked as unknown as keyof typeof textMap]}
+            <Tag color={colorMap[status as unknown as keyof typeof colorMap]}>
+              {textMap[status as unknown as keyof typeof textMap]}
             </Tag>
           </Row>
         );
@@ -227,6 +237,42 @@ export default function PayrollPeriodManager() {
             record.id,
           ),
         );
+      },
+    },
+    {
+      key: "lock",
+      label: "",
+      icon: <LockOutlined />,
+      showKey: "isCanLock",
+      type: "default",
+      tooltip: "Chốt kỳ lương",
+      hidden: (record) => record.isDeleted || record.isLocked,
+      onClick: async (record) => {
+        await onLockPayrollPeriod(record.id);
+      },
+    },
+    {
+      key: "approve",
+      label: "",
+      icon: <CheckOutlined />,
+      showKey: "isCanApprove",
+      type: "default",
+      tooltip: "Duyệt kỳ lương",
+      hidden: (record) => record.isDeleted || record.isLocked || record.status === "APPROVED",
+      onClick: async (record) => {
+        await onApprovePayrollPeriod(record.id);
+      },
+    },
+    {
+      key: "reject",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanReject",
+      type: "default",
+      tooltip: "Từ chối duyệt",
+      hidden: (record) => record.isDeleted || record.isLocked || record.status === "REJECTED",
+      onClick: async (record) => {
+        await onRejectPayrollPeriod({ id: record.id });
       },
     },
     {

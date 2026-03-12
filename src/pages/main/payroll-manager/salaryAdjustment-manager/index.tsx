@@ -54,7 +54,7 @@ export default function SalaryAdjustmentManager() {
       label: "Kỳ lương",
       type: "select",
       placeholder: "Chọn kỳ lương",
-      options: payrollPeriodOptions?.map(option => ({ label: option.name, value: option.id })) || [],
+      options: payrollPeriodOptions?.map((option: any) => ({ label: option.name, value: option.id })) || [],
       col: 6,
     },
     {
@@ -62,7 +62,7 @@ export default function SalaryAdjustmentManager() {
       label: "Nhân viên",
       type: "select",
       placeholder: "Chọn nhân viên",
-      options: employeeOptions?.map(option => ({ label: option.name, value: option.id })) || [],
+      options: employeeOptions?.map((option: any) => ({ label: option.name, value: option.id })) || [],
       col: 6,
     },
     {
