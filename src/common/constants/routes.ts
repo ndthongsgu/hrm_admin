@@ -215,6 +215,18 @@ export const ROUTES = {
             },
           },
         },
+        PAYSLIPS: {
+          key: "PAYSLIPS",
+          label: "Phiếu lương",
+          path: "/payroll/payslips",
+          children: {
+            DETAIL_PAYSLIP: {
+              key: "DETAIL_PAYSLIP",
+              label: "Chi tiết phiếu lương",
+              path: "/payroll/payslips/detail/:id",
+            },
+          },
+        },
       },
     },
   },

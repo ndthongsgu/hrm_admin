@@ -18,7 +18,7 @@ import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
 const initFilter: SalaryAdjustmentFilter = {
   payrollPeriodId: "",
   employeeId: "",
-  type: "",
+  type: undefined,
   reason: "",
   isTaxable: undefined,
   isNetOnly: undefined,
@@ -298,20 +298,6 @@ export default function SalaryAdjustmentManager() {
           content: `Bạn có chắc chắn muốn duyệt điều chỉnh lương cho ${record.employeeName}?`,
           onOk: () => onApproveSalaryAdjustment(record.id!),
         });
-      },
-    },
-    {
-      key: "reject",
-      label: "",
-      icon: <CloseOutlined />,
-      showKey: "isCanReject",
-      type: "default",
-      tooltip: "Từ chối duyệt",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || false,
-      onClick: async (record: SalaryAdjustmentDto) => {
-        setSelectedRecord(record);
-        setRejectReason("");
-        setRejectModalVisible(true);
       },
     },
   ];

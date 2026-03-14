@@ -1,3 +1,4 @@
+import { ATTENDANCE_SUMMARY_STATUS } from "@/common/constants/payrollPeriod";
 import { ROUTES } from "@/common/constants/routes";
 import BaseView from "@/components/base-view/BaseView";
 import FilterComponent, {
@@ -10,7 +11,6 @@ import { useRouter } from "@/routes/hooks";
 import {
   EditOutlined,
   EyeOutlined,
-  CheckCircleOutlined,
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
@@ -19,7 +19,7 @@ import { useState } from "react";
 
 const initFilter = {
   payrollPeriodId: "",
-  isApproved: undefined,
+  status: undefined,
 };
 
 export default function AttendanceSummaryManager() {
@@ -65,16 +65,12 @@ export default function AttendanceSummaryManager() {
       col: 6,
     },
     {
-      key: "isApproved",
-      label: "Trạng thái duyệt",
+      key: "status",
+      label: "Trạng thái",
       type: "select",
       placeholder: "Chọn trạng thái",
-      options: [
-        { label: "Tất cả", value: undefined },
-        { label: "Đã duyệt", value: true },
-        { label: "Chưa duyệt", value: false },
-      ],
-      col: 6,
+      options: Object.values(ATTENDANCE_SUMMARY_STATUS),
+      col: 6, 
     },
   ];
 
@@ -85,7 +81,7 @@ export default function AttendanceSummaryManager() {
     paidLeaveDays: 150,
     unpaidLeaveDays: 150,
     overtimeHours: 150,
-    isApproved: 120,
+    status: 120,
     actions: 200,
   });
 
@@ -133,23 +129,15 @@ export default function AttendanceSummaryManager() {
       render: (hours: number) => hours || 0,
     },
     {
-      title: "Trạng thái duyệt",
-      dataIndex: "isApproved",
-      key: "isApproved",
-      width: columnWidths.isApproved,
-      render: (isApproved: boolean) => {
-        const colorMap = {
-          true: "green",
-          false: "gold",
-        };
-        const textMap = {
-          true: "Đã duyệt",
-          false: "Chưa duyệt",
-        };
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: columnWidths.status,
+      render: (status: string) => {
         return (
           <Row justify={"center"}>
-            <Tag color={colorMap[isApproved ? "true" : "false"]}>
-              {textMap[isApproved ? "true" : "false"]}
+            <Tag color={ATTENDANCE_SUMMARY_STATUS[status as keyof typeof ATTENDANCE_SUMMARY_STATUS]?.color}>
+              {ATTENDANCE_SUMMARY_STATUS[status as keyof typeof ATTENDANCE_SUMMARY_STATUS]?.label}
             </Tag>
           </Row>
         );
@@ -181,7 +169,7 @@ export default function AttendanceSummaryManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record) => record.isApproved,
+      hidden: (record) => record.status === ATTENDANCE_SUMMARY_STATUS.APPROVED.value,
       onClick: (record) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path.replace(
@@ -198,7 +186,7 @@ export default function AttendanceSummaryManager() {
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt công",
-      hidden: (record) => record.isApproved,
+      hidden: (record) => record.status !== ATTENDANCE_SUMMARY_STATUS.PENDING.value,
       onClick: async (record) => {
         await onApproveAttendance(record.id);
       },
@@ -210,7 +198,7 @@ export default function AttendanceSummaryManager() {
       showKey: "isCanReject",
       type: "default",
       tooltip: "Từ chối duyệt",
-      hidden: (record) => record.isApproved,
+      hidden: (record) => record.status !== ATTENDANCE_SUMMARY_STATUS.PENDING.value,
       onClick: async (record) => {
         setSelectedRecord(record);
         setRejectReason("");

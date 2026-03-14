@@ -287,30 +287,13 @@ export default function PayrollPeriodManager() {
       },
     },
     {
-      key: "reject",
-      label: "",
-      icon: <CloseOutlined />,
-      showKey: "isCanReject",
-      type: "default",
-      tooltip: "Từ chối duyệt",
-      hidden: (record) =>
-        record.isDeleted ||
-        record.isLocked ||
-        record.status !== PAYROLL_PERIOD_STATUS.PENDING.value,
-      onClick: async (record) => {
-        setSelectedRecord(record);
-        setRejectReason("");
-        setRejectModalVisible(true);
-      },
-    },
-    {
       key: "deactivate",
       label: "",
       icon: <StopOutlined />,
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record) => record.isDeleted || record.isLocked,
+      hidden: (record) => record.isDeleted !== false,
       onClick: async (record) => {
         await onDeactivatePayrollPeriod(record.id);
       },
@@ -322,7 +305,7 @@ export default function PayrollPeriodManager() {
       showKey: "isCanActivate",
       type: "default",
       tooltip: "Kích hoạt lại",
-      hidden: (record) => !record.isDeleted,
+      hidden: (record) => record.isDeleted !== true,
       onClick: async (record) => {
         await onActivatePayrollPeriod(record.id);
       },

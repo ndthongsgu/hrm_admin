@@ -148,6 +148,8 @@ export const API_ENDPOINTS = {
     CREATE: "/api/payslips",
     UPDATE: (id: string) => `/api/payslips/${id}`,
     FIND_BY_ID: (id: string) => `/api/payslips/${id}`,
+    GENERATE: (payrollPeriodId: string) => `/api/payslips/generate/${payrollPeriodId}`,
+    GENERATE_FOR_EMPLOYEE: (payrollPeriodId: string, employeeId: string) => `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,
   },
   SALARY_ADJUSTMENT: {
     PAGINATION: "/api/salary-adjustments",

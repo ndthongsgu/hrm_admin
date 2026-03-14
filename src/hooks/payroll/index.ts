@@ -39,6 +39,11 @@ export {
 export {
   useDetailPayslip,
   usePaginationPayslips,
+  useApprovePayslip,
+  useRejectPayslip,
+  useDeactivatePayslip,
+  useActivatePayslip,
+  useGeneratePayslip,
 } from "./payslip";
 
 // ===== SELECT OPTIONS HOOKS =====

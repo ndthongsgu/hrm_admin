@@ -13,11 +13,9 @@ export const usePaginationSalaryAdjustments = (
       rootApiService.post<PaginationResponse<SalaryAdjustmentDto>>(
         API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION,
         {
-          page: Math.floor(params.skip / params.take),
-          size: params.take,
-          sortBy: "createdAt",
-          sortDirection: "DESC",
-          ...params.where,
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
         },
       ),
   });

@@ -121,6 +121,12 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           label: ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.label,
           moduleCode: ModuleCode.PAYROLL,
         },
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
       ],
     },
   ];

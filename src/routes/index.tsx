@@ -36,6 +36,8 @@ import DetailSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdj
 import AttendanceSummaryManager from "@/pages/main/payroll-manager/attendanceSummary-manager";
 import DetailAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/detail";
 import EditAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/edit";
+import PayslipManager from "@/pages/main/payroll-manager/payslip";
+import PayslipDetailScreen from "@/pages/main/payroll-manager/payslip/detail";
 
 
 export default function AppRoutes() {
@@ -172,6 +174,16 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path}
             element={<EditAttendanceSummaryScreen />}
+          />
+
+          {/* Quản lý phiếu lương */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.path}
+            element={<PayslipManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.children.DETAIL_PAYSLIP.path}
+            element={<PayslipDetailScreen />}
           />
 
           {/* Quản lý điều chỉnh lương */}

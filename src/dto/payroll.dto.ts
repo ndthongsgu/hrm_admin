@@ -84,6 +84,9 @@ export interface SalaryAdjustmentFilter {
 export interface PayslipDto {
   id?: string;
   payrollPeriodId: string;
+  payrollPeriodName?: string;
+  payrollPeriod?: PayrollPeriodDto;
+  employee: EmployeeDto;
   employeeId: string;
   employeeName?: string;
   employeeCode?: string;
@@ -111,6 +114,12 @@ export interface PayslipDto {
   
   // Net
   netSalary: number;
+  
+  // Approval
+  status?: string;
+  reason?: string;
+
+  isDeleted?: boolean;
   
   createdAt?: Date;
   updatedAt?: Date;

@@ -66,7 +66,7 @@ const DetailView = ({ data }: { data: EmployeeDto }) => {
               Mã nhân viên
             </Text>
             <Text strong style={{ fontSize: "18px" }}>
-              {data?.code}
+              {data?.employeeCode}
             </Text>
           </Col>
           <Col span={8} style={{ padding: "20px" }}>
