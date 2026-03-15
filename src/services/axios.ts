@@ -73,13 +73,30 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const authStore = useAuthStore.getState();
 
-    // Log failed API calls for debugging
+    // Extract error message from backend response
+    let errorMessage = "Có lỗi xảy ra";
+    if (error.response?.data) {
+      const responseData = error.response.data;
+      // Try to get message from different response formats
+      if (responseData.message) {
+        errorMessage = responseData.message; // BaseResponse format
+      } else if (responseData.error) {
+        errorMessage = responseData.error; // Some APIs use 'error' field
+      } else if (typeof responseData === 'string') {
+        errorMessage = responseData;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    // Log failed API calls for debugging with clear error message
     if (error.response) {
       console.error(
         `[API Error] ${originalRequest.method?.toUpperCase()} ${originalRequest.url}`,
         {
           status: error.response.status,
           statusText: error.response.statusText,
+          errorMessage: errorMessage,
           data: error.response.data,
         },
       );
@@ -115,7 +132,7 @@ axiosInstance.interceptors.response.use(
         authStore.clearTokens();
         if (!window.location.pathname.includes("/login")) {
           window.location.href = `/login?message=${encodeURIComponent(
-            "Session expired. Please login again.",
+            "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
           )}`;
         }
         return Promise.reject(error);
@@ -165,7 +182,7 @@ axiosInstance.interceptors.response.use(
           authStore.clearTokens();
           if (!window.location.pathname.includes("/login")) {
             window.location.href = `/login?message=${encodeURIComponent(
-              "Session expired. Please login again.",
+              "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
             )}`;
           }
           return Promise.reject(err);
@@ -181,6 +198,9 @@ axiosInstance.interceptors.response.use(
         });
       });
     }
+
+    // Attach error message to error object for easier access in catch blocks
+    error.errorMessage = errorMessage;
 
     // For auth endpoints or other 401 errors, just reject with the original error
     return Promise.reject(error);

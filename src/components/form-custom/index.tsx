@@ -64,7 +64,7 @@ export interface FormField {
   disabledDate?: (current: Dayjs) => boolean;
   disabledTime?: (current: Dayjs) => any;
   disabled?: boolean;
-  defaultValue?: Dayjs;
+  defaultValue?: any;
   step?: number;
   min?: number;
   max?: number;

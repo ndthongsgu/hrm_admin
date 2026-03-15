@@ -32,6 +32,16 @@ import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPerio
 import SysSettingsPage from "@/pages/main/settings-manager/sys-settings";
 import TaxBracketsPage from "@/pages/main/settings-manager/tax-brackets";
 import InsuranceConfigsPage from "@/pages/main/settings-manager/insurance-configs";
+import SalaryAdjustmentManager from "@/pages/main/payroll-manager/salaryAdjustment-manager";
+import AddSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/add";
+import EditSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/edit";
+import DetailSalaryAdjustmentScreen from "@/pages/main/payroll-manager/salaryAdjustment-manager/detail";
+import AttendanceSummaryManager from "@/pages/main/payroll-manager/attendanceSummary-manager";
+import DetailAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/detail";
+import EditAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/edit";
+import PayslipManager from "@/pages/main/payroll-manager/payslip";
+import PayslipDetailScreen from "@/pages/main/payroll-manager/payslip/detail";
+
 
 export default function AppRoutes() {
   return (
@@ -178,6 +188,46 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.path}
             element={<InsuranceConfigsPage />}
+          {/* Quản lý tổng hợp công */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.path}
+            element={<AttendanceSummaryManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.DETAIL_ATTENDANCE_SUMMARY.path}
+            element={<DetailAttendanceSummaryScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path}
+            element={<EditAttendanceSummaryScreen />}
+          />
+
+          {/* Quản lý phiếu lương */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.path}
+            element={<PayslipManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.children.DETAIL_PAYSLIP.path}
+            element={<PayslipDetailScreen />}
+          />
+
+          {/* Quản lý điều chỉnh lương */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.path}
+            element={<SalaryAdjustmentManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.ADD_SALARY_ADJUSTMENT.path}
+            element={<AddSalaryAdjustmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path}
+            element={<EditSalaryAdjustmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.DETAIL_SALARY_ADJUSTMENT.path}
+            element={<DetailSalaryAdjustmentScreen />}
           />
         </Route>
       </Route>{" "}

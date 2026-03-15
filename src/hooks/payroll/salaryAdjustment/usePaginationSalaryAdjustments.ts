@@ -1,0 +1,39 @@
+import type { PaginationDto, PaginationResponse } from "@/dto/pagination.dto";
+import type { SalaryAdjustmentDto } from "@/dto/payroll.dto";
+import { API_ENDPOINTS } from "@/services";
+import rootApiService from "@/services/api.service";
+import { useQuery } from "@tanstack/react-query";
+
+export const usePaginationSalaryAdjustments = (
+  params: PaginationDto<Record<string, any>>,
+) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION, params],
+    queryFn: () =>
+      rootApiService.post<PaginationResponse<SalaryAdjustmentDto>>(
+        API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION,
+        {
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
+        },
+      ),
+  });
+
+  const mappedData = (data?.content || []).map((item: any) => ({
+    ...item,
+    employeeId: item.employee?.id || item.employeeId,
+    employeeName: item.employee?.fullName || item.employeeName,
+    employeeCode: item.employee?.employeeCode || item.employeeCode,
+    payrollPeriodId: item.payrollPeriod?.id || item.payrollPeriodId,
+    payrollPeriodName: item.payrollPeriod?.name || item.payrollPeriodName,
+  }));
+
+  return {
+    data: mappedData,
+    total: data?.totalElements || 0,
+    isLoading,
+    refetch,
+    error,
+  };
+};

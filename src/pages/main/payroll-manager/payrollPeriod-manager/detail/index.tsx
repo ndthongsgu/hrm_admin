@@ -1,14 +1,14 @@
+import { PAYROLL_PERIOD_STATUS } from "@/common/constants/payrollPeriod";
 import ActionLog from "@/components/action-log";
 import BaseView from "@/components/base-view/BaseView";
 import Loading from "@/components/loading/Loading";
-import { ROUTES } from "@/common/constants/routes";
 import { useDetailPayrollPeriod } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
-import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Space, Tag, Typography } from "antd";
 import { useParams } from "react-router-dom";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 export default function PayrollPeriodDetailScreen() {
   const { id } = useParams();
@@ -18,15 +18,6 @@ export default function PayrollPeriodDetailScreen() {
   if (isLoading) {
     return <Loading />;
   }
-
-  const handleEdit = () => {
-    router.push(
-      ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.EDIT_PAYROLL_PERIOD.path.replace(
-        ":id",
-        id ?? "",
-      ),
-    );
-  };
 
   const goBack = () => {
     router.back();
@@ -45,10 +36,10 @@ export default function PayrollPeriodDetailScreen() {
             </Col>
             <Col span={8}>
               <Space direction="vertical" size={0}>
-                <Text type="secondary">Trạng thái chốt</Text>
+                <Text type="secondary">Trạng thái</Text>
                 <Text>
-                  <Tag color={data?.isLocked ? "gold" : "green"}>
-                    {data?.isLocked ? "Đã chốt" : "Chưa chốt"}
+                  <Tag color={PAYROLL_PERIOD_STATUS[data?.status as keyof typeof PAYROLL_PERIOD_STATUS]?.color}>
+                    {PAYROLL_PERIOD_STATUS[data?.status as keyof typeof PAYROLL_PERIOD_STATUS]?.label}
                   </Tag>
                 </Text>
               </Space>
