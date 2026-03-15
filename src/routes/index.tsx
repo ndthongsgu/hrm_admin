@@ -29,6 +29,7 @@ import PayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-mana
 import AddPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/add";
 import EditPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/edit";
 import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/detail";
+import ContractManagerPage from "@/pages/main/payroll-manager/contract-manager";
 import SysSettingsPage from "@/pages/main/settings-manager/sys-settings";
 import TaxBracketsPage from "@/pages/main/settings-manager/tax-brackets";
 import InsuranceConfigsPage from "@/pages/main/settings-manager/insurance-configs";
@@ -153,6 +154,10 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.path}
             element={<PayrollPeriodScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.path}
+            element={<ContractManagerPage />}
           />
           <Route
             path={
