@@ -1,11 +1,11 @@
 import {
   DashboardOutlined,
-  LockOutlined,
   SafetyOutlined,
   UserOutlined,
   ApartmentOutlined,
   TeamOutlined,
   DollarOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
@@ -61,22 +61,6 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       ],
     },
 
-    // HRM: Role / Permission
-    {
-      key: ROUTES.MAIN.ROLE_MANAGER.key,
-      path: ROUTES.MAIN.ROLE_MANAGER.path,
-      icon: <SafetyOutlined />,
-      label: ROUTES.MAIN.ROLE_MANAGER.label,
-      moduleCode: ModuleCode.ROLE,
-    },
-    {
-      key: ROUTES.MAIN.PERMISSION_MANAGER.key,
-      path: ROUTES.MAIN.PERMISSION_MANAGER.path,
-      icon: <LockOutlined />,
-      label: ROUTES.MAIN.PERMISSION_MANAGER.label,
-      moduleCode: ModuleCode.PERMISSION,
-    },
-
     // Department Manager
     {
       key: ROUTES.MAIN.DEPARTMENT_MANAGER.key,
@@ -126,6 +110,57 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           path: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.path,
           label: ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.label,
           moduleCode: ModuleCode.PAYROLL,
+        },
+      ],
+    },
+
+    // HRM: Role / Permission
+    {
+      key: ROUTES.MAIN.ROLE_MANAGER.key,
+      path: ROUTES.MAIN.ROLE_MANAGER.path,
+      icon: <SafetyOutlined />,
+      label: "Phân quyền",
+      children: [
+        {
+          key: ROUTES.MAIN.ROLE_MANAGER.key + "_list",
+          path: ROUTES.MAIN.ROLE_MANAGER.path,
+          label: ROUTES.MAIN.ROLE_MANAGER.label,
+          moduleCode: ModuleCode.ROLE,
+        },
+        {
+          key: ROUTES.MAIN.PERMISSION_MANAGER.key,
+          path: ROUTES.MAIN.PERMISSION_MANAGER.path,
+          label: ROUTES.MAIN.PERMISSION_MANAGER.label,
+          moduleCode: ModuleCode.PERMISSION,
+        },
+      ],
+    },
+
+    // Settings Manager
+    {
+      key: ROUTES.MAIN.SETTINGS_MANAGER.key,
+      path: ROUTES.MAIN.SETTINGS_MANAGER.path,
+      icon: <SettingOutlined />,
+      label: ROUTES.MAIN.SETTINGS_MANAGER.label,
+      moduleCode: ModuleCode.SETTINGS,
+      children: [
+        {
+          key: ROUTES.MAIN.SETTINGS_MANAGER.children.SYS_SETTINGS.key,
+          path: ROUTES.MAIN.SETTINGS_MANAGER.children.SYS_SETTINGS.path,
+          label: ROUTES.MAIN.SETTINGS_MANAGER.children.SYS_SETTINGS.label,
+          moduleCode: ModuleCode.SETTINGS,
+        },
+        {
+          key: ROUTES.MAIN.SETTINGS_MANAGER.children.TAX_BRACKETS.key,
+          path: ROUTES.MAIN.SETTINGS_MANAGER.children.TAX_BRACKETS.path,
+          label: ROUTES.MAIN.SETTINGS_MANAGER.children.TAX_BRACKETS.label,
+          moduleCode: ModuleCode.SETTINGS,
+        },
+        {
+          key: ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.key,
+          path: ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.path,
+          label: ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.label,
+          moduleCode: ModuleCode.SETTINGS,
         },
       ],
     },
@@ -233,7 +268,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
         >
           {item.label}
         </Menu.Item>
-      )
+      ),
     );
 
   return (

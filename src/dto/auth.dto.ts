@@ -77,6 +77,7 @@ export const ModuleCode = {
   PAYROLL: "PAYROLL",
   EMPLOYEE: "EMPLOYEE",
   ROLE: "ROLE",
+  SETTINGS: "SETTINGS",
   CUSTOMER: "CUSTOMER",
   CAR: "CAR",
   ROUTE: "ROUTE",
