@@ -249,6 +249,11 @@ export const ROUTES = {
             },
           },
         },
+        CONTRACTS: {
+          key: "CONTRACTS",
+          label: "Hợp đồng lao động",
+          path: "/payroll/contracts",
+        },
       },
     },
   },
