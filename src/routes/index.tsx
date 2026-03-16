@@ -43,7 +43,6 @@ import EditAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendance
 import PayslipManager from "@/pages/main/payroll-manager/payslip";
 import PayslipDetailScreen from "@/pages/main/payroll-manager/payslip/detail";
 
-
 export default function AppRoutes() {
   return (
     <Routes>
@@ -193,17 +192,24 @@ export default function AppRoutes() {
           <Route
             path={ROUTES.MAIN.SETTINGS_MANAGER.children.INSURANCE_CONFIGS.path}
             element={<InsuranceConfigsPage />}
+          />
           {/* Quản lý tổng hợp công */}
           <Route
             path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.path}
             element={<AttendanceSummaryManager />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.DETAIL_ATTENDANCE_SUMMARY.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children
+                .DETAIL_ATTENDANCE_SUMMARY.path
+            }
             element={<DetailAttendanceSummaryScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children
+                .EDIT_ATTENDANCE_SUMMARY.path
+            }
             element={<EditAttendanceSummaryScreen />}
           />
 
@@ -213,7 +219,10 @@ export default function AppRoutes() {
             element={<PayslipManager />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.children.DETAIL_PAYSLIP.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.PAYSLIPS.children
+                .DETAIL_PAYSLIP.path
+            }
             element={<PayslipDetailScreen />}
           />
 
@@ -223,15 +232,24 @@ export default function AppRoutes() {
             element={<SalaryAdjustmentManager />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.ADD_SALARY_ADJUSTMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children
+                .ADD_SALARY_ADJUSTMENT.path
+            }
             element={<AddSalaryAdjustmentScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children
+                .EDIT_SALARY_ADJUSTMENT.path
+            }
             element={<EditSalaryAdjustmentScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.DETAIL_SALARY_ADJUSTMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children
+                .DETAIL_SALARY_ADJUSTMENT.path
+            }
             element={<DetailSalaryAdjustmentScreen />}
           />
         </Route>
