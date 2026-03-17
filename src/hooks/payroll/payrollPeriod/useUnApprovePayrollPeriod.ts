@@ -4,35 +4,34 @@ import rootApiService from "@/services/api.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../layout/useToast";
 
-export const useLockPayrollPeriod = () => {
+export const useUnApprovePayrollPeriod = () => {
   const queryClient = useQueryClient();
   const showToast = useToast();
 
-  const { mutateAsync: onLockPayrollPeriod, isPending: isLoading } =
+  const { mutateAsync: onUnApprovePayrollPeriod, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.PAYROLL_PERIOD.FIND_BY_ID(id)}/lock`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.PAYROLL_PERIOD.UNAPPROVE(id);
+        return rootApiService.post<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.PAYROLL_PERIOD.PAGINATION],
         });
         showToast({
           type: "success",
-          message: res.message || "Chốt kỳ lương thành công!",
+          message: res.message || "Hủy duyệt kỳ lương thành công!",
           title: "Thành công",
         });
       },
       onError: (error: any) => {
         showToast({
           type: "error",
-          message: error?.message || "Chốt kỳ lương thất bại!",
+          message: error?.message || "Hủy duyệt kỳ lương thất bại!",
           title: "Thất bại",
         });
       },
     });
 
-  return { onLockPayrollPeriod, isLoading };
+  return { onUnApprovePayrollPeriod, isLoading };
 };

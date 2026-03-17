@@ -12,7 +12,7 @@ export const useDeactivatePayrollPeriod = () => {
     useMutation({
       mutationFn: (id: string) =>
         rootApiService.delete<SuccessResponse>(
-          API_ENDPOINTS.PAYROLL_PERIOD.FIND_BY_ID(id),
+          API_ENDPOINTS.PAYROLL_PERIOD.DEACTIVATE(id),
         ),
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({

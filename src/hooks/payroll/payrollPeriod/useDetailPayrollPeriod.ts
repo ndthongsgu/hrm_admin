@@ -16,7 +16,7 @@ export const useDetailPayrollPeriod = (id: string) => {
   if (data) {
     data.dateRange =
       data.startDate && data.endDate
-        ? [data.startDate, data.endDate]
+        ? [new Date(data.startDate), new Date(data.endDate)]
         : undefined;
   }
 

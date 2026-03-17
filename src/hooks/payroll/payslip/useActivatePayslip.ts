@@ -10,11 +10,10 @@ export const useActivatePayslip = () => {
 
   const { mutateAsync: onActivatePayslip, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.put<SuccessResponse>(
-          `${API_ENDPOINTS.PAYSLIP.FIND_BY_ID(id)}/activate`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.PAYSLIP.ACTIVATE(id);
+        return rootApiService.put<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.PAYSLIP.PAGINATION],
