@@ -12,7 +12,7 @@ export const useApproveAttendance = () => {
     useMutation({
       mutationFn: (id: string) =>
         rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.ATTENDANCE_SUMMARY.FIND_BY_ID(id)}/approve`,
+          `${API_ENDPOINTS.ATTENDANCE_SUMMARY.APPROVE(id)}`,
           {},
         ),
       onSuccess: (res: SuccessResponse) => {

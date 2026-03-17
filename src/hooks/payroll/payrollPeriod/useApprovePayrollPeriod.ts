@@ -10,11 +10,10 @@ export const useApprovePayrollPeriod = () => {
 
   const { mutateAsync: onApprovePayrollPeriod, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.PAYROLL_PERIOD.FIND_BY_ID(id)}/approve`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.PAYROLL_PERIOD.APPROVE(id);
+        return rootApiService.post<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.PAYROLL_PERIOD.PAGINATION],

@@ -14,6 +14,7 @@ import {
   useActivatePayrollPeriod,
   useApprovePayrollPeriod,
 } from "@/hooks/payroll";
+import { useUnApprovePayrollPeriod } from "@/hooks/payroll/payrollPeriod";
 import { useRouter } from "@/routes/hooks";
 import {
   EditOutlined,
@@ -22,13 +23,14 @@ import {
   CheckCircleOutlined,
   StopOutlined,
   CheckOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { Button, Row, Space, Tag} from "antd";
 import { useState } from "react";
 
 const initFilter: PayrollPeriodFilter = {
   name: "",
-  isLocked: undefined,
+  status: undefined,
   isDeleted: false,
   startDate: undefined,
   endDate: undefined,
@@ -51,6 +53,7 @@ export default function PayrollPeriodManager() {
   const { onDeactivatePayrollPeriod } = useDeactivatePayrollPeriod();
   const { onActivatePayrollPeriod } = useActivatePayrollPeriod();
   const { onApprovePayrollPeriod } = useApprovePayrollPeriod();
+  const { onUnApprovePayrollPeriod } = useUnApprovePayrollPeriod();
 
   const handleSearch = (isReset?: boolean) => {
     setPagination((prev) => ({
@@ -82,7 +85,7 @@ export default function PayrollPeriodManager() {
       col: 6,
     },
     {
-      key: "isLocked",
+      key: "status",
       label: "Trạng thái",
       type: "select",
       placeholder: "Chọn trạng thái",
@@ -225,7 +228,7 @@ export default function PayrollPeriodManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record) => record.isDeleted || record.isLocked,
+      hidden: (record) => record.isDeleted || record.status === PAYROLL_PERIOD_STATUS.APPROVED.value,
       onClick: (record) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children.EDIT_PAYROLL_PERIOD.path.replace(
@@ -244,13 +247,34 @@ export default function PayrollPeriodManager() {
       tooltip: "Duyệt kỳ lương",
       hidden: (record) =>
         record.isDeleted ||
-        record.isLocked ||
         record.status !== PAYROLL_PERIOD_STATUS.PENDING.value,
-      onClick: async (record) => {
+      onClick: (record) => {
         confirm({
           title: "Xác nhận duyệt kỳ lương",
           content: `Bạn có chắc chắn muốn duyệt kỳ lương ${record.name}?`,
-          onOk: () => onApprovePayrollPeriod(record.id!),
+          onOk: async () => {
+            await onApprovePayrollPeriod(record.id!);
+          },
+        });
+      },
+    },
+    {
+      key: "unApprove",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanUnApprove",
+      type: "default",
+      tooltip: "Hủy duyệt kỳ lương",
+      hidden: (record) =>
+        record.isDeleted ||
+        record.status !== PAYROLL_PERIOD_STATUS.APPROVED.value,
+      onClick: (record) => {
+        confirm({
+          title: "Xác nhận hủy duyệt kỳ lương",
+          content: `Bạn có chắc chắn muốn hủy duyệt kỳ lương ${record.name}?`,
+          onOk: async () => {
+            await onUnApprovePayrollPeriod(record.id!);
+          },
         });
       },
     },
@@ -263,7 +287,13 @@ export default function PayrollPeriodManager() {
       tooltip: "Ngừng hoạt động",
       hidden: (record) => record.isDeleted !== false,
       onClick: async (record) => {
-        await onDeactivatePayrollPeriod(record.id);
+        confirm({
+          title: "Xác nhận ngừng hoạt động",
+          content: `Bạn có chắc chắn muốn ngừng hoạt động kỳ lương ${record.name}?`,
+          onOk: async () => {
+            await onDeactivatePayrollPeriod(record.id);
+          },
+        });
       },
     },
     {

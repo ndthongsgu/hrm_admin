@@ -13,7 +13,7 @@ import { usePaginationSalaryAdjustments, useDeactivateSalaryAdjustment, useActiv
 import { useConfirm } from "@/hooks/layout/useConfirm";
 import { EditOutlined, EyeOutlined, StopOutlined, CheckCircleOutlined, PlusOutlined, CheckOutlined,  } from "@ant-design/icons";
 import { Button, Tag, } from "antd";
-import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
+import { SALARY_ADJUSTMENT_STATUS, SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
 
 const initFilter: SalaryAdjustmentFilter = {
   payrollPeriodId: "",
@@ -237,7 +237,7 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || false,
+      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: (record: SalaryAdjustmentDto) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path.replace(
@@ -254,12 +254,14 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || false,
+      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: async (record: SalaryAdjustmentDto) => {
         confirm({
           title: "Xác nhận ngừng hoạt động",
           content: `Bạn có chắc chắn muốn ngừng hoạt động điều chỉnh lương cho ${record.employeeName}?`,
-          onOk: () => onDeactivateSalaryAdjustment(record.id!),
+          onOk: async () => {
+            await onDeactivateSalaryAdjustment(record.id!);
+          },
         });
       },
     },
@@ -275,7 +277,9 @@ export default function SalaryAdjustmentManager() {
         confirm({
           title: "Xác nhận kích hoạt lại",
           content: `Bạn có chắc chắn muốn kích hoạt lại điều chỉnh lương cho ${record.employeeName}?`,
-          onOk: () => onActivateSalaryAdjustment(record.id!),
+          onOk: async () => {
+            await onActivateSalaryAdjustment(record.id!);
+          },
         });
       },
     },
@@ -286,12 +290,14 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || false,
+      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: async (record: SalaryAdjustmentDto) => {
         confirm({
           title: "Xác nhận duyệt",
           content: `Bạn có chắc chắn muốn duyệt điều chỉnh lương cho ${record.employeeName}?`,
-          onOk: () => onApproveSalaryAdjustment(record.id!),
+          onOk: async () => {
+            await onApproveSalaryAdjustment(record.id!);
+          },
         });
       },
     },

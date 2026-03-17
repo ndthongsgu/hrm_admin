@@ -8,23 +8,23 @@ export interface SelectOptionDto {
 export interface PayrollPeriodDto {
   id?: string;
   name: string;
-  startDate: Date; // ISO date
-  endDate: Date; // ISO date
+  startDate: string; // YYYY-MM-DD format
+  endDate: string; // YYYY-MM-DD format
   standardWorkingDays: number;
   status: string;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  dateRange?: [Date, Date]; // For form initialization only, not part of API contract
+  dateRange?: [Date, Date] | undefined; // For form initialization only, not part of API contract
 }
 
 export interface PayrollPeriodFilter {
   name?: string;
-  isLocked?: boolean;
   isDeleted?: boolean;
   startDate?: Date;
   endDate?: Date;
   dateRange?: [Date, Date];
+  status?: string;
 }
 
 export interface AttendanceSummaryDto {
@@ -68,6 +68,7 @@ export interface SalaryAdjustmentDto {
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  status?: string;
 }
 
 export interface SalaryAdjustmentFilter {

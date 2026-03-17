@@ -10,11 +10,10 @@ export const useActivateSalaryAdjustment = () => {
 
   const { mutateAsync: onActivateSalaryAdjustment, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.put<SuccessResponse>(
-          `${API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id)}/active`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.SALARY_ADJUSTMENT.ACTIVATE(id);
+        return rootApiService.put<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION],

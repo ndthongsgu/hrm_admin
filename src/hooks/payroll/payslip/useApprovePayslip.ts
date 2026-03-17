@@ -10,11 +10,10 @@ export const useApprovePayslip = () => {
 
   const { mutateAsync: onApprovePayslip, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.PAYSLIP.FIND_BY_ID(id)}/approve`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.PAYSLIP.APPROVE(id);
+        return rootApiService.post<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.PAYSLIP.PAGINATION],

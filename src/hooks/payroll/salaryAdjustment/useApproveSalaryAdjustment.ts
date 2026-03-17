@@ -10,11 +10,10 @@ export const useApproveSalaryAdjustment = () => {
 
   const { mutateAsync: onApproveSalaryAdjustment, isPending: isLoading } =
     useMutation({
-      mutationFn: (id: string) =>
-        rootApiService.post<SuccessResponse>(
-          `${API_ENDPOINTS.SALARY_ADJUSTMENT.FIND_BY_ID(id)}/approve`,
-          {},
-        ),
+      mutationFn: (id: string) => {
+        const url = API_ENDPOINTS.SALARY_ADJUSTMENT.APPROVE(id);
+        return rootApiService.post<SuccessResponse>(url, {});
+      },
       onSuccess: (res: SuccessResponse) => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.SALARY_ADJUSTMENT.PAGINATION],

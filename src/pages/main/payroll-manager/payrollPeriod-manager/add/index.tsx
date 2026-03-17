@@ -5,6 +5,7 @@ import type { PayrollPeriodDto } from "@/dto/payroll.dto";
 import { useCreatePayrollPeriod } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
 import { useMemo } from "react";
+import dayjs from "dayjs";
 
 export default function AddPayrollPeriodScreen({
   initData,
@@ -43,6 +44,8 @@ export default function AddPayrollPeriodScreen({
         label: "Số ngày công chuẩn",
         type: "number",
         required: true,
+        min: 0,
+        max: 31,
         placeholder: "Nhập số ngày công chuẩn",
       },
     ];
@@ -61,11 +64,10 @@ export default function AddPayrollPeriodScreen({
   }, [initData]);
 
   const handleSubmit = (values: any) => {
-    // Convert dateRange array to startDate and endDate
     const formattedValues = {
       ...values,
-      startDate: values.dateRange?.[0],
-      endDate: values.dateRange?.[1],
+      startDate: values.dateRange?.[0] ? dayjs(values.dateRange[0]).format("YYYY-MM-DD") : undefined,
+      endDate: values.dateRange?.[1] ? dayjs(values.dateRange[1]).format("YYYY-MM-DD") : undefined,
     };
     // Remove dateRange as it's not part of the API schema
     delete formattedValues.dateRange;
@@ -100,3 +102,4 @@ export default function AddPayrollPeriodScreen({
     </BaseView>
   );
 }
+

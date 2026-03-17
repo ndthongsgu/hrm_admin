@@ -47,6 +47,19 @@ export const ATTENDANCE_SUMMARY_STATUS = {
     },
 }
 
+export const SALARY_ADJUSTMENT_STATUS = {
+    APPROVED: {
+        label: "Đã duyệt",
+        value: "APPROVED",
+        color: "green",
+    },
+    PENDING: {
+        label: "Chờ duyệt",
+        value: "PENDING",
+        color: "gold",
+    },
+}
+
 
 export const PAYSLIP_STATUS = {
     APPROVED: {
