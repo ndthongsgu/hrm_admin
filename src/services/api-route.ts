@@ -69,9 +69,11 @@ export const API_ENDPOINTS = {
   CONTRACT: {
     PAGINATION: "/api/contracts",
     GET_ALL: "/api/contracts",
+    ACTIVE: "/api/contracts/active",
     CREATE: "/api/contracts",
     UPDATE: (id: string) => `/api/contracts/${id}`,
     FIND_BY_ID: (id: string) => `/api/contracts/${id}`,
+    DELETE: (id: string) => `/api/contracts/${id}`,
     SELECT: "/api/contracts/select",
     DEACTIVATE: (id: string) => `/api/contracts/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/contracts/activate/${id}`,
@@ -82,6 +84,7 @@ export const API_ENDPOINTS = {
     CREATE: "/api/allowance-types",
     UPDATE: (id: string) => `/api/allowance-types/${id}`,
     FIND_BY_ID: (id: string) => `/api/allowance-types/${id}`,
+    DELETE: (id: string) => `/api/allowance-types/${id}`,
     SELECT: "/api/allowance-types/select",
     DEACTIVATE: (id: string) => `/api/allowance-types/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/allowance-types/activate/${id}`,
@@ -89,6 +92,8 @@ export const API_ENDPOINTS = {
   CONTRACT_ALLOWANCE: {
     PAGINATION: "/api/contract-allowances",
     GET_ALL: "/api/contract-allowances",
+    BY_CONTRACT: (contractId: string) =>
+      `/api/contract-allowances/by-contract/${contractId}`,
     CREATE: "/api/contract-allowances",
     UPDATE: (id: string) => `/api/contract-allowances/${id}`,
     FIND_BY_ID: (id: string) => `/api/contract-allowances/${id}`,
