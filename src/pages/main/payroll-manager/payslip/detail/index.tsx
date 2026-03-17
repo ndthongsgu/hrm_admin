@@ -175,12 +175,6 @@ export default function PayslipDetailScreen() {
           </Row>
         </Card>
 
-        {data?.reason && data?.status === "REJECTED" && (
-          <Card title="Lý do từ chối" style={{ borderColor: "#ff4d4f" }}>
-            <Text>{data?.reason}</Text>
-          </Card>
-        )}
-
         <ActionLog functionId={id ?? ""} functionType="PAYSLIP" />
         <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
           <Button icon={<ArrowLeftOutlined />} onClick={goBack}>

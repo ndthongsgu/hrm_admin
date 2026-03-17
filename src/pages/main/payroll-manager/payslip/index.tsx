@@ -11,7 +11,6 @@ import type { PayslipDto } from "@/dto/payroll.dto";
 import {
   usePaginationPayslips,
   useApprovePayslip,
-  useRejectPayslip,
   useDeactivatePayslip,
   useActivatePayslip,
   usePayrollPeriodSelectOptions,
@@ -24,10 +23,9 @@ import {
   StopOutlined,
   CheckCircleOutlined,
   CheckOutlined,
-  CloseOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Tag, Modal, Input, Button, Form, Select, Row, Col } from "antd";
+import { Tag, Modal, Button, Form, Select, Row, Col } from "antd";
 
 const initFilter = {
   payrollPeriodId: "",
@@ -43,16 +41,12 @@ export default function PayslipManager() {
     take: 10,
     where: initFilter,
   });
-  const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<PayslipDto | null>(null);
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
   const [generateForm] = Form.useForm();
   const [generateLoading, setGenerateLoading] = useState(false);
 
   const { data, total, isLoading } = usePaginationPayslips(pagination);
   const { onApprovePayslip } = useApprovePayslip();
-  const { onRejectPayslip } = useRejectPayslip();
   const { onDeactivatePayslip } = useDeactivatePayslip();
   const { onActivatePayslip } = useActivatePayslip();
   const { onGeneratePayslip } = useGeneratePayslip();
@@ -94,7 +88,6 @@ export default function PayslipManager() {
         { label: "Tất cả", value: undefined },
         { label: PAYSLIP_STATUS.APPROVED.label, value: PAYSLIP_STATUS.APPROVED.value },
         { label: PAYSLIP_STATUS.PENDING.label, value: PAYSLIP_STATUS.PENDING.value },
-        { label: PAYSLIP_STATUS.REJECTED.label, value: PAYSLIP_STATUS.REJECTED.value },
       ],
       col: 6,
     },
@@ -297,37 +290,6 @@ export default function PayslipManager() {
         }}
         onPageChange={handlePageChange}
       />
-
-      <Modal
-        title="Xác nhận từ chối duyệt"
-        open={rejectModalVisible}
-        onOk={() => {
-          if (selectedRecord) {
-            onRejectPayslip({ id: selectedRecord.id!, reason: rejectReason });
-            setRejectModalVisible(false);
-            setRejectReason("");
-            setSelectedRecord(null);
-          }
-        }}
-        onCancel={() => {
-          setRejectModalVisible(false);
-          setRejectReason("");
-          setSelectedRecord(null);
-        }}
-        okText="Từ chối"
-        cancelText="Hủy"
-      >
-        <div style={{ marginBottom: "12px" }}>
-          Bạn có chắc chắn muốn từ chối duyệt phiếu lương cho <strong>{selectedRecord?.employeeName}</strong>?
-        </div>
-        <div style={{ marginBottom: "8px" }}>Lý do từ chối:</div>
-        <Input.TextArea
-          rows={4}
-          placeholder="Nhập lý do từ chối..."
-          value={rejectReason}
-          onChange={(e) => setRejectReason(e.target.value)}
-        />
-      </Modal>
 
       <Modal
         title="Tính lương"
