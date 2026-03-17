@@ -9,10 +9,10 @@ import type { TableAction } from "@/components/table/Table";
 import Table from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { SalaryAdjustmentDto, SalaryAdjustmentFilter } from "@/dto/payroll.dto";
-import { usePaginationSalaryAdjustments, useDeactivateSalaryAdjustment, useActivateSalaryAdjustment, useApproveSalaryAdjustment, useRejectSalaryAdjustment, usePayrollPeriodSelectOptions, useEmployeeSelectOptions } from "@/hooks/payroll";
+import { usePaginationSalaryAdjustments, useDeactivateSalaryAdjustment, useActivateSalaryAdjustment, useApproveSalaryAdjustment, usePayrollPeriodSelectOptions, useEmployeeSelectOptions } from "@/hooks/payroll";
 import { useConfirm } from "@/hooks/layout/useConfirm";
-import { EditOutlined, EyeOutlined, StopOutlined, CheckCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { Button, Tag, Modal, Input } from "antd";
+import { EditOutlined, EyeOutlined, StopOutlined, CheckCircleOutlined, PlusOutlined, CheckOutlined,  } from "@ant-design/icons";
+import { Button, Tag, } from "antd";
 import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
 
 const initFilter: SalaryAdjustmentFilter = {
@@ -33,15 +33,10 @@ export default function SalaryAdjustmentManager() {
     take: 10,
     where: initFilter,
   });
-  const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<SalaryAdjustmentDto | null>(null);
-
   const { data, total, isLoading } = usePaginationSalaryAdjustments(pagination);
   const { onDeactivateSalaryAdjustment } = useDeactivateSalaryAdjustment();
   const { onActivateSalaryAdjustment } = useActivateSalaryAdjustment();
   const { onApproveSalaryAdjustment } = useApproveSalaryAdjustment();
-  const { onRejectSalaryAdjustment } = useRejectSalaryAdjustment();
   const { confirm } = useConfirm();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
   const { data: employeeOptions } = useEmployeeSelectOptions();
@@ -341,37 +336,6 @@ export default function SalaryAdjustmentManager() {
           </Button>
         }
       />
-
-      <Modal
-        title="Xác nhận từ chối duyệt"
-        open={rejectModalVisible}
-        onOk={() => {
-          if (selectedRecord) {
-            onRejectSalaryAdjustment({ id: selectedRecord.id!, reason: rejectReason });
-            setRejectModalVisible(false);
-            setRejectReason("");
-            setSelectedRecord(null);
-          }
-        }}
-        onCancel={() => {
-          setRejectModalVisible(false);
-          setRejectReason("");
-          setSelectedRecord(null);
-        }}
-        okText="Từ chối"
-        cancelText="Hủy"
-      >
-        <div style={{ marginBottom: "12px" }}>
-          Bạn có chắc chắn muốn từ chối duyệt điều chỉnh lương cho <strong>{selectedRecord?.employeeName}</strong>?
-        </div>
-        <div style={{ marginBottom: "8px" }}>Lý do từ chối:</div>
-        <Input.TextArea
-          rows={4}
-          placeholder="Nhập lý do từ chối..."
-          value={rejectReason}
-          onChange={(e) => setRejectReason(e.target.value)}
-        />
-      </Modal>
     </BaseView>
   );
 }

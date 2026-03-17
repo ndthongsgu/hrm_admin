@@ -6,6 +6,5 @@ export { useDeactivatePayrollPeriod } from "./useDeactivatePayrollPeriod";
 export { useDetailPayrollPeriod } from "./useDetailPayrollPeriod";
 export { useLockPayrollPeriod } from "./useLockPayrollPeriod";
 export { usePaginationPayrollPeriods } from "./usePaginationPayrollPeriods";
-export { useRejectPayrollPeriod } from "./useRejectPayrollPeriod";
 export { useSummarizeAttendance } from "./useSummarizeAttendance";
 export { useUpdatePayrollPeriod } from "./useUpdatePayrollPeriod";
