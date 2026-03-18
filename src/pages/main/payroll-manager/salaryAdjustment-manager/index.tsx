@@ -8,18 +8,39 @@ import FilterComponent, {
 import type { TableAction } from "@/components/table/Table";
 import Table from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import type { SalaryAdjustmentDto, SalaryAdjustmentFilter } from "@/dto/payroll.dto";
-import { usePaginationSalaryAdjustments, useDeactivateSalaryAdjustment, useActivateSalaryAdjustment, useApproveSalaryAdjustment, usePayrollPeriodSelectOptions, useEmployeeSelectOptions } from "@/hooks/payroll";
+import type {
+  SalaryAdjustmentDto,
+  SalaryAdjustmentFilter,
+} from "@/dto/payroll.dto";
+import {
+  usePaginationSalaryAdjustments,
+  useDeactivateSalaryAdjustment,
+  useActivateSalaryAdjustment,
+  useApproveSalaryAdjustment,
+  usePayrollPeriodSelectOptions,
+  useEmployeeSelectOptions,
+  useUnApproveSalaryAdjustment,
+} from "@/hooks/payroll";
 import { useConfirm } from "@/hooks/layout/useConfirm";
-import { EditOutlined, EyeOutlined, StopOutlined, CheckCircleOutlined, PlusOutlined, CheckOutlined,  } from "@ant-design/icons";
-import { Button, Tag, } from "antd";
-import { SALARY_ADJUSTMENT_STATUS, SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
+import {
+  EditOutlined,
+  EyeOutlined,
+  StopOutlined,
+  CheckCircleOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+import { Button, Tag } from "antd";
+import {
+  SALARY_ADJUSTMENT_STATUS,
+  SALARY_ADJUSTMENT_TYPE,
+} from "@/common/constants/payrollPeriod";
 
 const initFilter: SalaryAdjustmentFilter = {
   payrollPeriodId: "",
   employeeId: "",
   type: undefined,
-  reason: "",
   isTaxable: undefined,
   isNetOnly: undefined,
   isDeleted: false,
@@ -28,7 +49,9 @@ const initFilter: SalaryAdjustmentFilter = {
 export default function SalaryAdjustmentManager() {
   const router = useRouter();
   const [filter, setFilter] = useState<SalaryAdjustmentFilter>(initFilter);
-  const [pagination, setPagination] = useState<PaginationDto<SalaryAdjustmentFilter>>({
+  const [pagination, setPagination] = useState<
+    PaginationDto<SalaryAdjustmentFilter>
+  >({
     skip: 0,
     take: 10,
     where: initFilter,
@@ -37,6 +60,7 @@ export default function SalaryAdjustmentManager() {
   const { onDeactivateSalaryAdjustment } = useDeactivateSalaryAdjustment();
   const { onActivateSalaryAdjustment } = useActivateSalaryAdjustment();
   const { onApproveSalaryAdjustment } = useApproveSalaryAdjustment();
+  const { onUnApproveSalaryAdjustment } = useUnApproveSalaryAdjustment();
   const { confirm } = useConfirm();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
   const { data: employeeOptions } = useEmployeeSelectOptions();
@@ -55,7 +79,11 @@ export default function SalaryAdjustmentManager() {
       label: "Kỳ lương",
       type: "select",
       placeholder: "Chọn kỳ lương",
-      options: payrollPeriodOptions?.map((option: any) => ({ label: option.name, value: option.id })) || [],
+      options:
+        payrollPeriodOptions?.map((option: any) => ({
+          label: option.name,
+          value: option.id,
+        })) || [],
       col: 6,
     },
     {
@@ -63,7 +91,11 @@ export default function SalaryAdjustmentManager() {
       label: "Nhân viên",
       type: "select",
       placeholder: "Chọn nhân viên",
-      options: employeeOptions?.map((option: any) => ({ label: option.name, value: option.id })) || [],
+      options:
+        employeeOptions?.map((option: any) => ({
+          label: option.name,
+          value: option.id,
+        })) || [],
       col: 6,
     },
     {
@@ -72,13 +104,6 @@ export default function SalaryAdjustmentManager() {
       type: "select",
       placeholder: "Chọn loại",
       options: Object.values(SALARY_ADJUSTMENT_TYPE),
-      col: 6,
-    },
-    {
-      key: "reason",
-      label: "Lý do",
-      type: "input",
-      placeholder: "Nhập lý do",
       col: 6,
     },
     {
@@ -156,7 +181,11 @@ export default function SalaryAdjustmentManager() {
           style: "currency",
           currency: "VND",
         }).format(amount || 0);
-        return <span style={{ color: amount >= 0 ? "green" : "red" }}>{formatted}</span>;
+        return (
+          <span style={{ color: amount >= 0 ? "green" : "red" }}>
+            {formatted}
+          </span>
+        );
       },
     },
     {
@@ -165,7 +194,10 @@ export default function SalaryAdjustmentManager() {
       key: "type",
       width: columnWidths.type,
       render: (type: keyof typeof SALARY_ADJUSTMENT_TYPE) => {
-        const config = SALARY_ADJUSTMENT_TYPE[type] || { text: type, color: "default" };
+        const config = SALARY_ADJUSTMENT_TYPE[type] || {
+          text: type,
+          color: "default",
+        };
         return <Tag color={config.color}>{config.label}</Tag>;
       },
     },
@@ -182,7 +214,9 @@ export default function SalaryAdjustmentManager() {
       key: "isTaxable",
       width: columnWidths.isTaxable,
       render: (isTaxable: boolean) => (
-        <Tag color={isTaxable ? "green" : "red"}>{isTaxable ? "Có" : "Không"}</Tag>
+        <Tag color={isTaxable ? "green" : "red"}>
+          {isTaxable ? "Có" : "Không"}
+        </Tag>
       ),
     },
     {
@@ -191,7 +225,9 @@ export default function SalaryAdjustmentManager() {
       key: "isNetOnly",
       width: columnWidths.isNetOnly,
       render: (isNetOnly: boolean) => (
-        <Tag color={isNetOnly ? "blue" : "default"}>{isNetOnly ? "Có" : "Không"}</Tag>
+        <Tag color={isNetOnly ? "blue" : "default"}>
+          {isNetOnly ? "Có" : "Không"}
+        </Tag>
       ),
     },
     {
@@ -208,7 +244,11 @@ export default function SalaryAdjustmentManager() {
           true: "Ngừng hoạt động",
           false: "Hoạt động",
         };
-        return <Tag color={colorMap[isDeleted ? "true" : "false"]}>{textMap[isDeleted ? "true" : "false"]}</Tag>;
+        return (
+          <Tag color={colorMap[isDeleted ? "true" : "false"]}>
+            {textMap[isDeleted ? "true" : "false"]}
+          </Tag>
+        );
       },
     },
   ];
@@ -237,7 +277,9 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
+      hidden: (record: SalaryAdjustmentDto) =>
+        record.isDeleted ||
+        record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: (record: SalaryAdjustmentDto) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path.replace(
@@ -254,7 +296,9 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
+      hidden: (record: SalaryAdjustmentDto) =>
+        record.isDeleted ||
+        record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: async (record: SalaryAdjustmentDto) => {
         confirm({
           title: "Xác nhận ngừng hoạt động",
@@ -290,13 +334,35 @@ export default function SalaryAdjustmentManager() {
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt",
-      hidden: (record: SalaryAdjustmentDto) => record.isDeleted || record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
+      hidden: (record: SalaryAdjustmentDto) =>
+        record.isDeleted ||
+        record.status !== SALARY_ADJUSTMENT_STATUS.PENDING.value,
       onClick: async (record: SalaryAdjustmentDto) => {
         confirm({
           title: "Xác nhận duyệt",
           content: `Bạn có chắc chắn muốn duyệt điều chỉnh lương cho ${record.employeeName}?`,
           onOk: async () => {
             await onApproveSalaryAdjustment(record.id!);
+          },
+        });
+      },
+    },
+    {
+      key: "unApprove",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanUnApprove",
+      type: "default",
+      tooltip: "Hủy duyệt điều chỉnh lương",
+      hidden: (record) =>
+        record.isDeleted ||
+        record.status !== SALARY_ADJUSTMENT_STATUS.APPROVED.value,
+      onClick: (record) => {
+        confirm({
+          title: "Xác nhận hủy duyệt điều chỉnh lương",
+          content: `Bạn có chắc chắn muốn hủy duyệt điều chỉnh lương ${record.name}?`,
+          onOk: async () => {
+            await onUnApproveSalaryAdjustment(record.id!);
           },
         });
       },
@@ -312,7 +378,10 @@ export default function SalaryAdjustmentManager() {
   };
 
   const handleAddNew = () => {
-    router.push(ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.ADD_SALARY_ADJUSTMENT.path);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children
+        .ADD_SALARY_ADJUSTMENT.path,
+    );
   };
 
   return (

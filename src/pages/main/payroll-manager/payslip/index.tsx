@@ -188,7 +188,9 @@ export default function PayslipManager() {
         confirm({
           title: "Xác nhận duyệt phiếu lương",
           content: `Bạn có chắc chắn muốn duyệt phiếu lương cho ${record.employeeName}?`,
-          onOk: () => onApprovePayslip(record.id!),
+          onOk: () => {
+            onApprovePayslip(record.id!)
+          },
         });
       },
     },
@@ -204,7 +206,9 @@ export default function PayslipManager() {
         confirm({
           title: "Xác nhận ngừng hoạt động",
           content: `Bạn có chắc chắn muốn ngừng hoạt động phiếu lương cho ${record.employeeName}?`,
-          onOk: () => onDeactivatePayslip(record.id!),
+          onOk: () => {
+            onDeactivatePayslip(record.id!)
+          },
         });
       },
     },
@@ -220,7 +224,9 @@ export default function PayslipManager() {
         confirm({
           title: "Xác nhận kích hoạt lại",
           content: `Bạn có chắc chắn muốn kích hoạt lại phiếu lương cho ${record.employeeName}?`,
-          onOk: () => onActivatePayslip(record.id!),
+          onOk: () => {
+            onActivatePayslip(record.id!)
+          },
         });
       },
     },
@@ -327,21 +333,20 @@ export default function PayslipManager() {
 
           <Form.Item
             name="employeeId"
-            label="Nhân viên (Bỏ trống để tính cho tất cả)"
+            label="Nhân viên"
+            rules={[
+              { required: true, message: "Vui lòng chọn nhân viên" },
+            ]}
           >
             <Select
               allowClear
-              placeholder="Chọn nhân viên (tùy chọn)"
+              placeholder="Chọn nhân viên"
               options={employeeOptions?.map((option: any) => ({
                 label: `${option.name}`.trim(),
                 value: option.id,
               })) || []}
             />
           </Form.Item>
-
-          <div style={{ color: "#8c8c8c", fontSize: "12px" }}>
-            <p>* Nếu không chọn nhân viên, hệ thống sẽ tính lương cho tất cả nhân viên trong kỳ lương này.</p>
-          </div>
         </Form>
       </Modal>
     </BaseView>

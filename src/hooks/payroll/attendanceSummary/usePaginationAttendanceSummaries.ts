@@ -17,7 +17,7 @@ export const usePaginationAttendanceSummaries = (
           size: params.take,
           sortBy: "createdAt",
           sortDirection: "DESC",
-          ...params.where,
+          where: params.where,
         },
       ),
   });
