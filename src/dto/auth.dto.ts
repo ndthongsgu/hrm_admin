@@ -84,6 +84,7 @@ export const ModuleCode = {
   TRIP: "TRIP",
   BOOKING: "BOOKING",
   PAYMENT: "PAYMENT",
+  OFFICE_LOCATION: "OFFICE_LOCATION",
 } as const;
 
 export type ModuleCodeType = (typeof ModuleCode)[keyof typeof ModuleCode];

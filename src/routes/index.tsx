@@ -42,6 +42,10 @@ import DetailAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendan
 import EditAttendanceSummaryScreen from "@/pages/main/payroll-manager/attendanceSummary-manager/edit";
 import PayslipManager from "@/pages/main/payroll-manager/payslip";
 import PayslipDetailScreen from "@/pages/main/payroll-manager/payslip/detail";
+import OfficeLocationManager from "@/pages/main/payroll-manager/officeLocation-manager";
+import AddOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/add";
+import EditOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/edit";
+import DetailOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/detail";
 
 export default function AppRoutes() {
   return (
@@ -251,6 +255,33 @@ export default function AppRoutes() {
                 .DETAIL_SALARY_ADJUSTMENT.path
             }
             element={<DetailSalaryAdjustmentScreen />}
+          />
+
+          {/* Quản lý địa điểm văn phòng */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.path}
+            element={<OfficeLocationManager />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.children
+                .ADD_OFFICE_LOCATION.path
+            }
+            element={<AddOfficeLocationScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.children
+                .EDIT_OFFICE_LOCATION.path
+            }
+            element={<EditOfficeLocationScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.children
+                .DETAIL_OFFICE_LOCATION.path
+            }
+            element={<DetailOfficeLocationScreen />}
           />
         </Route>
       </Route>{" "}

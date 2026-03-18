@@ -117,6 +117,12 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           label: ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.label,
           moduleCode: ModuleCode.PAYROLL,
         },
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.label,
+          moduleCode: ModuleCode.OFFICE_LOCATION,
+        },
       ],
     },
 

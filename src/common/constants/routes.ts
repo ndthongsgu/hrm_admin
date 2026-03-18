@@ -237,6 +237,28 @@ export const ROUTES = {
             },
           },
         },
+        OFFICE_LOCATIONS: {
+          key: "OFFICE_LOCATIONS",
+          label: "Địa điểm văn phòng",
+          path: "/payroll/office-locations",
+          children: {
+            ADD_OFFICE_LOCATION: {
+              key: "ADD_OFFICE_LOCATION",
+              label: "Thêm địa điểm văn phòng",
+              path: "/payroll/office-locations/add",
+            },
+            EDIT_OFFICE_LOCATION: {
+              key: "EDIT_OFFICE_LOCATION",
+              label: "Chỉnh sửa địa điểm văn phòng",
+              path: "/payroll/office-locations/edit/:id",
+            },
+            DETAIL_OFFICE_LOCATION: {
+              key: "DETAIL_OFFICE_LOCATION",
+              label: "Chi tiết địa điểm văn phòng",
+              path: "/payroll/office-locations/detail/:id",
+            },
+          },
+        },
         PAYSLIPS: {
           key: "PAYSLIPS",
           label: "Phiếu lương",
