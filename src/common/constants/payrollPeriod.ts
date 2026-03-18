@@ -73,3 +73,16 @@ export const PAYSLIP_STATUS = {
         color: "gold",
     },
 }
+
+export const OFFICE_LOCATION_STATUS = {
+    APPROVED: {
+        label: "Đã duyệt",
+        value: "APPROVED",
+        color: "green",
+    },
+    PENDING: {
+        label: "Chờ duyệt",
+        value: "PENDING",
+        color: "orange",
+    },
+}

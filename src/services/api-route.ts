@@ -173,6 +173,17 @@ export const API_ENDPOINTS = {
     APPROVE: (id: string) => `/api/salary-adjustments/${id}/approve`,
     UNAPPROVE: (id: string) => `/api/salary-adjustments/${id}/unApprove`,
   },
+  OFFICE_LOCATION: {
+    PAGINATION: "/api/office-locations",
+    GET_ALL: "/api/office-locations",
+    CREATE: "/api/office-locations/create",
+    UPDATE: (id: string) => `/api/office-locations/${id}`,
+    FIND_BY_ID: (id: string) => `/api/office-locations/${id}`,
+    DELETE: (id: string) => `/api/office-locations/${id}`,
+    ACTIVATE: (id: string) => `/api/office-locations/${id}/activate`,
+    APPROVE: (id: string) => `/api/office-locations/${id}/approve`,
+    UNAPPROVE: (id: string) => `/api/office-locations/${id}/unApprove`,
+  },
   TAX_BRACKET: {
     PAGINATION: "/api/tax-brackets",
     GET_ALL: "/api/tax-brackets",
