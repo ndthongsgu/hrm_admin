@@ -115,14 +115,12 @@ export default function PayslipDetailScreen() {
                 <Text strong>{formatCurrency(data?.bhtnAmount)}</Text>
               </Space>
             </Col>
-            {data?.socialInsuranceBenefitAmount && data?.socialInsuranceBenefitAmount !== 0 && (
               <Col span={8}>
                 <Space direction="vertical" size={0}>
                   <Text type="secondary">Trợ cấp BHXH</Text>
                   <Text strong style={{ color: "green" }}>{formatCurrency(data?.socialInsuranceBenefitAmount)}</Text>
                 </Space>
               </Col>
-            )}
           </Row>
         </Card>
 
@@ -164,7 +162,6 @@ export default function PayslipDetailScreen() {
         <Card title="V. Kết quả">
           <Row gutter={[24, 24]}>
             <Col span={12}>
-              <Divider />
               <Space direction="vertical" size={0}>
                 <Text type="secondary" style={{ fontSize: "16px" }}>Lương ròng</Text>
                 <Text strong style={{ fontSize: "24px", color: "green" }}>

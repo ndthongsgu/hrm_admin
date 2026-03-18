@@ -285,7 +285,7 @@ export default function PayrollPeriodManager() {
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record) => record.isDeleted !== false,
+      hidden: (record) => record.isDeleted !== false || record.status === PAYROLL_PERIOD_STATUS.APPROVED.value,
       onClick: async (record) => {
         confirm({
           title: "Xác nhận ngừng hoạt động",

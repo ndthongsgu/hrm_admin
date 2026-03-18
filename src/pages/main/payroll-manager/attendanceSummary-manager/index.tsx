@@ -6,15 +6,16 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import { usePaginationAttendanceSummaries, useApproveAttendance, usePayrollPeriodSelectOptions } from "@/hooks/payroll";
-import { useRouter } from "@/routes/hooks";
+import { useConfirm } from "@/hooks/layout/useConfirm";
 import {
-  EditOutlined,
-  EyeOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-import { Row, Space, Tag, Modal, Input } from "antd";
+  usePaginationAttendanceSummaries,
+  useApproveAttendance,
+  usePayrollPeriodSelectOptions,
+  useUnApproveAttendance,
+} from "@/hooks/payroll";
+import { useRouter } from "@/routes/hooks";
+import { EditOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Row, Space, Tag } from "antd";
 import { useState } from "react";
 
 const initFilter = {
@@ -33,9 +34,11 @@ export default function AttendanceSummaryManager() {
     where: initFilter,
   });
 
-
-  const { data, total, isLoading } = usePaginationAttendanceSummaries(pagination);
+  const { data, total, isLoading } =
+    usePaginationAttendanceSummaries(pagination);
   const { onApproveAttendance } = useApproveAttendance();
+  const { onUnApproveAttendance } = useUnApproveAttendance();
+  const { confirm } = useConfirm();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
 
   const handleSearch = (isReset?: boolean) => {
@@ -57,7 +60,11 @@ export default function AttendanceSummaryManager() {
       label: "Kỳ lương",
       type: "select",
       placeholder: "Chọn kỳ lương",
-      options: payrollPeriodOptions?.map((option: any) => ({ label: option.name, value: option.id })) || [],
+      options:
+        payrollPeriodOptions?.map((option: any) => ({
+          label: option.name,
+          value: option.id,
+        })) || [],
       col: 6,
     },
     {
@@ -66,7 +73,7 @@ export default function AttendanceSummaryManager() {
       type: "select",
       placeholder: "Chọn trạng thái",
       options: Object.values(ATTENDANCE_SUMMARY_STATUS),
-      col: 6, 
+      col: 6,
     },
   ];
 
@@ -132,8 +139,18 @@ export default function AttendanceSummaryManager() {
       render: (status: string) => {
         return (
           <Row justify={"center"}>
-            <Tag color={ATTENDANCE_SUMMARY_STATUS[status as keyof typeof ATTENDANCE_SUMMARY_STATUS]?.color}>
-              {ATTENDANCE_SUMMARY_STATUS[status as keyof typeof ATTENDANCE_SUMMARY_STATUS]?.label}
+            <Tag
+              color={
+                ATTENDANCE_SUMMARY_STATUS[
+                  status as keyof typeof ATTENDANCE_SUMMARY_STATUS
+                ]?.color
+              }
+            >
+              {
+                ATTENDANCE_SUMMARY_STATUS[
+                  status as keyof typeof ATTENDANCE_SUMMARY_STATUS
+                ]?.label
+              }
             </Tag>
           </Row>
         );
@@ -165,7 +182,8 @@ export default function AttendanceSummaryManager() {
       showKey: "isCanEdit",
       type: "default",
       tooltip: "Chỉnh sửa",
-      hidden: (record) => record.status === ATTENDANCE_SUMMARY_STATUS.APPROVED.value,
+      hidden: (record) =>
+        record.status === ATTENDANCE_SUMMARY_STATUS.APPROVED.value,
       onClick: (record) => {
         router.push(
           ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path.replace(
@@ -182,9 +200,36 @@ export default function AttendanceSummaryManager() {
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt công",
-      hidden: (record) => record.status !== ATTENDANCE_SUMMARY_STATUS.PENDING.value,
+      hidden: (record) =>
+        record.status !== ATTENDANCE_SUMMARY_STATUS.PENDING.value,
       onClick: async (record) => {
-        await onApproveAttendance(record.id);
+        confirm({
+          title: "Xác nhận duyệt",
+          content: `Bạn có chắc chắn muốn duyệt công cho ${record.employeeName}?`,
+          onOk: async () => {
+            await onApproveAttendance(record.id!);
+          },
+        });
+      },
+    },
+    {
+      key: "unApprove",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanUnApprove",
+      type: "default",
+      tooltip: "Hủy duyệt công",
+      hidden: (record) =>
+        record.isDeleted ||
+        record.status !== ATTENDANCE_SUMMARY_STATUS.APPROVED.value,
+      onClick: (record) => {
+        confirm({
+          title: "Xác nhận hủy duyệt công",
+          content: `Bạn có chắc chắn muốn hủy duyệt công ${record.employeeName}?`,
+          onOk: async () => {
+            await onUnApproveAttendance(record.id!);
+          },
+        });
       },
     },
   ];
