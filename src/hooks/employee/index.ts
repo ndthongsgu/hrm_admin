@@ -12,6 +12,50 @@ import rootApiService from "@/services/api.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../layout/useToast";
 
+const normalizeEmployee = (employee: any): EmployeeDto => {
+  const firstContract = employee?.contracts?.[0];
+
+  return {
+    ...employee,
+    code: employee?.code || employee?.employeeCode,
+    employeeCode: employee?.employeeCode || employee?.code || "",
+    phoneNumber: employee?.phoneNumber || employee?.phone,
+    departmentId: employee?.departmentId || employee?.department?.id,
+    departmentName: employee?.departmentName || employee?.department?.name,
+    positionId:
+      employee?.positionId || employee?.position?.id || firstContract?.position?.id,
+    positionName:
+      employee?.positionName ||
+      employee?.position?.name ||
+      firstContract?.position?.name,
+    hireDate: employee?.hireDate || firstContract?.startDate,
+    terminationDate: employee?.terminationDate || firstContract?.endDate,
+    isActive:
+      typeof employee?.isActive === "boolean"
+        ? employee.isActive
+        : employee?.status === "ACTIVE",
+  } as EmployeeDto;
+};
+
+const normalizeEmployeeFilter = (
+  filter?: EmployeeFilter
+): EmployeeFilter | undefined => {
+  if (!filter) return filter;
+
+  return {
+    ...filter,
+    employeeCode: filter.employeeCode || filter.code,
+    phone: filter.phone || filter.phoneNumber,
+    status:
+      filter.status ||
+      (typeof filter.isActive === "boolean"
+        ? filter.isActive
+          ? "ACTIVE"
+          : "DEACTIVE"
+        : undefined),
+  };
+};
+
 export const usePaginationEmployee = (
   params: PaginationDto<EmployeeFilter>
 ) => {
@@ -23,13 +67,13 @@ export const usePaginationEmployee = (
         {
           skip: params.skip,
           take: params.take,
-          where: params.where,
+          where: normalizeEmployeeFilter(params.where),
         }
       ),
   });
 
   return {
-    data: data?.content || [],
+    data: (data?.content || []).map(normalizeEmployee),
     total: data?.totalElements || 0,
     isLoading,
     refetch,
@@ -45,7 +89,7 @@ export const useAllEmployees = () => {
   });
 
   return {
-    data: data || [],
+    data: (data || []).map(normalizeEmployee),
     isLoading,
     refetch,
   };
@@ -59,7 +103,7 @@ export const useDetailEmployee = (id: string) => {
   });
 
   return {
-    data: data,
+    data: data ? normalizeEmployee(data) : undefined,
     isLoading,
     refetch,
     error,

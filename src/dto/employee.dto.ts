@@ -1,10 +1,36 @@
 import type { BaseDto } from "./base.dto";
 
+interface EmployeeDepartmentRef {
+  id: string;
+  name?: string;
+  code?: string;
+}
+
+interface EmployeePositionRef {
+  id: string;
+  name?: string;
+  code?: string;
+  department?: EmployeeDepartmentRef | null;
+}
+
+interface EmployeeContractRef {
+  id: string;
+  contractNumber?: string;
+  startDate?: string;
+  endDate?: string | null;
+  status?: string;
+  position?: EmployeePositionRef | null;
+}
+
+export type EmployeeStatus = "ACTIVE" | "RESIGNED" | "DEACTIVE";
+
 export interface EmployeeDto extends BaseDto {
+  code?: string;
   employeeCode: string;
+  status?: EmployeeStatus;
   fullName: string;
   email?: string;
-  phoneNumber?: string;
+  phone?: string;
   dateOfBirth?: string;
   gender?: string;
   address?: string;
@@ -15,21 +41,27 @@ export interface EmployeeDto extends BaseDto {
   bankName?: string;
   emergencyContact?: string;
   emergencyPhone?: string;
+  department?: EmployeeDepartmentRef | null;
   departmentId?: string;
   departmentName?: string;
+  position?: EmployeePositionRef | null;
   positionId?: string;
   positionName?: string;
   hireDate?: string;
   terminationDate?: string;
   isActive: boolean;
+  contracts?: EmployeeContractRef[];
   userId?: string;
   notes?: string;
 }
 
 export interface EmployeeCreateDto {
   code: string;
+  employeeCode?: string;
+  status?: EmployeeStatus;
   fullName: string;
   email?: string;
+  phone?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
   gender?: string;
@@ -49,8 +81,12 @@ export interface EmployeeCreateDto {
 }
 
 export interface EmployeeUpdateDto {
+  code?: string;
+  employeeCode?: string;
+  status?: EmployeeStatus;
   fullName?: string;
   email?: string;
+  phone?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
   gender?: string;
@@ -71,11 +107,14 @@ export interface EmployeeUpdateDto {
 
 export interface EmployeeFilter {
   code?: string;
+  employeeCode?: string;
   fullName?: string;
   email?: string;
+  phone?: string;
   phoneNumber?: string;
   departmentId?: string;
   positionId?: string;
+  status?: EmployeeStatus;
   isActive?: boolean;
 }
 
