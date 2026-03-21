@@ -1,7 +1,7 @@
 import BaseView from "@/components/base-view/BaseView";
 import type { FormField } from "@/components/form-custom";
 import FormCustom from "@/components/form-custom";
-import type { EmployeeDto } from "@/dto/employee.dto";
+import type { EmployeeDto, EmployeeStatus } from "@/dto/employee.dto";
 import { useCreateEmployee } from "@/hooks/employee";
 import { useSelectBoxDepartments } from "@/hooks/department";
 import { useSelectBoxPositions } from "@/hooks/position";
@@ -102,6 +102,18 @@ export default function AddEmployeeScreen({
         })),
       },
       {
+        name: "status",
+        label: "Trạng thái",
+        type: "select",
+        required: true,
+        placeholder: "Chọn trạng thái",
+        options: [
+          { id: "ACTIVE", name: "Đang làm việc", value: "ACTIVE" },
+          { id: "RESIGNED", name: "Đã nghỉ việc", value: "RESIGNED" },
+          { id: "DEACTIVE", name: "Ngưng hoạt động", value: "DEACTIVE" },
+        ],
+      },
+      {
         name: "hireDate",
         label: "Ngày vào làm",
         type: "datepicker",
@@ -191,12 +203,23 @@ export default function AddEmployeeScreen({
     router.back();
   };
 
+  const initialValues = useMemo(() => {
+    const fallbackStatus: EmployeeStatus = initData?.isActive ? "ACTIVE" : "DEACTIVE";
+
+    return {
+      ...(isEdit ? {} : { status: "ACTIVE" as EmployeeStatus }),
+      ...initData,
+      status: (initData?.status as EmployeeStatus | undefined) ||
+        (isEdit ? fallbackStatus : "ACTIVE"),
+    };
+  }, [initData, isEdit]);
+
   return (
     <BaseView>
       <FormCustom
         title={title}
         fields={formFields}
-        initialValues={initData}
+        initialValues={initialValues}
         loading={isLoading || isLoadingUpdate}
         onSubmit={handleSubmit}
         onCancel={goBack}
