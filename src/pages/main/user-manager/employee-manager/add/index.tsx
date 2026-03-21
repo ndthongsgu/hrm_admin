@@ -109,8 +109,7 @@ export default function AddEmployeeScreen({
         placeholder: "Chọn trạng thái",
         options: [
           { id: "ACTIVE", name: "Đang làm việc", value: "ACTIVE" },
-          { id: "RESIGNED", name: "Đã nghỉ việc", value: "RESIGNED" },
-          { id: "DEACTIVE", name: "Ngưng hoạt động", value: "DEACTIVE" },
+          { id: "RESIGNED", name: "Đã nghỉ việc", value: "RESIGNED" }
         ],
       },
       {
