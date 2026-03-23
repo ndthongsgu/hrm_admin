@@ -207,6 +207,7 @@ export const API_ENDPOINTS = {
   },
   DEPENDENT: {
     PAGINATION: "/api/dependents",
+    BY_EMPLOYEE: (employeeId: string) => `/api/dependents/employee/${employeeId}`,
     GET_ALL: "/api/dependents",
     CREATE: "/api/dependents",
     UPDATE: (id: string) => `/api/dependents/${id}`,

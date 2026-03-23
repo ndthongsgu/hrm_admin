@@ -47,6 +47,9 @@ import AddOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation
 import EditOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/edit";
 import DetailOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/detail";
 import AddKnownFaceScreen from "@/pages/main/user-manager/employee-manager/addKnowFace";
+import DependentManagerScreen from "@/pages/main/user-manager/employee-manager/dependent";
+import AddDependentScreen from "@/pages/main/user-manager/employee-manager/dependent/add";
+import EditDependentScreen from "@/pages/main/user-manager/employee-manager/dependent/edit";
 
 export default function AppRoutes() {
   return (
@@ -109,6 +112,27 @@ export default function AppRoutes() {
                 .ADD_KNOWN_FACE.path
             }
             element={<AddKnownFaceScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .DEPENDENT_MANAGER.path
+            }
+            element={<DependentManagerScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .ADD_DEPENDENT.path
+            }
+            element={<AddDependentScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .EDIT_DEPENDENT.path
+            }
+            element={<EditDependentScreen />}
           />
           <Route
             path={

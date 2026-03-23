@@ -135,6 +135,21 @@ export const ROUTES = {
               label: "Thêm ảnh nhân viên",
               path: "/employee_manager/:id/known-faces",
             },
+            DEPENDENT_MANAGER: {
+              key: "DEPENDENT_MANAGER",
+              label: "Quản lý thân nhân",
+              path: "/employee_manager/:id/dependents",
+            },
+            ADD_DEPENDENT: {
+              key: "ADD_DEPENDENT",
+              label: "Thêm thân nhân",
+              path: "/employee_manager/:id/dependents/add",
+            },
+            EDIT_DEPENDENT: {
+              key: "EDIT_DEPENDENT",
+              label: "Chỉnh sửa thân nhân",
+              path: "/employee_manager/:id/dependents/edit/:dependentId",
+            },
           },
         },
         ADD_USER: {

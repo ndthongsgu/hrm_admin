@@ -21,6 +21,7 @@ import {
   PlayCircleOutlined,
   StopOutlined,
   FileImageOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Button, Row, Tag } from "antd";
 import { useState } from "react";
@@ -117,7 +118,7 @@ export default function EmployeeManager() {
     departmentName: 150,
     positionName: 150,
     isActive: 120,
-    actions: 120,
+    actions: 170,
   });
 
   const columns = [
@@ -248,6 +249,23 @@ export default function EmployeeManager() {
             router.push(
               ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
                 .ADD_KNOWN_FACE.path.replace(":id", record.id)
+            );
+          }}
+        />
+      ),
+    },
+    {
+      key: "dependentManager",
+      tooltip: "Quản lý thân nhân",
+      showKey: "isCanEdit",
+      type: "default",
+      render: (record) => (
+        <Button
+          icon={<TeamOutlined />}
+          onClick={() => {
+            router.push(
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .DEPENDENT_MANAGER.path.replace(":id", record.id)
             );
           }}
         />
