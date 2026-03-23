@@ -30,8 +30,9 @@ export default function PayslipDetailScreen() {
     // Thông tin cơ bản
     { key: "1", section: "I. THÔNG TIN CƠ BẢN", label: "Nhân viên", value: `${data?.employee?.fullName} (${data?.employee?.employeeCode})`, bold: true },
     { key: "2", label: "Kỳ lương", value: data?.payrollPeriod?.name },
+    { key: "3", label: "Người tạo bảng lương", value: data?.createBy },
     { 
-      key: "3", 
+      key: "4", 
       label: "Trạng thái duyệt", 
       value: (
         <Tag color={PAYSLIP_STATUS[data?.status as keyof typeof PAYSLIP_STATUS]?.color || "gold"}>
@@ -40,34 +41,37 @@ export default function PayslipDetailScreen() {
       ) 
     },
     // Thu nhập
-    { key: "4", section: "II. THU NHẬP", label: "II. THU NHẬP", value: '' , bold: true  },
-    { key: "5", label: "(1) Lương cơ sở", value: formatCurrency(data?.grossSalary)},
-    { key: "6", label: "(2) Lương thanh toán theo công", value: formatCurrency(data?.salaryByWorkdays) },
-    { key: "7", label: "(3a) Phụ cấp chịu thuế + tính bảo hiểm", value: formatCurrency(data?.taxableAndInsurableAllowance) },
-    { key: "8", label: "(3b) Phụ cấp chịu thuế + không tính bảo hiểm", value: formatCurrency(data?.taxableAndNonInsurableAllowance) },
-    { key: "9", label: "(3c) Phụ cấp không chịu thuế + tính bảo hiểm", value: formatCurrency(data?.nonTaxableAndInsurableAllowance) },
-    { key: "10", label: "(3d) Phụ cấp không chịu thuế + không tính bảo hiểm", value: formatCurrency(data?.nonTaxableAndNonInsurableAllowance) },
-    { key: "11", label: "(4a) Thưởng/Phạt chịu thuế", value: formatCurrency(data?.totalBonus) },
-    { key: "12", label: "(4b) Thưởng/Phạt không chịu thuế", value: formatCurrency(data?.totalBonusNonTax) },
+    { key: "5", section: "II. THU NHẬP", label: "II. THU NHẬP", value: '' , bold: true  },
+    { key: "6", label: "(1) Lương cơ sở", value: formatCurrency(data?.grossSalary)},
+    { key: "6", label: "(2) Số ngày công tính lương", value:data?.totalWorkdays || 0},
+    { key: "6", label: "(3) Số ngày công thực tế", value:data?.totalWorkdays || 0},
+    { key: "6", label: "(4) Lương thanh toán theo công = (1) * (3) / (2)", value: formatCurrency(data?.salaryByWorkdays) },
+    { key: "7", label: "(5) Phụ cấp chịu thuế + tính bảo hiểm", value: formatCurrency(data?.taxableAndInsurableAllowance) },
+    { key: "8", label: "(6) Phụ cấp chịu thuế + không tính bảo hiểm", value: formatCurrency(data?.taxableAndNonInsurableAllowance) },
+    { key: "9", label: "(7) Phụ cấp không chịu thuế + tính bảo hiểm", value: formatCurrency(data?.nonTaxableAndInsurableAllowance) },
+    { key: "10", label: "(8) Phụ cấp không chịu thuế + không tính bảo hiểm", value: formatCurrency(data?.nonTaxableAndNonInsurableAllowance) },
+    { key: "11", label: "(9) Thưởng/Phạt chịu thuế", value: formatCurrency(data?.totalBonus) },
+    { key: "12", label: "(10) Thưởng/Phạt không chịu thuế", value: formatCurrency(data?.totalBonusNonTax) },
     // Bảo hiểm xã hội
     { key: "13", section: "III. BẢO HIỂM XÃ HỘI", label: "III. BẢO HIỂM XÃ HỘI", value: '' , bold: true  },
-    { key: "14", label: "(5) Cơ sở tính bảo hiểm", value: formatCurrency(data?.bhxhSalaryBase) },
-    { key: "15", label: "(6) Lương đóng bảo hiểm = (5) + (3a) + (3c)", value: formatCurrency(data?.bhxhSalaryBase || 0 + (data?.taxableAndInsurableAllowance || 0) + (data?.nonTaxableAndInsurableAllowance || 0)) },
-    { key: "16", label: "(7) BHXH (8%)", value: formatCurrency(data?.bhxhAmount) },
-    { key: "17", label: "(8) BHYT (1.5%)", value: formatCurrency(data?.bhytAmount) },
-    { key: "18", label: "(9) BHTN (1%)", value: formatCurrency(data?.bhtnAmount) },
-    { key: "19", label: "(10)Tổng bảo hiểm = (7) + (8) + (9)", value: formatCurrency((data?.bhxhAmount || 0) + (data?.bhytAmount || 0) + (data?.bhtnAmount || 0)), bold: true },
+    { key: "14", label: "(11) Cơ sở tính bảo hiểm", value: formatCurrency(data?.bhxhSalaryBase) },
+    { key: "15", label: "(12) Lương đóng bảo hiểm = (5) + (7) + (11)", value: formatCurrency(data?.bhxhSalaryBase || 0 + (data?.taxableAndInsurableAllowance || 0) + (data?.nonTaxableAndInsurableAllowance || 0)) },
+    { key: "16", label: "(13) BHXH", value: formatCurrency(data?.bhxhAmount) },
+    { key: "17", label: "(14) BHYT", value: formatCurrency(data?.bhytAmount) },
+    { key: "18", label: "(15) BHTN", value: formatCurrency(data?.bhtnAmount) },
+    { key: "19", label: "(16) Tổng bảo hiểm = (13) + (14) + (15)", value: formatCurrency((data?.bhxhAmount || 0) + (data?.bhytAmount || 0) + (data?.bhtnAmount || 0)), bold: true },
     // PIT
     { key: "20", section: "IV. THUẾ THU NHẬP CÁ NHÂN (PIT)", label: "IV. THUẾ THU NHẬP CÁ NHÂN (PIT)", value: '' , bold: true  },
-    { key: "21", label: "(11) Thu nhập chịu thuế = (2) + (3a) + (3b) + (4a)", value: formatCurrency(data?.taxableIncome) },
-    { key: "22", label: "(12) Giảm trừ cá nhân", value: formatCurrency(data?.deductionPersonal) },
-    { key: "23", label: "(13) Giảm trừ người phụ thuộc", value: formatCurrency(data?.deductionDependents) },
-    { key: "24", label: "(14) Giảm trừ cố định", value: formatCurrency(data?.taxFixedDeduction) },
-    { key: "25", label: "(15) Tổng giảm trừ = (10) + (12) + (13)", value: formatCurrency(data?.totalDeductions) },
-    { key: "26", label: "(16) Thu nhập tính thuế = (11) - (15)", value: formatCurrency(data?.assessableIncome), bold: true },
-    { key: "27", label: "(17) Tiền thuế phải nộp = (16) * thuế suất - (14)", value: formatCurrency(data?.taxAmount), bold: true },
+    { key: "21", label: "(17) Thu nhập chịu thuế = (4) + (5) + (6) + (9)", value: formatCurrency(data?.taxableIncome) },
+    { key: "22", label: "(18) Giảm trừ cá nhân", value: formatCurrency(data?.deductionPersonal) },
+    { key: "23", label: "(19) Giảm trừ người phụ thuộc", value: formatCurrency(data?.deductionDependents) },
+    { key: "24", label: "(20) Giảm trừ cố định", value: formatCurrency(data?.taxFixedDeduction) },
+    { key: "25", label: "(21) Tổng giảm trừ = (16) + (18) + (19)", value: formatCurrency(data?.totalDeductions) },
+    { key: "26", label: "(22) Thu nhập tính thuế = (17) - (21)", value: formatCurrency(data?.assessableIncome), bold: true },
+    { key: "26", label: "(23) Thuế suất áp dụng", value: data?.taxRate || 0 + '%', bold: true },
+    { key: "27", label: "(24) Tiền thuế phải nộp = (22) * (23) - (20)", value: formatCurrency(data?.taxAmount), bold: true },
     // Kết quả
-    { key: "28", section: "V. KẾT QUẢ CUỐI CÙNG", label: "(18) Lương ròng =  + (3c) + (3d) + (4b) + (11) - (17)", value: formatCurrency(data?.netSalary), bold: true, highlight: true },
+    { key: "28", section: "V. KẾT QUẢ CUỐI CÙNG", label: "Thực nhận = (7) + (8) + (10) + (17) - (24)", value: formatCurrency(data?.netSalary), bold: true, highlight: true },
   ];
 
   const columns: ColumnsType<any> = [
