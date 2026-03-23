@@ -4,6 +4,7 @@ export interface SimpleRefDto {
   id: string;
   name?: string;
   code?: string;
+  employeeCode?: string;
   fullName?: string;
 }
 

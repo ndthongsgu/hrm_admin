@@ -4,6 +4,7 @@ import type {
   ContractDto,
   SelectOptionDto,
 } from "@/dto/contract.dto";
+import type { PaginationDto } from "@/dto/pagination.dto";
 import { useToast } from "@/hooks/layout/useToast";
 import { API_ENDPOINTS } from "@/services";
 import rootApiService from "@/services/api.service";
@@ -16,15 +17,17 @@ type PagedResponse<T> = {
 
 const LIST_SIZE = 200;
 
-const listParams = { page: 0, size: LIST_SIZE };
-
-export const useContracts = () => {
+export const useContracts = (params: PaginationDto<Record<string, any>>) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.CONTRACT.PAGINATION, listParams],
+    queryKey: [API_ENDPOINTS.CONTRACT.PAGINATION, params],
     queryFn: () =>
       rootApiService.get<PagedResponse<ContractDto>>(
         API_ENDPOINTS.CONTRACT.PAGINATION,
-        listParams,
+        {
+          page: Math.floor(params.skip / params.take),
+          size: params.take,
+          ...params.where,
+        },
       ),
   });
 
@@ -36,13 +39,19 @@ export const useContracts = () => {
   };
 };
 
-export const useAllowanceTypes = () => {
+export const useAllowanceTypes = (
+  params: PaginationDto<Record<string, any>>,
+) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.ALLOWANCE_TYPE.PAGINATION, listParams],
+    queryKey: [API_ENDPOINTS.ALLOWANCE_TYPE.PAGINATION, params],
     queryFn: () =>
       rootApiService.get<PagedResponse<AllowanceTypeDto>>(
         API_ENDPOINTS.ALLOWANCE_TYPE.PAGINATION,
-        listParams,
+        {
+          page: Math.floor(params.skip / params.take),
+          size: params.take,
+          ...params.where,
+        },
       ),
   });
 
@@ -54,13 +63,19 @@ export const useAllowanceTypes = () => {
   };
 };
 
-export const useContractAllowances = () => {
+export const useContractAllowances = (
+  params: PaginationDto<Record<string, any>>,
+) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.CONTRACT_ALLOWANCE.PAGINATION, listParams],
+    queryKey: [API_ENDPOINTS.CONTRACT_ALLOWANCE.PAGINATION, params],
     queryFn: () =>
       rootApiService.get<PagedResponse<ContractAllowanceDto>>(
         API_ENDPOINTS.CONTRACT_ALLOWANCE.PAGINATION,
-        listParams,
+        {
+          page: Math.floor(params.skip / params.take),
+          size: params.take,
+          ...params.where,
+        },
       ),
   });
 
@@ -74,21 +89,17 @@ export const useContractAllowances = () => {
 
 export const useEmployeeOptions = () => {
   const { data, isLoading } = useQuery({
-    queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION, "contract-options"],
+    queryKey: [API_ENDPOINTS.EMPLOYEE.SELECT_OPTIONS, "contract-options"],
     queryFn: () =>
-      rootApiService.post<PagedResponse<any>>(
-        API_ENDPOINTS.EMPLOYEE.PAGINATION,
-        {
-          skip: 0,
-          take: LIST_SIZE,
-          where: {},
-        },
+      rootApiService.get<SelectOptionDto[] | PagedResponse<any>>(
+        API_ENDPOINTS.EMPLOYEE.SELECT_OPTIONS,
       ),
   });
 
-  const options: SelectOptionDto[] = (data?.content || []).map((item: any) => ({
+  const source = Array.isArray(data) ? data : data?.content || [];
+  const options: SelectOptionDto[] = source.map((item: any) => ({
     id: item.id,
-    name: item.fullName || item.name || item.code || "N/A",
+    name: item.name || item.fullName || item.employeeCode || item.code || "N/A",
   }));
 
   return { data: options, isLoading };

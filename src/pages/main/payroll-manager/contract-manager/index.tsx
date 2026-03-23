@@ -1,4 +1,9 @@
 import BaseView from "@/components/base-view/BaseView";
+import FilterComponent, {
+  type FilterField,
+} from "@/components/filter/FilterCustom";
+import TableCustom, { type TableAction } from "@/components/table/Table";
+import type { PaginationDto } from "@/dto/base.dto";
 import type {
   AllowanceTypeDto,
   ContractAllowanceDto,
@@ -21,12 +26,8 @@ import {
   useUpdateContract,
   useUpdateContractAllowance,
 } from "@/hooks/contract";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ExclamationCircleOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { useConfirm } from "@/hooks/layout/useConfirm";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   DatePicker,
@@ -34,21 +35,33 @@ import {
   Input,
   InputNumber,
   Modal,
-  Popconfirm,
   Select,
   Space,
   Switch,
-  Table,
   Tabs,
   Tag,
-  Typography,
 } from "antd";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 
-const { Title } = Typography;
-
 type TabKey = "contracts" | "allowanceTypes" | "contractAllowances";
+
+const initContractFilter = {
+  contractNumber: "",
+  employeeId: undefined,
+  status: undefined,
+};
+
+const initAllowanceTypeFilter = {
+  name: "",
+  isTaxable: undefined,
+  isInsuranceBased: undefined,
+};
+
+const initContractAllowanceFilter = {
+  contractId: undefined,
+  allowanceTypeId: undefined,
+};
 
 const CONTRACT_STATUSES = [
   { label: "ACTIVE", value: "ACTIVE" },
@@ -65,27 +78,71 @@ const formatDate = (value?: string | null) =>
 
 export default function ContractManagerPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("contracts");
+  const [contractFilter, setContractFilter] =
+    useState<Record<string, any>>(initContractFilter);
+  const [allowanceTypeFilter, setAllowanceTypeFilter] = useState<
+    Record<string, any>
+  >(initAllowanceTypeFilter);
+  const [contractAllowanceFilter, setContractAllowanceFilter] = useState<
+    Record<string, any>
+  >(initContractAllowanceFilter);
+  const [contractPagination, setContractPagination] = useState<
+    PaginationDto<Record<string, any>>
+  >({
+    skip: 0,
+    take: 20,
+    where: initContractFilter,
+  });
+  const [allowanceTypePagination, setAllowanceTypePagination] = useState<
+    PaginationDto<Record<string, any>>
+  >({
+    skip: 0,
+    take: 20,
+    where: initAllowanceTypeFilter,
+  });
+  const [contractAllowancePagination, setContractAllowancePagination] =
+    useState<PaginationDto<Record<string, any>>>({
+      skip: 0,
+      take: 20,
+      where: initContractAllowanceFilter,
+    });
 
   const {
     data: contracts,
+    total: totalContracts,
     isLoading: loadingContracts,
     refetch: refetchContracts,
-  } = useContracts();
+  } = useContracts(contractPagination);
   const {
     data: allowanceTypes,
+    total: totalAllowanceTypes,
     isLoading: loadingAllowanceTypes,
     refetch: refetchAllowanceTypes,
-  } = useAllowanceTypes();
+  } = useAllowanceTypes(allowanceTypePagination);
   const {
     data: contractAllowances,
+    total: totalContractAllowances,
     isLoading: loadingContractAllowances,
     refetch: refetchContractAllowances,
-  } = useContractAllowances();
+  } = useContractAllowances(contractAllowancePagination);
 
   const { data: employeeOptions, isLoading: loadingEmployees } =
     useEmployeeOptions();
   const { data: positionOptions, isLoading: loadingPositions } =
     usePositionOptions();
+  const { confirm } = useConfirm();
+
+  const resolveEmployeeName = (record: any) => {
+    const employee = record?.employee;
+
+    return (
+      employee?.fullName ||
+      employee?.name ||
+      employee?.employeeCode ||
+      employee?.code ||
+      "-"
+    );
+  };
 
   const createContractMutation = useCreateContract();
   const updateContractMutation = useUpdateContract();
@@ -120,12 +177,138 @@ export default function ContractManagerPage() {
     () =>
       contracts.map((item) => ({
         id: item.id,
-        name: `${item.contractNumber || "N/A"} - ${
-          item.employee?.fullName || item.employee?.name || "N/A"
-        }`,
+        name: `${item.contractNumber || "N/A"} - ${resolveEmployeeName(item)}`,
       })),
     [contracts],
   );
+
+  const allowanceTypeSelectOptions = useMemo<SelectOptionDto[]>(
+    () =>
+      allowanceTypes.map((item) => ({
+        id: item.id,
+        name: item.name || "N/A",
+      })),
+    [allowanceTypes],
+  );
+
+  const handleSearchContracts = (isReset?: boolean) => {
+    setContractPagination((prev) => ({
+      ...prev,
+      skip: 0,
+      where: isReset
+        ? initContractFilter
+        : { ...prev.where, ...contractFilter },
+    }));
+  };
+
+  const handleSearchAllowanceTypes = (isReset?: boolean) => {
+    setAllowanceTypePagination((prev) => ({
+      ...prev,
+      skip: 0,
+      where: isReset
+        ? initAllowanceTypeFilter
+        : { ...prev.where, ...allowanceTypeFilter },
+    }));
+  };
+
+  const handleSearchContractAllowances = (isReset?: boolean) => {
+    setContractAllowancePagination((prev) => ({
+      ...prev,
+      skip: 0,
+      where: isReset
+        ? initContractAllowanceFilter
+        : { ...prev.where, ...contractAllowanceFilter },
+    }));
+  };
+
+  const contractFilterFields: FilterField[] = [
+    {
+      key: "contractNumber",
+      label: "Số hợp đồng",
+      type: "input",
+      placeholder: "Nhập số hợp đồng",
+      col: 8,
+    },
+    {
+      key: "employeeId",
+      label: "Nhân viên",
+      type: "select",
+      placeholder: "Chọn nhân viên",
+      options:
+        employeeOptions?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })) || [],
+      col: 8,
+    },
+    {
+      key: "status",
+      label: "Trạng thái",
+      type: "select",
+      placeholder: "Chọn trạng thái",
+      options: [{ label: "Tất cả", value: undefined }, ...CONTRACT_STATUSES],
+      col: 8,
+    },
+  ];
+
+  const allowanceTypeFilterFields: FilterField[] = [
+    {
+      key: "name",
+      label: "Tên loại phụ cấp",
+      type: "input",
+      placeholder: "Nhập tên loại phụ cấp",
+      col: 8,
+    },
+    {
+      key: "isTaxable",
+      label: "Tính thuế",
+      type: "select",
+      options: [
+        { label: "Tất cả", value: undefined },
+        { label: "Có", value: true },
+        { label: "Không", value: false },
+      ],
+      col: 8,
+    },
+    {
+      key: "isInsuranceBased",
+      label: "Tính bảo hiểm",
+      type: "select",
+      options: [
+        { label: "Tất cả", value: undefined },
+        { label: "Có", value: true },
+        { label: "Không", value: false },
+      ],
+      col: 8,
+    },
+  ];
+
+  const contractAllowanceFilterFields: FilterField[] = [
+    {
+      key: "contractId",
+      label: "Hợp đồng",
+      type: "select",
+      placeholder: "Chọn hợp đồng",
+      options:
+        contractSelectOptions?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })) || [],
+      col: 12,
+    },
+    {
+      key: "allowanceTypeId",
+      label: "Loại phụ cấp",
+      type: "select",
+      placeholder: "Chọn loại phụ cấp",
+      options:
+        allowanceTypeSelectOptions?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })) || [],
+      col: 12,
+    },
+  ];
 
   const openCreateContract = () => {
     setEditingContract(null);
@@ -269,8 +452,7 @@ export default function ContractManagerPage() {
     {
       title: "Nhân viên",
       key: "employee",
-      render: (_: any, record: ContractDto) =>
-        record.employee?.fullName || record.employee?.name || "-",
+      render: (_: any, record: ContractDto) => resolveEmployeeName(record),
     },
     {
       title: "Vị trí",
@@ -297,7 +479,7 @@ export default function ContractManagerPage() {
       key: "isNet",
       width: 110,
       render: (value: boolean) =>
-        value ? <Tag color="blue">NET</Tag> : <Tag color="gold">GROSS</Tag>,
+        value ? <Tag color="green">NET</Tag> : <Tag color="red">GROSS</Tag>,
     },
     {
       title: "Hiệu lực",
@@ -315,36 +497,35 @@ export default function ContractManagerPage() {
         value === "ACTIVE" ? (
           <Tag color="green">ACTIVE</Tag>
         ) : (
-          <Tag color="default">{value || "-"}</Tag>
+          <Tag color="red">{value || "-"}</Tag>
         ),
     },
+  ];
+
+  const contractActions: TableAction[] = [
     {
-      title: "Thao tác",
-      key: "actions",
-      width: 120,
-      render: (_: any, record: ContractDto) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEditContract(record)}
-          />
-          <Popconfirm
-            title="Xoá hợp đồng này?"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-            onConfirm={() => deleteContractMutation.mutateAsync(record.id)}
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              loading={deleteContractMutation.isPending}
-            />
-          </Popconfirm>
-        </Space>
-      ),
+      key: "edit",
+      label: "",
+      icon: <EditOutlined />,
+      type: "default",
+      tooltip: "Cập nhật",
+      onClick: (record: ContractDto) => openEditContract(record),
+    },
+    {
+      key: "delete",
+      label: "",
+      icon: <DeleteOutlined />,
+      type: "default",
+      danger: true,
+      tooltip: "Xóa",
+      disabled: () => deleteContractMutation.isPending,
+      onClick: (record: ContractDto) => {
+        confirm({
+          title: "Xác nhận xóa hợp đồng",
+          content: `Bạn có chắc chắn muốn xóa hợp đồng ${record.contractNumber || ""}?`,
+          onOk: () => deleteContractMutation.mutateAsync(record.id),
+        });
+      },
     },
   ];
 
@@ -360,7 +541,7 @@ export default function ContractManagerPage() {
       key: "isTaxable",
       width: 120,
       render: (value: boolean) =>
-        value ? <Tag color="green">Có</Tag> : <Tag color="default">Không</Tag>,
+        value ? <Tag color="green">Có</Tag> : <Tag color="red">Không</Tag>,
     },
     {
       title: "Tính bảo hiểm",
@@ -368,35 +549,34 @@ export default function ContractManagerPage() {
       key: "isInsuranceBased",
       width: 140,
       render: (value: boolean) =>
-        value ? <Tag color="green">Có</Tag> : <Tag color="default">Không</Tag>,
+        value ? <Tag color="green">Có</Tag> : <Tag color="red">Không</Tag>,
+    },
+  ];
+
+  const allowanceTypeActions: TableAction[] = [
+    {
+      key: "edit",
+      label: "",
+      icon: <EditOutlined />,
+      type: "default",
+      tooltip: "Cập nhật",
+      onClick: (record: AllowanceTypeDto) => openEditAllowanceType(record),
     },
     {
-      title: "Thao tác",
-      key: "actions",
-      width: 120,
-      render: (_: any, record: AllowanceTypeDto) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEditAllowanceType(record)}
-          />
-          <Popconfirm
-            title="Xoá loại phụ cấp này?"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-            onConfirm={() => deleteAllowanceTypeMutation.mutateAsync(record.id)}
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              loading={deleteAllowanceTypeMutation.isPending}
-            />
-          </Popconfirm>
-        </Space>
-      ),
+      key: "delete",
+      label: "",
+      icon: <DeleteOutlined />,
+      type: "default",
+      danger: true,
+      tooltip: "Xóa",
+      disabled: () => deleteAllowanceTypeMutation.isPending,
+      onClick: (record: AllowanceTypeDto) => {
+        confirm({
+          title: "Xác nhận xóa loại phụ cấp",
+          content: `Bạn có chắc chắn muốn xóa loại phụ cấp ${record.name || ""}?`,
+          onOk: () => deleteAllowanceTypeMutation.mutateAsync(record.id),
+        });
+      },
     },
   ];
 
@@ -411,9 +591,7 @@ export default function ContractManagerPage() {
       title: "Nhân viên",
       key: "employee",
       render: (_: any, record: ContractAllowanceDto) =>
-        record.contract?.employee?.fullName ||
-        record.contract?.employee?.name ||
-        "-",
+        resolveEmployeeName(record.contract),
     },
     {
       title: "Loại phụ cấp",
@@ -428,53 +606,38 @@ export default function ContractManagerPage() {
       width: 140,
       render: (value: number) => currency(value),
     },
+  ];
+
+  const contractAllowanceActions: TableAction[] = [
     {
-      title: "Thao tác",
-      key: "actions",
-      width: 120,
-      render: (_: any, record: ContractAllowanceDto) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEditContractAllowance(record)}
-          />
-          <Popconfirm
-            title="Xoá phụ cấp hợp đồng này?"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-            onConfirm={() =>
-              deleteContractAllowanceMutation.mutateAsync(record.id)
-            }
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              loading={deleteContractAllowanceMutation.isPending}
-            />
-          </Popconfirm>
-        </Space>
-      ),
+      key: "edit",
+      label: "",
+      icon: <EditOutlined />,
+      type: "default",
+      tooltip: "Cập nhật",
+      onClick: (record: ContractAllowanceDto) =>
+        openEditContractAllowance(record),
+    },
+    {
+      key: "delete",
+      label: "",
+      icon: <DeleteOutlined />,
+      type: "default",
+      danger: true,
+      tooltip: "Xóa",
+      disabled: () => deleteContractAllowanceMutation.isPending,
+      onClick: (record: ContractAllowanceDto) => {
+        confirm({
+          title: "Xác nhận xóa phụ cấp hợp đồng",
+          content: "Bạn có chắc chắn muốn xóa phụ cấp hợp đồng này?",
+          onOk: () => deleteContractAllowanceMutation.mutateAsync(record.id),
+        });
+      },
     },
   ];
 
   return (
     <BaseView>
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Title level={4} style={{ margin: 0 }}>
-          Quản lý hợp đồng lao động
-        </Title>
-      </div>
-
       <Tabs
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key as TabKey)}
@@ -484,23 +647,51 @@ export default function ContractManagerPage() {
             label: "Hợp đồng",
             children: (
               <>
-                <div style={{ marginBottom: 12, textAlign: "right" }}>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openCreateContract}
-                  >
-                    Thêm hợp đồng
-                  </Button>
-                </div>
-                <Table
+                <FilterComponent
+                  fields={contractFilterFields}
+                  filters={contractFilter}
+                  onFiltersChange={setContractFilter}
+                  onSearch={() => handleSearchContracts(false)}
+                  onClear={() => {
+                    setContractFilter(initContractFilter);
+                    handleSearchContracts(true);
+                  }}
+                />
+                <TableCustom
                   rowKey="id"
                   bordered
                   size="middle"
                   columns={contractColumns}
-                  dataSource={contracts}
+                  actions={contractActions}
+                  actionsFixed="right"
+                  data={contracts}
                   loading={loadingContracts}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  scroll={{ x: "max-content" }}
+                  customToolbar={
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={openCreateContract}
+                    >
+                      Thêm hợp đồng
+                    </Button>
+                  }
+                  pagination={{
+                    current:
+                      Math.floor(
+                        contractPagination.skip / contractPagination.take,
+                      ) + 1,
+                    pageSize: contractPagination.take,
+                    total: totalContracts,
+                    showSizeChanger: true,
+                  }}
+                  onPageChange={(page, pageSize) => {
+                    setContractPagination((prev) => ({
+                      ...prev,
+                      skip: (page - 1) * pageSize,
+                      take: pageSize,
+                    }));
+                  }}
                 />
               </>
             ),
@@ -510,23 +701,52 @@ export default function ContractManagerPage() {
             label: "Loại phụ cấp",
             children: (
               <>
-                <div style={{ marginBottom: 12, textAlign: "right" }}>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openCreateAllowanceType}
-                  >
-                    Thêm loại phụ cấp
-                  </Button>
-                </div>
-                <Table
+                <FilterComponent
+                  fields={allowanceTypeFilterFields}
+                  filters={allowanceTypeFilter}
+                  onFiltersChange={setAllowanceTypeFilter}
+                  onSearch={() => handleSearchAllowanceTypes(false)}
+                  onClear={() => {
+                    setAllowanceTypeFilter(initAllowanceTypeFilter);
+                    handleSearchAllowanceTypes(true);
+                  }}
+                />
+                <TableCustom
                   rowKey="id"
                   bordered
                   size="middle"
                   columns={allowanceTypeColumns}
-                  dataSource={allowanceTypes}
+                  actions={allowanceTypeActions}
+                  actionsFixed="right"
+                  data={allowanceTypes}
                   loading={loadingAllowanceTypes}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  scroll={{ x: "max-content" }}
+                  customToolbar={
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={openCreateAllowanceType}
+                    >
+                      Thêm loại phụ cấp
+                    </Button>
+                  }
+                  pagination={{
+                    current:
+                      Math.floor(
+                        allowanceTypePagination.skip /
+                          allowanceTypePagination.take,
+                      ) + 1,
+                    pageSize: allowanceTypePagination.take,
+                    total: totalAllowanceTypes,
+                    showSizeChanger: true,
+                  }}
+                  onPageChange={(page, pageSize) => {
+                    setAllowanceTypePagination((prev) => ({
+                      ...prev,
+                      skip: (page - 1) * pageSize,
+                      take: pageSize,
+                    }));
+                  }}
                 />
               </>
             ),
@@ -536,23 +756,52 @@ export default function ContractManagerPage() {
             label: "Phụ cấp theo hợp đồng",
             children: (
               <>
-                <div style={{ marginBottom: 12, textAlign: "right" }}>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openCreateContractAllowance}
-                  >
-                    Thêm phụ cấp hợp đồng
-                  </Button>
-                </div>
-                <Table
+                <FilterComponent
+                  fields={contractAllowanceFilterFields}
+                  filters={contractAllowanceFilter}
+                  onFiltersChange={setContractAllowanceFilter}
+                  onSearch={() => handleSearchContractAllowances(false)}
+                  onClear={() => {
+                    setContractAllowanceFilter(initContractAllowanceFilter);
+                    handleSearchContractAllowances(true);
+                  }}
+                />
+                <TableCustom
                   rowKey="id"
                   bordered
                   size="middle"
                   columns={contractAllowanceColumns}
-                  dataSource={contractAllowances}
+                  actions={contractAllowanceActions}
+                  actionsFixed="right"
+                  data={contractAllowances}
                   loading={loadingContractAllowances}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  scroll={{ x: "max-content" }}
+                  customToolbar={
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={openCreateContractAllowance}
+                    >
+                      Thêm phụ cấp hợp đồng
+                    </Button>
+                  }
+                  pagination={{
+                    current:
+                      Math.floor(
+                        contractAllowancePagination.skip /
+                          contractAllowancePagination.take,
+                      ) + 1,
+                    pageSize: contractAllowancePagination.take,
+                    total: totalContractAllowances,
+                    showSizeChanger: true,
+                  }}
+                  onPageChange={(page, pageSize) => {
+                    setContractAllowancePagination((prev) => ({
+                      ...prev,
+                      skip: (page - 1) * pageSize,
+                      take: pageSize,
+                    }));
+                  }}
                 />
               </>
             ),
