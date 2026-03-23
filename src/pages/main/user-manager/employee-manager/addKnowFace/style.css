@@ -1,0 +1,66 @@
+/* Known Face Upload Styles */
+.known-face-upload {
+  width: 100%;
+}
+
+.known-face-upload .ant-upload {
+  width: 100%;
+}
+
+.known-face-upload .ant-upload-list-item-thumbnail {
+  width: 100%;
+  height: 150px !important;
+  object-fit: cover;
+}
+
+.known-face-upload .ant-upload.ant-upload-drag {
+  border: 2px dashed #d9d9d9;
+  border-radius: 4px;
+  padding: 24px;
+  text-align: center;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.known-face-upload .ant-upload.ant-upload-drag:hover {
+  border-color: #1890ff;
+  background-color: #f5f7ff;
+}
+
+.known-face-upload .ant-upload.ant-upload-drag.ant-upload-drag-over {
+  border-color: #1890ff;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.upload-area p {
+  margin: 0;
+  color: #666;
+}
+
+/* File preview cards */
+.known-face-upload .ant-upload-list-picture-card .ant-upload-list-item {
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .known-face-upload .ant-upload.ant-upload-drag {
+    padding: 16px;
+  }
+
+  .upload-area {
+    padding: 12px;
+  }
+
+  .upload-area p {
+    font-size: 14px;
+  }
+}

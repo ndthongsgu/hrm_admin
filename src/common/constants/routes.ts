@@ -130,6 +130,11 @@ export const ROUTES = {
               label: "Chỉnh sửa nhân viên",
               path: "/employee_manager/edit/:id",
             },
+            ADD_KNOWN_FACE: {
+              key: "ADD_KNOWN_FACE",
+              label: "Thêm ảnh nhân viên",
+              path: "/employee_manager/:id/known-faces",
+            },
           },
         },
         ADD_USER: {

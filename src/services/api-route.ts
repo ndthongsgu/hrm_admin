@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     SELECT_OPTIONS: "/api/employees/select-options",
     DEACTIVATE: (id: string) => `/api/employees/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/employees/activate/${id}`,
+    UPLOAD_KNOWN_FACES: (id: string) => `/api/employees/${id}/known-faces/upload`,
   },
 
   ROLE: {
