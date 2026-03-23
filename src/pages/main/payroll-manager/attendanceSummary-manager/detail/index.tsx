@@ -3,10 +3,9 @@ import BaseView from "@/components/base-view/BaseView";
 import Loading from "@/components/loading/Loading";
 import { useDetailAttendanceSummary } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
-import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Space, Tag, Typography } from "antd";
 import { useParams } from "react-router-dom";
-import { ROUTES } from "@/common/constants/routes";
 import { ATTENDANCE_SUMMARY_STATUS } from "@/common/constants/payrollPeriod";
 
 const { Text } = Typography;
@@ -22,15 +21,6 @@ export default function AttendanceSummaryDetailScreen() {
 
   const goBack = () => {
     router.back();
-  };
-
-  const goToEdit = () => {
-    router.push(
-      ROUTES.MAIN.PAYROLL_MANAGER.children.ATTENDANCE_SUMMARY.children.EDIT_ATTENDANCE_SUMMARY.path.replace(
-        ":id",
-        id ?? "",
-      ),
-    );
   };
 
   return (
@@ -117,11 +107,6 @@ export default function AttendanceSummaryDetailScreen() {
             width: "100%",
           }}
         >
-          {(data?.status !== ATTENDANCE_SUMMARY_STATUS.APPROVED.value) && (
-            <Button type="primary" icon={<EditOutlined />} onClick={goToEdit}>
-              Chỉnh sửa
-            </Button>
-          )}
           <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
             Quay lại
           </Button>

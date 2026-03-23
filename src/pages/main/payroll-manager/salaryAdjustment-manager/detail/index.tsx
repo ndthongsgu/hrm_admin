@@ -1,10 +1,9 @@
 import ActionLog from "@/components/action-log";
 import BaseView from "@/components/base-view/BaseView";
 import Loading from "@/components/loading/Loading";
-import { ROUTES } from "@/common/constants/routes";
 import { useDetailSalaryAdjustment } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
-import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Space, Tag, Typography } from "antd";
 import { useParams } from "react-router-dom";
 import { SALARY_ADJUSTMENT_TYPE } from "@/common/constants/payrollPeriod";
@@ -19,15 +18,6 @@ export default function SalaryAdjustmentDetailScreen() {
   if (isLoading) {
     return <Loading />;
   }
-
-  const handleEdit = () => {
-    router.push(
-      ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.children.EDIT_SALARY_ADJUSTMENT.path.replace(
-        ":id",
-        id ?? "",
-      ),
-    );
-  };
 
   const goBack = () => {
     router.back();
@@ -105,11 +95,6 @@ export default function SalaryAdjustmentDetailScreen() {
             <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
               Quay lại
             </Button>
-            {!data?.isDeleted && (
-              <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                Chỉnh sửa
-              </Button>
-            )}
           </Space>
         </div>
       </Space>

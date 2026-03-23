@@ -1,5 +1,4 @@
 import { message } from "antd";
-import type { AxiosError } from "axios";
 
 /**
  * Utility để hiển thị error từ API

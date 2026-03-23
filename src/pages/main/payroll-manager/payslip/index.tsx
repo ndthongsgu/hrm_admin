@@ -8,6 +8,7 @@ import type { TableAction } from "@/components/table/Table";
 import Table from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PayslipDto } from "@/dto/payroll.dto";
+import PayslipPrintModal from "@/components/payslip-print/PayslipPrintModal";
 import {
   usePaginationPayslips,
   useApprovePayslip,
@@ -16,6 +17,7 @@ import {
   usePayrollPeriodSelectOptions,
   useEmployeeSelectOptions,
   useGeneratePayslip,
+  useUnApprovePayslip,
 } from "@/hooks/payroll";
 import { useConfirm } from "@/hooks/layout/useConfirm";
 import {
@@ -24,6 +26,8 @@ import {
   CheckCircleOutlined,
   CheckOutlined,
   PlusOutlined,
+  CloseOutlined,
+  FilePdfOutlined,
 } from "@ant-design/icons";
 import { Tag, Modal, Button, Form, Select, Row, Col } from "antd";
 
@@ -44,9 +48,12 @@ export default function PayslipManager() {
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
   const [generateForm] = Form.useForm();
   const [generateLoading, setGenerateLoading] = useState(false);
+  const [printModalVisible, setPrintModalVisible] = useState(false);
+  const [selectedPayslip, setSelectedPayslip] = useState<PayslipDto | null>(null);
 
   const { data, total, isLoading } = usePaginationPayslips(pagination);
   const { onApprovePayslip } = useApprovePayslip();
+  const { onUnApprovePayslip } = useUnApprovePayslip();
   const { onDeactivatePayslip } = useDeactivatePayslip();
   const { onActivatePayslip } = useActivatePayslip();
   const { onGeneratePayslip } = useGeneratePayslip();
@@ -177,13 +184,25 @@ export default function PayslipManager() {
       },
     },
     {
+      key: "print-pdf",
+      label: "",
+      icon: <FilePdfOutlined />,
+      type: "default",
+      tooltip: "In PDF",
+      hidden: (record: PayslipDto) => record.status !== PAYSLIP_STATUS.APPROVED.value || record.isDeleted === true,
+      onClick: (record: PayslipDto) => {
+        setSelectedPayslip(record);
+        setPrintModalVisible(true);
+      },
+    },
+    {
       key: "approve",
       label: "",
       icon: <CheckOutlined />,
       showKey: "isCanApprove",
       type: "default",
       tooltip: "Duyệt",
-      hidden: (record: PayslipDto) => record.status !== PAYSLIP_STATUS.PENDING.value,
+      hidden: (record: PayslipDto) => record.status !== PAYSLIP_STATUS.PENDING.value || record.isDeleted === true,
       onClick: async (record: PayslipDto) => {
         confirm({
           title: "Xác nhận duyệt phiếu lương",
@@ -195,13 +214,31 @@ export default function PayslipManager() {
       },
     },
     {
+      key: "unapprove",
+      label: "",
+      icon: <CloseOutlined />,
+      showKey: "isCanApprove",
+      type: "default",
+      tooltip: "Hủy duyệt",
+      hidden: (record: PayslipDto) => record.status === PAYSLIP_STATUS.PENDING.value || record.isDeleted === true,
+      onClick: async (record: PayslipDto) => {
+        confirm({
+          title: "Xác nhận hủy duyệt phiếu lương",
+          content: `Bạn có chắc chắn muốn hủy duyệt phiếu lương cho ${record.employeeName}?`,
+          onOk: () => {
+            onUnApprovePayslip(record.id!)
+          },
+        });
+      },
+    },
+    {
       key: "deactivate",
       label: "",
       icon: <StopOutlined />,
       showKey: "isCanDeactivate",
       type: "default",
       tooltip: "Ngừng hoạt động",
-      hidden: (record: PayslipDto) => record.isDeleted !== false,
+      hidden: (record: PayslipDto) => record.isDeleted !== false || record.status !== PAYSLIP_STATUS.PENDING.value,
       onClick: async (record: PayslipDto) => {
         confirm({
           title: "Xác nhận ngừng hoạt động",
@@ -219,7 +256,7 @@ export default function PayslipManager() {
       showKey: "isCanActivate",
       type: "default",
       tooltip: "Kích hoạt lại",
-      hidden: (record: PayslipDto) => record.isDeleted !== true,
+      hidden: (record: PayslipDto) => record.isDeleted !== true || record.status !== PAYSLIP_STATUS.PENDING.value,
       onClick: async (record: PayslipDto) => {
         confirm({
           title: "Xác nhận kích hoạt lại",
@@ -349,6 +386,15 @@ export default function PayslipManager() {
           </Form.Item>
         </Form>
       </Modal>
+
+      <PayslipPrintModal
+        visible={printModalVisible}
+        data={selectedPayslip}
+        onClose={() => {
+          setPrintModalVisible(false);
+          setSelectedPayslip(null);
+        }}
+      />
     </BaseView>
   );
 }

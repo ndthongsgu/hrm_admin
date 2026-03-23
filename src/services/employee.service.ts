@@ -7,7 +7,7 @@ import type {
 } from "@/dto/employee.dto";
 import type { PageResponse } from "@/dto/base.dto";
 import { API_ENDPOINTS } from "./api-route";
-import rootApiService from "./api.service";
+import rootApiService, { requestAxios } from "./api.service";
 
 export const employeeService = {
   /**
@@ -80,6 +80,21 @@ export const employeeService = {
    */
   getSelectOptions: async (): Promise<EmployeeSelectDto[]> => {
     return rootApiService.get<EmployeeSelectDto[]>(API_ENDPOINTS.EMPLOYEE.SELECT);
+  },
+
+  /**
+   * Upload known face images for an employee
+   */
+  uploadKnownFaces: async (employeeId: string, files: File[]): Promise<any> => {
+    const formData = new FormData();
+    formData.append("employee_id", employeeId);
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    return requestAxios<any>("POST", API_ENDPOINTS.EMPLOYEE.UPLOAD_KNOWN_FACES(employeeId), {
+      body: formData,
+    });
   },
 };
 

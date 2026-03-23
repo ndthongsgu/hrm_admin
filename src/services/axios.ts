@@ -10,6 +10,20 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+  transformRequest: [
+    (data, headers) => {
+      // If data is FormData, don't stringify and remove Content-Type header
+      // Let browser/axios auto-detect and set multipart/form-data
+      if (data instanceof FormData) {
+        // Delete Content-Type to allow browser to set it with boundary
+        delete headers["Content-Type"];
+        return data;
+      }
+      
+      // For non-FormData, use default JSON stringify
+      return JSON.stringify(data);
+    },
+  ],
 });
 
 let isRefreshing = false;

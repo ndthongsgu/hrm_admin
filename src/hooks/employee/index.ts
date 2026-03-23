@@ -9,8 +9,47 @@ import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
 import { useRouter } from "@/routes/hooks";
 import { API_ENDPOINTS } from "@/services";
 import rootApiService from "@/services/api.service";
+import employeeService from "@/services/employee.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../layout/useToast";
+
+export const useUploadKnownFaces = () => {
+  const router = useRouter();
+  const showToast = useToast();
+  const queryClient = useQueryClient();
+
+  const { mutate: upload, isPending } = useMutation({
+    mutationFn: ({ employeeId, files }: { employeeId: string; files: File[] }) =>
+      employeeService.uploadKnownFaces(employeeId, files),
+    onSuccess: (response: any) => {
+      showToast({
+        type: "success",
+        title: "Thành công",
+        message: response?.data?.message || "Upload ảnh nhân viên thành công",
+      });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION],
+      });
+      router.back();
+    },
+    onError: (error: any) => {
+      const errorMsg =
+        error?.response?.data?.data?.message ||
+        error?.message ||
+        "Có lỗi xảy ra khi upload ảnh";
+      showToast({
+        type: "error",
+        title: "Lỗi",
+        message: errorMsg,
+      });
+    },
+  });
+
+  return {
+    upload,
+    isPending,
+  };
+};
 
 const normalizeEmployee = (employee: any): EmployeeDto => {
   const firstContract = employee?.contracts?.[0];

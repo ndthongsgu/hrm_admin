@@ -96,22 +96,35 @@ export interface PayslipDto {
   // Income
   grossSalary: number;
   salaryByWorkdays: number;
-  totalAllowance: number;
-  totalBonus: number;
+  workdays: number; // Công thực tế
+  totalWorkdays: number; // Tổng số ngày công trong kỳ
+  
+  // Allowances (theo 2 tiêu chí: chịu thuế × tính bảo hiểm)
+  taxableAndInsurableAllowance: number;
+  taxableAndNonInsurableAllowance: number;
+  nonTaxableAndInsurableAllowance: number;
+  nonTaxableAndNonInsurableAllowance: number;
+  
+  // Salary Adjustments
+  totalBonus: number; // Thưởng/Phạt chịu thuế
+  totalBonusNonTax: number; // Thưởng/Phạt không chịu thuế
   
   // Insurance
   bhxhSalaryBase: number;
   bhxhAmount: number;
   bhytAmount: number;
   bhtnAmount: number;
-  socialInsuranceBenefitAmount: number;
+  totalInsurance: number;
   
   // Tax
   taxableIncome: number;
   deductionPersonal: number;
   deductionDependents: number;
+  taxFixedDeduction: number;
+  totalDeductions: number;
   assessableIncome: number;
   taxAmount: number;
+  taxRate?: number; // Thuế suất áp dụng, có thể lấy từ PayrollPeriod hoặc tính dựa trên assessableIncome
   
   // Net
   netSalary: number;
@@ -119,7 +132,8 @@ export interface PayslipDto {
   // Approval
   status?: string;
   reason?: string;
-
+  createBy?: string;
+  updateBy?: string;
   isDeleted?: boolean;
   
   createdAt?: Date;

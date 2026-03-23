@@ -234,10 +234,21 @@ export const requestAxios = async <T>(
     skipAuth = false,
   } = options;
 
-  const finalHeaders = {
-    ...headers,
-    ...(skipAuth ? { "x-skip-auth": "true" } : {}),
-  };
+  // Check if body is FormData (multipart upload)
+  const isFormData = body instanceof FormData;
+  
+  // Only set default headers if not FormData
+  // For FormData, let axios auto-detect and set multipart/form-data
+  const finalHeaders = isFormData
+    ? {
+        ...headers,
+        ...(skipAuth ? { "x-skip-auth": "true" } : {}),
+        // Remove Content-Type header for FormData - let axios/browser handle it
+      }
+    : {
+        ...headers,
+        ...(skipAuth ? { "x-skip-auth": "true" } : {}),
+      };
 
   // Determine if this is a payment endpoint
   const isPaymentEndpoint =
