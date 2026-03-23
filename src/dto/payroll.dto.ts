@@ -96,20 +96,30 @@ export interface PayslipDto {
   // Income
   grossSalary: number;
   salaryByWorkdays: number;
-  totalAllowance: number;
-  totalBonus: number;
+  
+  // Allowances (theo 2 tiêu chí: chịu thuế × tính bảo hiểm)
+  taxableAndInsurableAllowance: number;
+  taxableAndNonInsurableAllowance: number;
+  nonTaxableAndInsurableAllowance: number;
+  nonTaxableAndNonInsurableAllowance: number;
+  
+  // Salary Adjustments
+  totalBonus: number; // Thưởng/Phạt chịu thuế
+  totalBonusNonTax: number; // Thưởng/Phạt không chịu thuế
   
   // Insurance
   bhxhSalaryBase: number;
   bhxhAmount: number;
   bhytAmount: number;
   bhtnAmount: number;
-  socialInsuranceBenefitAmount: number;
+  totalInsurance: number;
   
   // Tax
   taxableIncome: number;
   deductionPersonal: number;
   deductionDependents: number;
+  taxFixedDeduction: number;
+  totalDeductions: number;
   assessableIncome: number;
   taxAmount: number;
   

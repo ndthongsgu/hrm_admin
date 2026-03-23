@@ -105,11 +105,6 @@ export default function SalaryAdjustmentDetailScreen() {
             <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
               Quay lại
             </Button>
-            {!data?.isDeleted && (
-              <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                Chỉnh sửa
-              </Button>
-            )}
           </Space>
         </div>
       </Space>

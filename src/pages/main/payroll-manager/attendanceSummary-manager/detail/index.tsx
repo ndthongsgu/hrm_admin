@@ -117,11 +117,6 @@ export default function AttendanceSummaryDetailScreen() {
             width: "100%",
           }}
         >
-          {(data?.status !== ATTENDANCE_SUMMARY_STATUS.APPROVED.value) && (
-            <Button type="primary" icon={<EditOutlined />} onClick={goToEdit}>
-              Chỉnh sửa
-            </Button>
-          )}
           <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
             Quay lại
           </Button>
