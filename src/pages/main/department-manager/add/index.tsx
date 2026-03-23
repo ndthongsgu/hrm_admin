@@ -23,6 +23,15 @@ export default function AddDepartmentScreen({
   const { data: departments = [] } = useSelectBoxDepartments();
   const router = useRouter();
 
+  const initialValues = useMemo(
+    () => ({
+      ...initData,
+      parentDepartmentId:
+        initData?.parentDepartmentId ?? initData?.parent?.id ?? undefined,
+    }),
+    [initData]
+  );
+
   const formFields = useMemo(() => {
     const fields: FormField[] = [
       {
@@ -93,7 +102,7 @@ export default function AddDepartmentScreen({
       <FormCustom
         title={title}
         fields={formFields}
-        initialValues={initData}
+        initialValues={initialValues}
         loading={isLoading || isLoadingUpdate}
         onSubmit={handleSubmit}
         onCancel={goBack}

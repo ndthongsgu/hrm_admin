@@ -6,6 +6,7 @@ export interface PositionDto extends BaseDto {
   description?: string;
   level?: number;
   baseSalary?: number;
+  standardResponsibilityAllowance?: number;
   isActive: boolean;
 }
 

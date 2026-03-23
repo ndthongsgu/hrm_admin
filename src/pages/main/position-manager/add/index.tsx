@@ -22,6 +22,17 @@ export default function AddPositionScreen({
   const { isLoading, onCreatePosition } = useCreatePosition();
   const router = useRouter();
 
+  const initialValues = useMemo(
+    () => ({
+      ...initData,
+      baseSalary:
+        initData?.baseSalary ??
+        initData?.standardResponsibilityAllowance ??
+        undefined,
+    }),
+    [initData]
+  );
+
   const formFields = useMemo(() => {
     const fields: FormField[] = [
       {
@@ -83,7 +94,7 @@ export default function AddPositionScreen({
       <FormCustom
         title={title}
         fields={formFields}
-        initialValues={initData}
+        initialValues={initialValues}
         loading={isLoading || isLoadingUpdate}
         onSubmit={handleSubmit}
         onCancel={goBack}

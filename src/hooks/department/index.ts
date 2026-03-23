@@ -32,7 +32,7 @@ export const usePaginationDepartment = (
   });
 
   return {
-    data: data?.content || [],
+    data: data?.items || data?.content || [],
     total: data?.totalElements || 0,
     isLoading,
     refetch,

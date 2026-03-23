@@ -65,18 +65,10 @@ export default function DepartmentDetailScreen() {
                 <Text strong>{data?.code}</Text>
               </Space>
             </Col>
-            <Col span={8}>
+            <Col span={16}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Tên phòng ban</Text>
                 <Text strong>{data?.name}</Text>
-              </Space>
-            </Col>
-            <Col span={8}>
-              <Space direction="vertical" size={0}>
-                <Text type="secondary">Trạng thái</Text>
-                <Text strong>
-                  {data?.isActive ? "Hoạt động" : "Không hoạt động"}
-                </Text>
               </Space>
             </Col>
           </Row>
@@ -84,16 +76,10 @@ export default function DepartmentDetailScreen() {
 
         <Card title="II. Thông tin tổ chức">
           <Row gutter={[24, 24]}>
-            <Col span={12}>
-              <Space direction="vertical" size={0}>
-                <Text type="secondary">Trưởng phòng</Text>
-                <Text strong>{data?.managerName || "Chưa có"}</Text>
-              </Space>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Phòng ban cha</Text>
-                <Text strong>{data?.parentDepartmentName || "Không có"}</Text>
+                <Text strong>{data?.parent?.name || "Không có"}</Text>
               </Space>
             </Col>
           </Row>

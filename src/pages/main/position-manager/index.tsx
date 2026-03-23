@@ -5,7 +5,7 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import type { PositionFilter } from "@/dto/position.dto";
+import type { PositionDto, PositionFilter } from "@/dto/position.dto";
 import {
   useActivatePosition,
   useDeActivatePosition,
@@ -18,13 +18,12 @@ import {
   PlayCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import { Button, Row, Tag } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
 
 const initFilter: PositionFilter = {
   code: "",
   name: "",
-  isActive: undefined,
 };
 
 export default function PositionManager() {
@@ -67,26 +66,12 @@ export default function PositionManager() {
       placeholder: "Nhập tên chức vụ",
       col: 6,
     },
-    {
-      key: "isActive",
-      label: "Trạng thái",
-      type: "select",
-      placeholder: "Chọn trạng thái",
-      options: [
-        { label: "Tất cả", value: undefined },
-        { label: "Hoạt động", value: true },
-        { label: "Không hoạt động", value: false },
-      ],
-      col: 6,
-    },
   ];
 
   const [columnWidths] = useState<Record<string, number>>({
     code: 120,
     name: 200,
-    level: 100,
     baseSalary: 150,
-    isActive: 120,
     actions: 120,
   });
 
@@ -104,43 +89,16 @@ export default function PositionManager() {
       width: columnWidths.name,
     },
     {
-      title: "Cấp bậc",
-      dataIndex: "level",
-      key: "level",
-      width: columnWidths.level,
-      render: (level: number) => level || "N/A",
-    },
-    {
       title: "Lương cơ bản",
-      dataIndex: "baseSalary",
+      dataIndex: "standardResponsibilityAllowance",
       key: "baseSalary",
       width: columnWidths.baseSalary,
-      render: (baseSalary: number) =>
-        baseSalary ? baseSalary.toLocaleString("vi-VN") + " VNĐ" : "N/A",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "isActive",
-      key: "isActive",
-      width: columnWidths.isActive,
-      render: (isActive: boolean) => {
-        const colorMap = {
-          true: "green",
-          false: "red",
-        };
-        const textMap = {
-          true: "Hoạt động",
-          false: "Không hoạt động",
-        };
-        return (
-          <Row justify={"center"}>
-            <Tag
-              color={colorMap[isActive as unknown as keyof typeof colorMap]}
-            >
-              {textMap[isActive as unknown as keyof typeof textMap]}
-            </Tag>
-          </Row>
-        );
+      render: (_: unknown, record: PositionDto) => {
+        const salary =
+          record?.standardResponsibilityAllowance ?? record?.baseSalary;
+        return salary != null
+          ? salary.toLocaleString("vi-VN") + " VNĐ"
+          : "N/A";
       },
     },
   ];

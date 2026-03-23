@@ -32,6 +32,9 @@ export default function PositionDetailScreen() {
     router.back();
   };
 
+  const salary =
+    data?.standardResponsibilityAllowance ?? data?.baseSalary;
+
   return (
     <BaseView>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -65,37 +68,23 @@ export default function PositionDetailScreen() {
                 <Text strong>{data?.code}</Text>
               </Space>
             </Col>
-            <Col span={8}>
+            <Col span={16}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Tên chức vụ</Text>
                 <Text strong>{data?.name}</Text>
               </Space>
             </Col>
-            <Col span={8}>
-              <Space direction="vertical" size={0}>
-                <Text type="secondary">Trạng thái</Text>
-                <Text strong>
-                  {data?.isActive ? "Hoạt động" : "Không hoạt động"}
-                </Text>
-              </Space>
-            </Col>
           </Row>
         </Card>
 
-        <Card title="II. Thông tin lương và cấp bậc">
+        <Card title="II. Thông tin lương">
           <Row gutter={[24, 24]}>
-            <Col span={12}>
-              <Space direction="vertical" size={0}>
-                <Text type="secondary">Cấp bậc</Text>
-                <Text strong>{data?.level || "N/A"}</Text>
-              </Space>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Space direction="vertical" size={0}>
                 <Text type="secondary">Lương cơ bản</Text>
                 <Text strong>
-                  {data?.baseSalary
-                    ? data.baseSalary.toLocaleString("vi-VN") + " VNĐ"
+                  {salary != null
+                    ? salary.toLocaleString("vi-VN") + " VNĐ"
                     : "N/A"}
                 </Text>
               </Space>

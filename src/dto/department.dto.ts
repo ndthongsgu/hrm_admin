@@ -1,14 +1,17 @@
 import type { BaseDto } from "./base.dto";
 
+export interface DepartmentParentDto extends BaseDto {
+  code: string;
+  name: string;
+}
+
 export interface DepartmentDto extends BaseDto {
   code: string;
   name: string;
   description?: string;
   managerId?: string;
-  managerName?: string;
   parentDepartmentId?: string;
-  parentDepartmentName?: string;
-  isActive: boolean;
+  parent?: DepartmentParentDto | null;
 }
 
 export interface DepartmentCreateDto {

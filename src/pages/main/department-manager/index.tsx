@@ -5,7 +5,7 @@ import FilterComponent, {
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
-import type { DepartmentFilter } from "@/dto/department.dto";
+import type { DepartmentDto, DepartmentFilter } from "@/dto/department.dto";
 import {
   useActivateDepartment,
   useDeActivateDepartment,
@@ -18,13 +18,12 @@ import {
   PlayCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import { Button, Row, Tag } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
 
 const initFilter: DepartmentFilter = {
   code: "",
   name: "",
-  isActive: undefined,
 };
 
 export default function DepartmentManager() {
@@ -67,26 +66,12 @@ export default function DepartmentManager() {
       placeholder: "Nhập tên phòng ban",
       col: 6,
     },
-    {
-      key: "isActive",
-      label: "Trạng thái",
-      type: "select",
-      placeholder: "Chọn trạng thái",
-      options: [
-        { label: "Tất cả", value: undefined },
-        { label: "Hoạt động", value: true },
-        { label: "Không hoạt động", value: false },
-      ],
-      col: 6,
-    },
   ];
 
   const [columnWidths] = useState<Record<string, number>>({
     code: 120,
-    name: 200,
-    managerName: 180,
-    parentDepartmentName: 180,
-    isActive: 120,
+    name: 260,
+    parentDepartmentName: 240,
     actions: 120,
   });
 
@@ -104,43 +89,11 @@ export default function DepartmentManager() {
       width: columnWidths.name,
     },
     {
-      title: "Quản lý",
-      dataIndex: "managerName",
-      key: "managerName",
-      width: columnWidths.managerName,
-      render: (managerName: string) => managerName || "Chưa có",
-    },
-    {
       title: "Phòng ban cha",
-      dataIndex: "parentDepartmentName",
+      dataIndex: "parent",
       key: "parentDepartmentName",
       width: columnWidths.parentDepartmentName,
-      render: (parentDepartmentName: string) => parentDepartmentName || "Không có",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "isActive",
-      key: "isActive",
-      width: columnWidths.isActive,
-      render: (isActive: boolean) => {
-        const colorMap = {
-          true: "green",
-          false: "red",
-        };
-        const textMap = {
-          true: "Hoạt động",
-          false: "Không hoạt động",
-        };
-        return (
-          <Row justify={"center"}>
-            <Tag
-              color={colorMap[isActive as unknown as keyof typeof colorMap]}
-            >
-              {textMap[isActive as unknown as keyof typeof textMap]}
-            </Tag>
-          </Row>
-        );
-      },
+      render: (parent: DepartmentDto["parent"]) => parent?.name || "Không có",
     },
   ];
 
