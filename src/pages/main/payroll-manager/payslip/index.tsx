@@ -8,6 +8,7 @@ import type { TableAction } from "@/components/table/Table";
 import Table from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PayslipDto } from "@/dto/payroll.dto";
+import PayslipPrintModal from "@/components/payslip-print/PayslipPrintModal";
 import {
   usePaginationPayslips,
   useApprovePayslip,
@@ -26,6 +27,7 @@ import {
   CheckOutlined,
   PlusOutlined,
   CloseOutlined,
+  FilePdfOutlined,
 } from "@ant-design/icons";
 import { Tag, Modal, Button, Form, Select, Row, Col } from "antd";
 
@@ -46,6 +48,8 @@ export default function PayslipManager() {
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
   const [generateForm] = Form.useForm();
   const [generateLoading, setGenerateLoading] = useState(false);
+  const [printModalVisible, setPrintModalVisible] = useState(false);
+  const [selectedPayslip, setSelectedPayslip] = useState<PayslipDto | null>(null);
 
   const { data, total, isLoading } = usePaginationPayslips(pagination);
   const { onApprovePayslip } = useApprovePayslip();
@@ -177,6 +181,18 @@ export default function PayslipManager() {
             record.id!,
           ),
         );
+      },
+    },
+    {
+      key: "print-pdf",
+      label: "",
+      icon: <FilePdfOutlined />,
+      type: "default",
+      tooltip: "In PDF",
+      hidden: (record: PayslipDto) => record.status !== PAYSLIP_STATUS.APPROVED.value || record.isDeleted === true,
+      onClick: (record: PayslipDto) => {
+        setSelectedPayslip(record);
+        setPrintModalVisible(true);
       },
     },
     {
@@ -370,6 +386,15 @@ export default function PayslipManager() {
           </Form.Item>
         </Form>
       </Modal>
+
+      <PayslipPrintModal
+        visible={printModalVisible}
+        data={selectedPayslip}
+        onClose={() => {
+          setPrintModalVisible(false);
+          setSelectedPayslip(null);
+        }}
+      />
     </BaseView>
   );
 }

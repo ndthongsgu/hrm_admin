@@ -96,6 +96,8 @@ export interface PayslipDto {
   // Income
   grossSalary: number;
   salaryByWorkdays: number;
+  workdays: number; // Công thực tế
+  totalWorkdays: number; // Tổng số ngày công trong kỳ
   
   // Allowances (theo 2 tiêu chí: chịu thuế × tính bảo hiểm)
   taxableAndInsurableAllowance: number;
@@ -122,6 +124,7 @@ export interface PayslipDto {
   totalDeductions: number;
   assessableIncome: number;
   taxAmount: number;
+  taxRate?: number; // Thuế suất áp dụng, có thể lấy từ PayrollPeriod hoặc tính dựa trên assessableIncome
   
   // Net
   netSalary: number;
@@ -129,7 +132,8 @@ export interface PayslipDto {
   // Approval
   status?: string;
   reason?: string;
-
+  createBy?: string;
+  updateBy?: string;
   isDeleted?: boolean;
   
   createdAt?: Date;
