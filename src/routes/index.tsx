@@ -46,6 +46,7 @@ import OfficeLocationManager from "@/pages/main/payroll-manager/officeLocation-m
 import AddOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/add";
 import EditOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/edit";
 import DetailOfficeLocationScreen from "@/pages/main/payroll-manager/officeLocation-manager/detail";
+import AddKnownFaceScreen from "@/pages/main/user-manager/employee-manager/addKnowFace";
 
 export default function AppRoutes() {
   return (
@@ -101,6 +102,13 @@ export default function AppRoutes() {
                 .ADD_EMPLOYEE.path
             }
             element={<AddEmployeeScreen />}
+          />
+           <Route
+            path={
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .ADD_KNOWN_FACE.path
+            }
+            element={<AddKnownFaceScreen />}
           />
           <Route
             path={

@@ -1,5 +1,3 @@
-import type { AxiosError } from "axios";
-
 /**
  * Hook để xử lý và trích xuất error message từ API response
  */

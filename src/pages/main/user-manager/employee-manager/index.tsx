@@ -20,6 +20,7 @@ import {
   EyeOutlined,
   PlayCircleOutlined,
   StopOutlined,
+  FileImageOutlined,
 } from "@ant-design/icons";
 import { Button, Row, Tag } from "antd";
 import { useState } from "react";
@@ -235,6 +236,23 @@ export default function EmployeeManager() {
       ),
     },
 
+    {
+      key: "knownFace",
+      tooltip: "Thêm ảnh nhân viên",
+      showKey: "isCanEdit",
+      type: "default",
+      render: (record) => (
+        <Button
+          icon={<FileImageOutlined />}
+          onClick={() => {
+            router.push(
+              ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
+                .ADD_KNOWN_FACE.path.replace(":id", record.id)
+            );
+          }}
+        />
+      ),
+    },
     {
       key: "activate",
       tooltip: "Kích hoạt",

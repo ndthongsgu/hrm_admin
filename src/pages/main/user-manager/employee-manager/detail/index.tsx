@@ -121,7 +121,7 @@ const DetailView = ({ data }: { data: EmployeeDto }) => {
               Số điện thoại
             </Text>
             <Text strong style={{ fontSize: "18px" }}>
-              {data?.phoneNumber || "Không có"}
+              {data?.phone || "Không có"}
             </Text>
           </Col>
           <Col span={24} style={{ padding: "20px" }}>
