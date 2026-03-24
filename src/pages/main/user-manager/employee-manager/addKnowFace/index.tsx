@@ -1,5 +1,5 @@
 import { useRouter } from "@/routes/hooks";
-import { useDetailEmployee, useUploadKnownFaces } from "@/hooks/employee";
+import { useDetailEmployee, useUploadKnownFaces, useGetKnownFaces, useDeleteKnownFace } from "@/hooks/employee";
 import { ROUTES } from "@/common/constants/routes";
 import BaseView from "@/components/base-view/BaseView";
 import {
@@ -14,6 +14,9 @@ import {
   Badge,
   Space,
   Result,
+  Image,
+  Modal,
+  Popconfirm,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -36,6 +39,8 @@ export default function AddKnownFaceScreen() {
   const { data: employee, isLoading: employeeLoading } =
     useDetailEmployee(employeeId || "");
   const { upload, isPending } = useUploadKnownFaces();
+  const { deleteImage, isPending: isDeleting } = useDeleteKnownFace(employeeId || "");
+  const { data: knownFacesData, isLoading: knownFacesLoading, refetch: refetchKnownFaces } = useGetKnownFaces(employeeId || "");
 
   const [fileList, setFileList] = useState<FileWithPreview[]>([]);
 
@@ -50,8 +55,22 @@ export default function AddKnownFaceScreen() {
   };
 
   const handleRemoveFile = (file: UploadFile) => {
+    const modal = Modal.confirm({
+      title: "Xoá ảnh",
+      content: "Bạn có chắc muốn xoá ảnh này?",
+      okText: "Xoá",
+      cancelText: "Huỷ",
+      okButtonProps: { danger: true },
+    });
+
     const newList = fileList.filter((item) => item.uid !== file.uid);
     setFileList(newList);
+  };
+
+  const handleDeleteExistingImage = (filename: string) => {
+    if (employeeId) {
+      deleteImage(filename);
+    }
   };
 
   const handleUpload = () => {
@@ -83,10 +102,7 @@ export default function AddKnownFaceScreen() {
 
   const handleBack = () => {
     if (!employeeId) return;
-    router.push(
-      ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
-        .DETAIL_EMPLOYEE.path.replace(":id", employeeId)
-    );
+    router.back();
   };
 
   if (employeeLoading) {
@@ -116,6 +132,8 @@ export default function AddKnownFaceScreen() {
     );
   }
 
+  const existingImages = knownFacesData?.images || [];
+
   return (
     <BaseView>
       <Card>
@@ -125,11 +143,7 @@ export default function AddKnownFaceScreen() {
             <Row justify="space-between" align="middle">
               <Col>
                 <h2 style={{ margin: 0 }}>
-                  <ArrowLeftOutlined
-                    onClick={handleBack}
-                    style={{ marginRight: 16, cursor: "pointer" }}
-                  />
-                  Thêm ảnh nhân viên
+                  Quản lý ảnh nhân viên
                 </h2>
               </Col>
               <Col>
@@ -171,6 +185,83 @@ export default function AddKnownFaceScreen() {
             </Card>
           </Col>
 
+          {/* Existing Known Faces */}
+          {existingImages && existingImages.length > 0 && (
+            <Col span={24}>
+              <Card type="inner">
+                <Row gutter={[16, 16]}>
+                  <Col span={24}>
+                    <strong>Ảnh đã tải lên ({existingImages.length})</strong>
+                  </Col>
+                  <Col span={24}>
+                    <Row gutter={[16, 16]}>
+                      {existingImages.map((image: any, index: number) => (
+                        <Col key={index} xs={12} sm={8} md={6}>
+                          <Card
+                            style={{
+                              padding: "8px",
+                              textAlign: "center",
+                              position: "relative",
+                            }}
+                            hoverable
+                          >
+                            <Image
+                              src={image.url}
+                              alt={image.filename}
+                              style={{
+                                width: "100%",
+                                height: "150px",
+                                objectFit: "cover",
+                                borderRadius: "4px",
+                              }}
+                              preview
+                            />
+                            <div
+                              style={{
+                                marginTop: "8px",
+                                fontSize: "12px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                              title={image.filename}
+                            >
+                              {image.filename}
+                            </div>
+                            <Popconfirm
+                              title="Xoá ảnh"
+                              description="Bạn có chắc muốn xoá ảnh này?"
+                              onConfirm={() => handleDeleteExistingImage(image.filename)}
+                              okText="Xoá"
+                              cancelText="Huỷ"
+                              okButtonProps={{
+                                danger: true,
+                                loading: isDeleting,
+                              }}
+                              disabled={isDeleting}
+                            >
+                              <Button
+                                type="text"
+                                danger
+                                size="small"
+                                icon={<DeleteOutlined />}
+                                style={{ marginTop: "8px", width: "100%" }}
+                                loading={isDeleting}
+                                disabled={isDeleting}
+                              >
+                                Xoá
+                              </Button>
+                            </Popconfirm>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          )}
+
           {/* Upload Area */}
           <Col span={24}>
             <Card type="inner">
@@ -192,8 +283,8 @@ export default function AddKnownFaceScreen() {
                     listType="picture-card"
                     onRemove={handleRemoveFile}
                     className="known-face-upload"
-                     style={{
-                        width: '300px'
+                    style={{
+                      width: '300px'
                     }}
                   >
                     <div className="upload-area">
@@ -213,96 +304,19 @@ export default function AddKnownFaceScreen() {
             </Card>
           </Col>
 
-          {/* File List */}
-          {fileList.length > 0 && (
-            <Col span={24}>
-              <Card type="inner" title="Danh sách ảnh đã chọn">
-                <Row gutter={[16, 16]}>
-                  {fileList.map((file) => (
-                    <Col key={file.uid} xs={24} sm={12} lg={8}>
-                      <Card size="small" hoverable>
-                        <div style={{ position: "relative" }}>
-                          {file.preview ? (
-                            <img
-                              src={file.preview}
-                              style={{
-                                width: "100%",
-                                height: "150px",
-                                objectFit: "cover",
-                                borderRadius: "4px",
-                              }}
-                              alt={file.name}
-                            />
-                          ) : (
-                            <div
-                              style={{
-                                width: "100%",
-                                height: "150px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "#f0f0f0",
-                                borderRadius: "4px",
-                              }}
-                            >
-                              <FileImageOutlined
-                                style={{ fontSize: "32px", color: "#bfbfbf" }}
-                              />
-                            </div>
-                          )}
-                          <div
-                            style={{
-                              marginTop: "8px",
-                              fontSize: "12px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                            title={file.name}
-                          >
-                            {file.name}
-                          </div>
-                          <Button
-                            danger
-                            size="small"
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleRemoveFile(file)}
-                            style={{ marginTop: "8px", width: "100%" }}
-                          >
-                            Xoá
-                          </Button>
-                        </div>
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-              </Card>
-            </Col>
-          )}
-
-          {/* Empty State */}
-          {fileList.length === 0 && (
-            <Col span={24}>
-              <Empty
-                description="Chưa chọn ảnh nào"
-                style={{ marginTop: "20px" }}
-              />
-            </Col>
-          )}
-
           {/* Action Buttons */}
           <Col span={24}>
             <Space style={{ width: "100%" }} direction="vertical">
               <Space>
                 <Button
                   type="primary"
-                  size="large"
+                  size="middle"
                   onClick={handleUpload}
                   loading={isPending}
                   disabled={fileList.length === 0 || isPending}
                   icon={<CloudUploadOutlined />}
                 >
-                  Upload {fileList.length > 0 && `(${fileList.length} ảnh)`}
+                  Thêm {fileList.length > 0 && `(${fileList.length} ảnh)`}
                 </Button>
                 <Button
                   onClick={handleReset}

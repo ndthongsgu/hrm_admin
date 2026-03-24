@@ -83,6 +83,13 @@ export const employeeService = {
   },
 
   /**
+   * Get known face images for an employee
+   */
+  getKnownFaces: async (id: string): Promise<any> => {
+    return rootApiService.get<any>(API_ENDPOINTS.EMPLOYEE.GET_KNOWN_FACES(id));
+  },
+
+  /**
    * Upload known face images for an employee
    */
   uploadKnownFaces: async (employeeId: string, files: File[]): Promise<any> => {
@@ -95,6 +102,13 @@ export const employeeService = {
     return requestAxios<any>("POST", API_ENDPOINTS.EMPLOYEE.UPLOAD_KNOWN_FACES(employeeId), {
       body: formData,
     });
+  },
+
+  /**
+   * Delete a known face image for an employee
+   */
+  deleteKnownFace: async (employeeId: string, filename: string): Promise<any> => {
+    return requestAxios<any>("DELETE", API_ENDPOINTS.EMPLOYEE.DELETE_KNOWN_FACE(employeeId, filename));
   },
 };
 

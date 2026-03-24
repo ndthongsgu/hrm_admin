@@ -1,6 +1,6 @@
 export const API_ROUTES: ApiRoutes = {
   BASE_URL: import.meta.env.VITE_BE_API,
-  PAYMENT_BASE_URL: import.meta.env.VITE_API_PAYMENT_URL,
+  PYTHON_BASE_URL: 'http://localhost:8000', 
   TIMEOUT: 10000,
   HEADERS: {
     "Content-Type": "application/json",
@@ -32,7 +32,9 @@ export const API_ENDPOINTS = {
     SELECT_OPTIONS: "/api/employees/select-options",
     DEACTIVATE: (id: string) => `/api/employees/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/employees/activate/${id}`,
+    GET_KNOWN_FACES: (id: string) => `/api/employees/${id}/known-faces`,
     UPLOAD_KNOWN_FACES: (id: string) => `/api/employees/${id}/known-faces/upload`,
+    DELETE_KNOWN_FACE: (id: string, filename: string) => `/api/employees/${id}/known-faces/${filename}`,
   },
 
   ROLE: {
@@ -253,7 +255,7 @@ export const API_ENDPOINTS = {
 
 interface ApiRoutes {
   BASE_URL: string;
-  PAYMENT_BASE_URL: string;
+  PYTHON_BASE_URL: string;
   TIMEOUT: number;
   HEADERS: {
     "Content-Type": string;

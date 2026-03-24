@@ -7,7 +7,7 @@ import type {
 } from "@/dto/employee.dto";
 import type { PaginationResponse, SuccessResponse } from "@/dto/pagination.dto";
 import { useRouter } from "@/routes/hooks";
-import { API_ENDPOINTS } from "@/services";
+import { API_ENDPOINTS, API_ROUTES } from "@/services";
 import rootApiService from "@/services/api.service";
 import employeeService from "@/services/employee.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,10 @@ export const useUploadKnownFaces = () => {
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.EMPLOYEE.PAGINATION],
       });
+      // Also invalidate the known faces query
+      queryClient.invalidateQueries({
+        queryKey: ["knownFaces"],
+      });
       router.back();
     },
     onError: (error: any) => {
@@ -48,6 +52,68 @@ export const useUploadKnownFaces = () => {
   return {
     upload,
     isPending,
+  };
+};
+
+export const useDeleteKnownFace = (employeeId: string) => {
+  const showToast = useToast();
+  const queryClient = useQueryClient();
+
+  const { mutate: deleteImage, isPending } = useMutation({
+    mutationFn: (filename: string) =>
+      employeeService.deleteKnownFace(employeeId, filename),
+    onSuccess: () => {
+      showToast({
+        type: "success",
+        title: "Thành công",
+        message: "Xoá ảnh thành công",
+      });
+      // Invalidate known faces query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: ["knownFaces", employeeId],
+      });
+    },
+    onError: (error: any) => {
+      const errorMsg =
+        error?.response?.data?.data?.message ||
+        error?.message ||
+        "Có lỗi xảy ra khi xoá ảnh";
+      showToast({
+        type: "error",
+        title: "Lỗi",
+        message: errorMsg,
+      });
+    },
+  });
+
+  return {
+    deleteImage,
+    isPending,
+  };
+};
+
+export const useGetKnownFaces = (employeeId: string) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: ["knownFaces", employeeId],
+    queryFn: async () => {
+      const response = await employeeService.getKnownFaces(employeeId);
+      // Transform URLs to include full API base URL
+      if (response?.images) {
+        response.images = response.images.map((img: any) => ({
+          ...img,
+          url: `${API_ROUTES.PYTHON_BASE_URL}${img.url}`,
+        }));
+      }
+      return response;
+    },
+    enabled: !!employeeId,
+  });
+
+  return {
+    data: data || { status: "success", employee_id: employeeId, total_images: 0, images: [] },
+    isLoading,
+    refetch,
+    error,
   };
 };
 
