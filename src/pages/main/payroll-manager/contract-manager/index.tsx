@@ -1,4 +1,5 @@
 import BaseView from "@/components/base-view/BaseView";
+import TableCustom from "@/components/table/Table";
 import type {
   AllowanceTypeDto,
   ContractAllowanceDto,
@@ -38,7 +39,6 @@ import {
   Select,
   Space,
   Switch,
-  Table,
   Tabs,
   Tag,
   Typography,
@@ -65,6 +65,15 @@ const formatDate = (value?: string | null) =>
 
 export default function ContractManagerPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("contracts");
+  const [contractPage, setContractPage] = useState({ current: 1, pageSize: 20 });
+  const [allowanceTypePage, setAllowanceTypePage] = useState({
+    current: 1,
+    pageSize: 20,
+  });
+  const [contractAllowancePage, setContractAllowancePage] = useState({
+    current: 1,
+    pageSize: 20,
+  });
 
   const {
     data: contracts,
@@ -460,6 +469,26 @@ export default function ContractManagerPage() {
     },
   ];
 
+  const pagedContracts = useMemo(() => {
+    const start = (contractPage.current - 1) * contractPage.pageSize;
+    return contracts.slice(start, start + contractPage.pageSize);
+  }, [contracts, contractPage.current, contractPage.pageSize]);
+
+  const pagedAllowanceTypes = useMemo(() => {
+    const start = (allowanceTypePage.current - 1) * allowanceTypePage.pageSize;
+    return allowanceTypes.slice(start, start + allowanceTypePage.pageSize);
+  }, [allowanceTypes, allowanceTypePage.current, allowanceTypePage.pageSize]);
+
+  const pagedContractAllowances = useMemo(() => {
+    const start =
+      (contractAllowancePage.current - 1) * contractAllowancePage.pageSize;
+    return contractAllowances.slice(start, start + contractAllowancePage.pageSize);
+  }, [
+    contractAllowances,
+    contractAllowancePage.current,
+    contractAllowancePage.pageSize,
+  ]);
+
   return (
     <BaseView>
       <div
@@ -493,14 +522,19 @@ export default function ContractManagerPage() {
                     Thêm hợp đồng
                   </Button>
                 </div>
-                <Table
-                  rowKey="id"
-                  bordered
-                  size="middle"
+                <TableCustom<ContractDto>
                   columns={contractColumns}
-                  dataSource={contracts}
+                  data={pagedContracts}
                   loading={loadingContracts}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  pagination={{
+                    total: contracts.length,
+                    pageSize: contractPage.pageSize,
+                    current: contractPage.current,
+                    showSizeChanger: false,
+                  }}
+                  onPageChange={(page, pageSize) =>
+                    setContractPage({ current: page, pageSize })
+                  }
                 />
               </>
             ),
@@ -519,14 +553,19 @@ export default function ContractManagerPage() {
                     Thêm loại phụ cấp
                   </Button>
                 </div>
-                <Table
-                  rowKey="id"
-                  bordered
-                  size="middle"
+                <TableCustom<AllowanceTypeDto>
                   columns={allowanceTypeColumns}
-                  dataSource={allowanceTypes}
+                  data={pagedAllowanceTypes}
                   loading={loadingAllowanceTypes}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  pagination={{
+                    total: allowanceTypes.length,
+                    pageSize: allowanceTypePage.pageSize,
+                    current: allowanceTypePage.current,
+                    showSizeChanger: false,
+                  }}
+                  onPageChange={(page, pageSize) =>
+                    setAllowanceTypePage({ current: page, pageSize })
+                  }
                 />
               </>
             ),
@@ -545,14 +584,19 @@ export default function ContractManagerPage() {
                     Thêm phụ cấp hợp đồng
                   </Button>
                 </div>
-                <Table
-                  rowKey="id"
-                  bordered
-                  size="middle"
+                <TableCustom<ContractAllowanceDto>
                   columns={contractAllowanceColumns}
-                  dataSource={contractAllowances}
+                  data={pagedContractAllowances}
                   loading={loadingContractAllowances}
-                  pagination={{ pageSize: 20, showSizeChanger: false }}
+                  pagination={{
+                    total: contractAllowances.length,
+                    pageSize: contractAllowancePage.pageSize,
+                    current: contractAllowancePage.current,
+                    showSizeChanger: false,
+                  }}
+                  onPageChange={(page, pageSize) =>
+                    setContractAllowancePage({ current: page, pageSize })
+                  }
                 />
               </>
             ),

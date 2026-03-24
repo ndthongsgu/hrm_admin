@@ -1,6 +1,5 @@
 import { ROUTES } from "@/common/constants/routes";
 import BaseView from "@/components/base-view/BaseView";
-import ActionConfirm from "@/components/confirm-action";
 import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
@@ -9,17 +8,11 @@ import { CommonActions } from "@/components/row-action/CommonAction";
 import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { EmployeeDto, EmployeeFilter } from "@/dto/employee.dto";
-import {
-  useActivateEmployee,
-  useDeActivateEmployee,
-  usePaginationEmployee,
-} from "@/hooks/employee";
+import { usePaginationEmployee } from "@/hooks/employee";
 import { useRouter } from "@/routes/hooks";
 import {
   EditOutlined,
   EyeOutlined,
-  PlayCircleOutlined,
-  StopOutlined,
   FileImageOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -43,10 +36,7 @@ export default function EmployeeManager() {
     where: initFilter,
   });
 
-  const { data, total, isLoading, refetch } = usePaginationEmployee(pagination);
-
-  const { onDeActivateEmployee } = useDeActivateEmployee();
-  const { onActivateEmployee } = useActivateEmployee();
+  const { data, total, isLoading } = usePaginationEmployee(pagination);
 
   const handleSearch = (isReset?: boolean) => {
     setPagination((prev) => ({
@@ -219,25 +209,6 @@ export default function EmployeeManager() {
       },
     },
     {
-      key: "deActivate",
-      tooltip: "Ngưng hoạt động",
-      showKey: "isCanDeactivate",
-      type: "default",
-      render: (record) => (
-        <ActionConfirm
-          title="Bạn có chắc muốn ngưng hoạt động nhân viên này?"
-          confirmText="Ngưng hoạt động"
-          onConfirm={async () => {
-            await onDeActivateEmployee(record.id);
-            refetch();
-          }}
-        >
-          <Button icon={<StopOutlined />} danger />
-        </ActionConfirm>
-      ),
-    },
-
-    {
       key: "knownFace",
       tooltip: "Thêm ảnh nhân viên",
       showKey: "isCanEdit",
@@ -269,25 +240,6 @@ export default function EmployeeManager() {
             );
           }}
         />
-      ),
-    },
-    {
-      key: "activate",
-      tooltip: "Kích hoạt",
-      showKey: "isCanActivate",
-      label: "",
-      type: "default",
-      render: (record) => (
-        <ActionConfirm
-          title="Bạn có chắc muốn kích hoạt nhân viên này?"
-          confirmText="Hoạt động"
-          onConfirm={async () => {
-            await onActivateEmployee(record.id);
-            refetch();
-          }}
-        >
-          <Button icon={<PlayCircleOutlined />} />
-        </ActionConfirm>
       ),
     },
   ];
