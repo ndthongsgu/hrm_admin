@@ -53,6 +53,7 @@ export interface EmployeeDto extends BaseDto {
   contracts?: EmployeeContractRef[];
   userId?: string;
   notes?: string;
+  officeLocationId?: string;
 }
 
 export interface EmployeeCreateDto {
@@ -78,6 +79,7 @@ export interface EmployeeCreateDto {
   hireDate?: string;
   userId?: string;
   notes?: string;
+  officeLocationId?: string;
 }
 
 export interface EmployeeUpdateDto {
@@ -103,6 +105,7 @@ export interface EmployeeUpdateDto {
   hireDate?: string;
   terminationDate?: string;
   notes?: string;
+  officeLocationId?: string;
 }
 
 export interface EmployeeFilter {
@@ -116,6 +119,7 @@ export interface EmployeeFilter {
   positionId?: string;
   status?: EmployeeStatus;
   isActive?: boolean;
+  officeLocationId?: string;
 }
 
 export interface EmployeePageRequest extends EmployeeFilter {

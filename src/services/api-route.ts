@@ -109,8 +109,9 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/work-shifts/${id}`,
     FIND_BY_ID: (id: string) => `/api/work-shifts/${id}`,
     SELECT: "/api/work-shifts/select",
-    DEACTIVATE: (id: string) => `/api/work-shifts/deactivate/${id}`,
-    ACTIVATE: (id: string) => `/api/work-shifts/activate/${id}`,
+    SELECT_OPTIONS: "/api/work-shifts/select-options",
+    SEARCH: "/api/work-shifts/search",
+    DELETE: (id: string) => `/api/work-shifts/${id}`,
   },
   SHIFT_ASSIGNMENT: {
     PAGINATION: "/api/shift-assignments",
@@ -119,6 +120,9 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/shift-assignments/${id}`,
     FIND_BY_ID: (id: string) => `/api/shift-assignments/${id}`,
     DELETE: (id: string) => `/api/shift-assignments/${id}`,
+    SELECT: "/api/shift-assignments/select",
+    SELECT_OPTIONS: "/api/shift-assignments/select-options",
+    SEARCH: "/api/shift-assignments/search",
   },
   DAILY_ATTENDANCE: {
     PAGINATION: "/api/daily-attendances",
@@ -179,6 +183,7 @@ export const API_ENDPOINTS = {
   OFFICE_LOCATION: {
     PAGINATION: "/api/office-locations",
     GET_ALL: "/api/office-locations",
+    SELECT: "/api/office-locations/select",
     CREATE: "/api/office-locations/create",
     UPDATE: (id: string) => `/api/office-locations/${id}`,
     FIND_BY_ID: (id: string) => `/api/office-locations/${id}`,
@@ -256,6 +261,7 @@ export const API_ENDPOINTS = {
 interface ApiRoutes {
   BASE_URL: string;
   PYTHON_BASE_URL: string;
+  PAYMENT_BASE_URL?: string;
   TIMEOUT: number;
   HEADERS: {
     "Content-Type": string;

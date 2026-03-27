@@ -29,6 +29,14 @@ import PayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-mana
 import AddPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/add";
 import EditPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/edit";
 import DetailPayrollPeriodScreen from "@/pages/main/payroll-manager/payrollPeriod-manager/detail";
+import WorkShiftManager from "@/pages/main/payroll-manager/workShift-manager";
+import AddWorkShiftScreen from "@/pages/main/payroll-manager/workShift-manager/add";
+import EditWorkShiftScreen from "@/pages/main/payroll-manager/workShift-manager/edit";
+import WorkShiftDetailScreen from "@/pages/main/payroll-manager/workShift-manager/detail";
+import EmployeeShiftAssignmentManager from "@/pages/main/payroll-manager/employeeShiftAssignment-manager";
+import AddEmployeeShiftAssignmentScreen from "@/pages/main/payroll-manager/employeeShiftAssignment-manager/add";
+import EditEmployeeShiftAssignmentScreen from "@/pages/main/payroll-manager/employeeShiftAssignment-manager/edit";
+import EmployeeShiftAssignmentDetailScreen from "@/pages/main/payroll-manager/employeeShiftAssignment-manager/detail";
 import ContractManagerPage from "@/pages/main/payroll-manager/contract-manager";
 import SysSettingsPage from "@/pages/main/settings-manager/sys-settings";
 import TaxBracketsPage from "@/pages/main/settings-manager/tax-brackets";
@@ -214,6 +222,42 @@ export default function AppRoutes() {
                 .DETAIL_PAYROLL_PERIOD.path
             }
             element={<DetailPayrollPeriodScreen />}
+          />
+
+          {/* Quản lý ca làm việc */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.path}
+            element={<WorkShiftManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.ADD_WORK_SHIFT.path}
+            element={<AddWorkShiftScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.EDIT_WORK_SHIFT.path}
+            element={<EditWorkShiftScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.DETAIL_WORK_SHIFT.path}
+            element={<WorkShiftDetailScreen />}
+          />
+
+          {/* Quản lý gán ca làm việc */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.path}
+            element={<EmployeeShiftAssignmentManager />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.ADD_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            element={<AddEmployeeShiftAssignmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.EDIT_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            element={<EditEmployeeShiftAssignmentScreen />}
+          />
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.DETAIL_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            element={<EmployeeShiftAssignmentDetailScreen />}
           />
 
           {/* Cấu hình hệ thống */}

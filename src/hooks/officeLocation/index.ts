@@ -6,3 +6,4 @@ export * from "./useDeactivateOfficeLocation";
 export * from "./useActivateOfficeLocation";
 export * from "./useApproveOfficeLocation";
 export * from "./useUnApproveOfficeLocation";
+export * from "./useSelectBoxOfficeLocations";

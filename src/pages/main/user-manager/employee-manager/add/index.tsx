@@ -5,6 +5,7 @@ import type { EmployeeDto, EmployeeStatus } from "@/dto/employee.dto";
 import { useCreateEmployee } from "@/hooks/employee";
 import { useSelectBoxDepartments } from "@/hooks/department";
 import { useSelectBoxPositions } from "@/hooks/position";
+import { useSelectBoxOfficeLocations } from "@/hooks/officeLocation";
 import { useRouter } from "@/routes/hooks";
 import { useMemo } from "react";
 
@@ -24,6 +25,7 @@ export default function AddEmployeeScreen({
   const { isLoading, onCreateEmployee } = useCreateEmployee();
   const { data: departments = [] } = useSelectBoxDepartments();
   const { data: positions = [] } = useSelectBoxPositions();
+  const { data: officeLocations = [] } = useSelectBoxOfficeLocations();
   const router = useRouter();
 
   const formFields = useMemo(() => {
@@ -99,6 +101,19 @@ export default function AddEmployeeScreen({
           name: pos.name,
           value: pos.id,
           id: pos.id,
+        })),
+      },
+      {
+        name: "officeLocationId",
+        label: "Địa điểm làm việc",
+        type: "select",
+        required: false,
+        placeholder: "Chọn địa điểm làm việc",
+        options: officeLocations.map((location) => ({
+          label: location.name,
+          name: location.name,
+          value: location.id,
+          id: location.id,
         })),
       },
       {
@@ -186,7 +201,7 @@ export default function AddEmployeeScreen({
       },
     ];
     return fields;
-  }, [departments, positions]);
+  }, [departments, positions, officeLocations]);
 
   const handleSubmit = (values: any) => {
     if (isEdit) {

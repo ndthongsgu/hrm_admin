@@ -254,7 +254,7 @@ export const requestAxios = async <T>(
   const isPaymentEndpoint =
     url.includes("/payments") || url.includes("/payment-methods");
   const baseURL = isPaymentEndpoint
-    ? API_ROUTES.PAYMENT_BASE_URL
+    ? (API_ROUTES.PAYMENT_BASE_URL || API_ROUTES.BASE_URL)
     : API_ROUTES.BASE_URL;
 
   try {
@@ -342,7 +342,7 @@ const rootApiService = {
     const isPaymentEndpoint =
       url.includes("/payments") || url.includes("/payment-methods");
     const baseURL = isPaymentEndpoint
-      ? API_ROUTES.PAYMENT_BASE_URL
+      ? (API_ROUTES.PAYMENT_BASE_URL || API_ROUTES.BASE_URL)
       : API_ROUTES.BASE_URL;
 
     const response = await axiosInstance.request<Blob>({

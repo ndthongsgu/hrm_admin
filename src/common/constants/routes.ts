@@ -291,6 +291,50 @@ export const ROUTES = {
             },
           },
         },
+        WORK_SHIFTS: {
+          key: "WORK_SHIFTS",
+          label: "Ca làm việc",
+          path: "/payroll-manager/work-shift",
+          children: {
+            ADD_WORK_SHIFT: {
+              key: "ADD_WORK_SHIFT",
+              label: "Thêm ca làm việc",
+              path: "/payroll-manager/work-shift/add",
+            },
+            EDIT_WORK_SHIFT: {
+              key: "EDIT_WORK_SHIFT",
+              label: "Chỉnh sửa ca làm việc",
+              path: "/payroll-manager/work-shift/:id/edit",
+            },
+            DETAIL_WORK_SHIFT: {
+              key: "DETAIL_WORK_SHIFT",
+              label: "Chi tiết ca làm việc",
+              path: "/payroll-manager/work-shift/:id/detail",
+            },
+          },
+        },
+        EMPLOYEE_SHIFT_ASSIGNMENTS: {
+          key: "EMPLOYEE_SHIFT_ASSIGNMENTS",
+          label: "Gán ca làm việc",
+          path: "/payroll-manager/employee-shift-assignments",
+          children: {
+            ADD_EMPLOYEE_SHIFT_ASSIGNMENT: {
+              key: "ADD_EMPLOYEE_SHIFT_ASSIGNMENT",
+              label: "Thêm gán ca làm việc",
+              path: "/payroll-manager/employee-shift-assignments/add",
+            },
+            EDIT_EMPLOYEE_SHIFT_ASSIGNMENT: {
+              key: "EDIT_EMPLOYEE_SHIFT_ASSIGNMENT",
+              label: "Chỉnh sửa gán ca làm việc",
+              path: "/payroll-manager/employee-shift-assignments/:id/edit",
+            },
+            DETAIL_EMPLOYEE_SHIFT_ASSIGNMENT: {
+              key: "DETAIL_EMPLOYEE_SHIFT_ASSIGNMENT",
+              label: "Chi tiết gán ca làm việc",
+              path: "/payroll-manager/employee-shift-assignments/:id/detail",
+            },
+          },
+        },
         CONTRACTS: {
           key: "CONTRACTS",
           label: "Hợp đồng lao động",

@@ -139,6 +139,7 @@ const normalizeEmployee = (employee: any): EmployeeDto => {
       typeof employee?.isActive === "boolean"
         ? employee.isActive
         : employee?.status === "ACTIVE",
+    officeLocationId: employee?.officeLocationId || employee?.officeLocation?.id,
   } as EmployeeDto;
 };
 

@@ -1,6 +1,5 @@
 import { useRouter } from "@/routes/hooks";
 import { useDetailEmployee, useUploadKnownFaces, useGetKnownFaces, useDeleteKnownFace } from "@/hooks/employee";
-import { ROUTES } from "@/common/constants/routes";
 import BaseView from "@/components/base-view/BaseView";
 import {
   Button,
@@ -8,7 +7,6 @@ import {
   Col,
   Row,
   Spin,
-  Empty,
   Upload,
   Form,
   Badge,
@@ -19,7 +17,6 @@ import {
   Popconfirm,
 } from "antd";
 import {
-  ArrowLeftOutlined,
   CloudUploadOutlined,
   FileImageOutlined,
   DeleteOutlined,
@@ -40,7 +37,7 @@ export default function AddKnownFaceScreen() {
     useDetailEmployee(employeeId || "");
   const { upload, isPending } = useUploadKnownFaces();
   const { deleteImage, isPending: isDeleting } = useDeleteKnownFace(employeeId || "");
-  const { data: knownFacesData, isLoading: knownFacesLoading, refetch: refetchKnownFaces } = useGetKnownFaces(employeeId || "");
+  const { data: knownFacesData } = useGetKnownFaces(employeeId || "");
 
   const [fileList, setFileList] = useState<FileWithPreview[]>([]);
 
@@ -55,7 +52,7 @@ export default function AddKnownFaceScreen() {
   };
 
   const handleRemoveFile = (file: UploadFile) => {
-    const modal = Modal.confirm({
+    Modal.confirm({
       title: "Xoá ảnh",
       content: "Bạn có chắc muốn xoá ảnh này?",
       okText: "Xoá",

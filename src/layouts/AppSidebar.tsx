@@ -63,11 +63,25 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
 
     // Department Manager
     {
-      key: ROUTES.MAIN.DEPARTMENT_MANAGER.key,
-      path: ROUTES.MAIN.DEPARTMENT_MANAGER.path,
+      key: ROUTES.MAIN.DEPARTMENT_MANAGER.key + 'index',
+      path: ROUTES.MAIN.DEPARTMENT_MANAGER.path + 'index',
       icon: <ApartmentOutlined />,
       label: ROUTES.MAIN.DEPARTMENT_MANAGER.label,
       moduleCode: ModuleCode.DEPARTMENT,
+      children: [
+        {
+          key: ROUTES.MAIN.DEPARTMENT_MANAGER.key,
+          path: ROUTES.MAIN.DEPARTMENT_MANAGER.path,
+          label: ROUTES.MAIN.DEPARTMENT_MANAGER.label,
+          moduleCode: ModuleCode.DEPARTMENT,
+        },
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.label,
+          moduleCode: ModuleCode.OFFICE_LOCATION,
+        },
+      ],
     },
 
     // Position Manager
@@ -112,16 +126,22 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           moduleCode: ModuleCode.PAYROLL,
         },
         {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
+        {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
+        {
           key: ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.key,
           path: ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.path,
           label: ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.label,
           moduleCode: ModuleCode.PAYROLL,
-        },
-        {
-          key: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.key,
-          path: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.path,
-          label: ROUTES.MAIN.PAYROLL_MANAGER.children.OFFICE_LOCATIONS.label,
-          moduleCode: ModuleCode.OFFICE_LOCATION,
         },
       ],
     },
