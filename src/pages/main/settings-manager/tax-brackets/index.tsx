@@ -1,4 +1,8 @@
 import BaseView from "@/components/base-view/BaseView";
+import FilterComponent, {
+  type FilterField,
+} from "@/components/filter/FilterCustom";
+import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { TaxBracketDto } from "@/dto/settings.dto";
 import {
   useListTaxBrackets,
@@ -6,23 +10,17 @@ import {
   useUpdateTaxBracket,
   useDeleteTaxBracket,
 } from "@/hooks/settings";
+import { useConfirm } from "@/hooks/layout/useConfirm";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
-import {
+  Alert,
   Button,
   DatePicker,
   Form,
   Input,
   InputNumber,
   Modal,
-  Popconfirm,
-  Space,
   Switch,
-  Table,
   Tag,
   Typography,
 } from "antd";
@@ -31,11 +29,27 @@ import { useState } from "react";
 
 const { Title } = Typography;
 
+const initFilter = {
+  policyName: "",
+  isActive: undefined,
+};
+
 export default function TaxBracketsPage() {
-  const { data, isLoading, refetch } = useListTaxBrackets();
+  const [filter, setFilter] = useState<Record<string, any>>(initFilter);
+  const [pagination, setPagination] = useState({
+    skip: 0,
+    take: 20,
+    where: initFilter,
+  });
+  const { data, total, isLoading, refetch, error } = useListTaxBrackets({
+    skip: pagination.skip,
+    take: pagination.take,
+    where: pagination.where,
+  });
   const { onCreateTaxBracket, isLoading: isCreating } = useCreateTaxBracket();
   const { onUpdateTaxBracket, isLoading: isUpdating } = useUpdateTaxBracket();
   const { onDeleteTaxBracket, isLoading: isDeleting } = useDeleteTaxBracket();
+  const { confirm } = useConfirm();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editRecord, setEditRecord] = useState<TaxBracketDto | null>(null);
@@ -83,6 +97,35 @@ export default function TaxBracketsPage() {
     await onDeleteTaxBracket(id);
     refetch();
   };
+
+  const handleSearch = (isReset?: boolean) => {
+    setPagination((prev) => ({
+      ...prev,
+      skip: 0,
+      where: isReset ? initFilter : { ...prev.where, ...filter },
+    }));
+  };
+
+  const filterFields: FilterField[] = [
+    {
+      key: "policyName",
+      label: "Tên chính sách",
+      type: "input",
+      placeholder: "Nhập tên chính sách",
+      col: 12,
+    },
+    {
+      key: "isActive",
+      label: "Trạng thái",
+      type: "select",
+      options: [
+        { label: "Tất cả", value: undefined },
+        { label: "Đang dùng", value: true },
+        { label: "Không dùng", value: false },
+      ],
+      col: 12,
+    },
+  ];
 
   const fmtCurrency = (v: number | undefined | null) =>
     v !== undefined && v !== null
@@ -143,33 +186,32 @@ export default function TaxBracketsPage() {
       render: (d: string) =>
         d ? new Date(d).toLocaleDateString("vi-VN") : "-",
     },
+  ];
+
+  const actions: TableAction[] = [
     {
-      title: "Thao tác",
-      key: "actions",
-      width: 120,
-      render: (_: any, record: TaxBracketDto) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEdit(record)}
-          />
-          <Popconfirm
-            title="Xoá bậc thuế này?"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-            onConfirm={() => handleDelete(record.id!)}
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              loading={isDeleting}
-            />
-          </Popconfirm>
-        </Space>
-      ),
+      key: "edit",
+      label: "",
+      icon: <EditOutlined />,
+      type: "default",
+      tooltip: "Cập nhật",
+      onClick: (record: TaxBracketDto) => openEdit(record),
+    },
+    {
+      key: "delete",
+      label: "",
+      icon: <DeleteOutlined />,
+      type: "default",
+      danger: true,
+      tooltip: "Xóa",
+      disabled: () => isDeleting,
+      onClick: (record: TaxBracketDto) => {
+        confirm({
+          title: "Xác nhận xóa bậc thuế",
+          content: `Bạn có chắc chắn muốn xóa ${record.policyName || "bậc thuế này"}?`,
+          onOk: () => handleDelete(record.id!),
+        });
+      },
     },
   ];
 
@@ -191,12 +233,46 @@ export default function TaxBracketsPage() {
         </Button>
       </div>
 
-      <Table
+      <FilterComponent
+        fields={filterFields}
+        filters={filter}
+        onFiltersChange={setFilter}
+        onSearch={() => handleSearch(false)}
+        onClear={() => {
+          setFilter(initFilter);
+          handleSearch(true);
+        }}
+      />
+
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="Không thể tải dữ liệu bậc thuế"
+          description={(error as any)?.message || "Đã có lỗi xảy ra"}
+          style={{ marginBottom: 12 }}
+        />
+      )}
+
+      <TableCustom
         rowKey="id"
         columns={columns}
-        dataSource={data}
+        actions={actions}
+        data={data}
         loading={isLoading}
-        pagination={{ pageSize: 20, showSizeChanger: false }}
+        pagination={{
+          current: Math.floor(pagination.skip / pagination.take) + 1,
+          pageSize: pagination.take,
+          total: total,
+          showSizeChanger: true,
+        }}
+        onPageChange={(page, pageSize) => {
+          setPagination({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            where: pagination.where,
+          });
+        }}
         size="middle"
         bordered
       />

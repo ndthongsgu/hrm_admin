@@ -1,4 +1,8 @@
 import BaseView from "@/components/base-view/BaseView";
+import FilterComponent, {
+  type FilterField,
+} from "@/components/filter/FilterCustom";
+import TableCustom, { type TableAction } from "@/components/table/Table";
 import type { InsuranceConfigDto } from "@/dto/settings.dto";
 import {
   useListInsuranceConfigs,
@@ -6,22 +10,16 @@ import {
   useUpdateInsuranceConfig,
   useDeleteInsuranceConfig,
 } from "@/hooks/settings";
+import { useConfirm } from "@/hooks/layout/useConfirm";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
-import {
+  Alert,
   Button,
   DatePicker,
   Form,
   InputNumber,
   Modal,
-  Popconfirm,
   Select,
-  Space,
-  Table,
   Tag,
   Typography,
 } from "antd";
@@ -42,14 +40,30 @@ const CAP_BASE_OPTIONS = [
   { value: "ACTUAL_SALARY", label: "Lương thực tế" },
 ];
 
+const initFilter = {
+  type: undefined,
+  capBaseType: undefined,
+};
+
 export default function InsuranceConfigsPage() {
-  const { data, isLoading, refetch } = useListInsuranceConfigs();
+  const [filter, setFilter] = useState<Record<string, any>>(initFilter);
+  const [pagination, setPagination] = useState({
+    skip: 0,
+    take: 20,
+    where: initFilter,
+  });
+  const { data, total, isLoading, refetch, error } = useListInsuranceConfigs({
+    skip: pagination.skip,
+    take: pagination.take,
+    where: pagination.where,
+  });
   const { onCreateInsuranceConfig, isLoading: isCreating } =
     useCreateInsuranceConfig();
   const { onUpdateInsuranceConfig, isLoading: isUpdating } =
     useUpdateInsuranceConfig();
   const { onDeleteInsuranceConfig, isLoading: isDeleting } =
     useDeleteInsuranceConfig();
+  const { confirm } = useConfirm();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editRecord, setEditRecord] = useState<InsuranceConfigDto | null>(null);
@@ -95,6 +109,37 @@ export default function InsuranceConfigsPage() {
     await onDeleteInsuranceConfig(id);
     refetch();
   };
+
+  const handleSearch = (isReset?: boolean) => {
+    setPagination((prev) => ({
+      ...prev,
+      skip: 0,
+      where: isReset ? initFilter : { ...prev.where, ...filter },
+    }));
+  };
+
+  const filterFields: FilterField[] = [
+    {
+      key: "type",
+      label: "Loại bảo hiểm",
+      type: "select",
+      options: [
+        { label: "Tất cả", value: undefined },
+        ...Object.entries(INSURANCE_TYPE_MAP).map(([value, meta]) => ({
+          label: meta.label,
+          value,
+        })),
+      ],
+      col: 12,
+    },
+    {
+      key: "capBaseType",
+      label: "Căn cơ trần",
+      type: "select",
+      options: [{ label: "Tất cả", value: undefined }, ...CAP_BASE_OPTIONS],
+      col: 12,
+    },
+  ];
 
   const columns = [
     {
@@ -148,33 +193,32 @@ export default function InsuranceConfigsPage() {
       render: (d: string) =>
         d ? new Date(d).toLocaleDateString("vi-VN") : "-",
     },
+  ];
+
+  const actions: TableAction[] = [
     {
-      title: "Thao tác",
-      key: "actions",
-      width: 120,
-      render: (_: any, record: InsuranceConfigDto) => (
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEdit(record)}
-          />
-          <Popconfirm
-            title="Xoá cấu hình bảo hiểm này?"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-            onConfirm={() => handleDelete(record.id!)}
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              loading={isDeleting}
-            />
-          </Popconfirm>
-        </Space>
-      ),
+      key: "edit",
+      label: "",
+      icon: <EditOutlined />,
+      type: "default",
+      tooltip: "Cập nhật",
+      onClick: (record: InsuranceConfigDto) => openEdit(record),
+    },
+    {
+      key: "delete",
+      label: "",
+      icon: <DeleteOutlined />,
+      type: "default",
+      danger: true,
+      tooltip: "Xóa",
+      disabled: () => isDeleting,
+      onClick: (record: InsuranceConfigDto) => {
+        confirm({
+          title: "Xác nhận xóa cấu hình bảo hiểm",
+          content: "Bạn có chắc chắn muốn xóa cấu hình bảo hiểm này?",
+          onOk: () => handleDelete(record.id!),
+        });
+      },
     },
   ];
 
@@ -196,12 +240,46 @@ export default function InsuranceConfigsPage() {
         </Button>
       </div>
 
-      <Table
+      <FilterComponent
+        fields={filterFields}
+        filters={filter}
+        onFiltersChange={setFilter}
+        onSearch={() => handleSearch(false)}
+        onClear={() => {
+          setFilter(initFilter);
+          handleSearch(true);
+        }}
+      />
+
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="Không thể tải dữ liệu cấu hình bảo hiểm"
+          description={(error as any)?.message || "Đã có lỗi xảy ra"}
+          style={{ marginBottom: 12 }}
+        />
+      )}
+
+      <TableCustom
         rowKey="id"
         columns={columns}
-        dataSource={data}
+        actions={actions}
+        data={data}
         loading={isLoading}
-        pagination={{ pageSize: 20, showSizeChanger: false }}
+        pagination={{
+          current: Math.floor(pagination.skip / pagination.take) + 1,
+          pageSize: pagination.take,
+          total: total,
+          showSizeChanger: true,
+        }}
+        onPageChange={(page, pageSize) => {
+          setPagination({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            where: pagination.where,
+          });
+        }}
         size="middle"
         bordered
       />

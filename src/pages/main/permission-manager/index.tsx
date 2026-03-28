@@ -1,4 +1,5 @@
 import BaseView from "@/components/base-view/BaseView";
+import TableCustom from "@/components/table/Table";
 import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
@@ -6,15 +7,14 @@ import { useSelectBoxRoles, useRoleDetail, useUpdateRole } from "@/hooks/role";
 import { useToast } from "@/hooks/layout/useToast";
 import { SaveOutlined } from "@ant-design/icons";
 import {
+  Alert,
   Button,
   Card,
   Checkbox,
   Col,
   Row,
   Space,
-  Table,
   Typography,
-  Spin,
 } from "antd";
 import { useEffect, useState } from "react";
 import { module_show_map } from "@/common/constants/module";
@@ -40,9 +40,10 @@ export default function PermissionManager() {
     data: roleDetail,
     isLoading: isLoadingRoleDetail,
     refetch: refetchRoleDetail,
+    error: roleDetailError,
   } = useRoleDetail(filter.roleId || "");
   const { onUpdateRole, isLoading: isSaving } = useUpdateRole(
-    filter.roleId || ""
+    filter.roleId || "",
   );
   const showToast = useToast();
 
@@ -82,7 +83,11 @@ export default function PermissionManager() {
     setHasChanges(false);
   };
 
-  const toggleAction = (moduleCode: string, action: string, checked: boolean) => {
+  const toggleAction = (
+    moduleCode: string,
+    action: string,
+    checked: boolean,
+  ) => {
     setSelectedPermissions((prev) => {
       const current = new Set(prev[moduleCode] || []);
       if (checked) current.add(action);
@@ -157,7 +162,9 @@ export default function PermissionManager() {
       fixed: "left" as const,
       render: (_: any, record: { code: string }) => (
         <Space direction="vertical" size={0}>
-          <Text strong>{module_show_map[record.code]?.name || record.code}</Text>
+          <Text strong>
+            {module_show_map[record.code]?.name || record.code}
+          </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             {record.code}
           </Text>
@@ -273,7 +280,9 @@ export default function PermissionManager() {
       align: "center" as const,
       render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={(selectedPermissions[record.code] || []).includes("ACTIVATE")}
+          checked={(selectedPermissions[record.code] || []).includes(
+            "ACTIVATE",
+          )}
           onChange={(e) =>
             toggleAction(record.code, "ACTIVATE", e.target.checked)
           }
@@ -291,7 +300,9 @@ export default function PermissionManager() {
       align: "center" as const,
       render: (_: any, record: { code: string }) => (
         <Checkbox
-          checked={(selectedPermissions[record.code] || []).includes("DEACTIVATE")}
+          checked={(selectedPermissions[record.code] || []).includes(
+            "DEACTIVATE",
+          )}
           onChange={(e) =>
             toggleAction(record.code, "DEACTIVATE", e.target.checked)
           }
@@ -379,17 +390,26 @@ export default function PermissionManager() {
             }
             bordered={false}
           >
-            <Spin spinning={isLoading}>
-              <Table
-                columns={columns}
-                dataSource={moduleRows}
-                rowKey="code"
-                pagination={false}
-                scroll={{ x: 1200 }}
-                bordered
-                size="middle"
+            {roleDetailError && (
+              <Alert
+                type="error"
+                showIcon
+                message="Không thể tải dữ liệu phân quyền"
+                description={
+                  (roleDetailError as any)?.message || "Đã có lỗi xảy ra"
+                }
+                style={{ marginBottom: 12 }}
               />
-            </Spin>
+            )}
+            <TableCustom
+              columns={columns}
+              data={moduleRows}
+              rowKey="code"
+              loading={isLoading}
+              scroll={{ x: 1200 }}
+              bordered
+              size="middle"
+            />
           </Card>
         )}
 

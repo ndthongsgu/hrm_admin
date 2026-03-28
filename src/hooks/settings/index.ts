@@ -1,10 +1,9 @@
 import type {
   SysSettingDto,
   TaxBracketDto,
-  TaxBracketFilter,
   InsuranceConfigDto,
-  InsuranceConfigFilter,
 } from "@/dto/settings.dto";
+import type { PaginationDto } from "@/dto/base.dto";
 import type { SuccessResponse } from "@/dto/pagination.dto";
 import { API_ENDPOINTS } from "@/services";
 import rootApiService from "@/services/api.service";
@@ -30,12 +29,36 @@ function toPageResult<T>(raw: any): PageResult<T> {
   };
 }
 
-export const useListSysSettings = () => {
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.SYS_SETTING.GET_ALL],
+const buildQueryParams = (params: PaginationDto<Record<string, any>>) => {
+  const where = params.where || {};
+  const cleanedWhere = Object.fromEntries(
+    Object.entries(where).filter(([, value]) => {
+      if (value === undefined || value === null) return false;
+      if (typeof value === "string" && value.trim() === "") return false;
+      return true;
+    }),
+  );
+
+  return {
+    page: Math.floor(params.skip / params.take),
+    size: params.take,
+    sortBy: params.sortBy || "createdAt",
+    sortDirection: params.sortDirection || "DESC",
+    ...cleanedWhere,
+  };
+};
+
+export const useListSysSettings = (
+  params: PaginationDto<Record<string, any>>,
+) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.SYS_SETTING.PAGINATION, params],
     queryFn: () =>
       rootApiService
-        .get<any>(`${API_ENDPOINTS.SYS_SETTING.GET_ALL}?size=200`)
+        .get<any>(
+          API_ENDPOINTS.SYS_SETTING.PAGINATION,
+          buildQueryParams(params),
+        )
         .then(toPageResult<SysSettingDto>),
   });
   return {
@@ -43,6 +66,7 @@ export const useListSysSettings = () => {
     total: data?.totalElements ?? 0,
     isLoading,
     refetch,
+    error,
   };
 };
 
@@ -58,7 +82,7 @@ export const useCreateSysSetting = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.SYS_SETTING.GET_ALL],
+          queryKey: [API_ENDPOINTS.SYS_SETTING.PAGINATION],
         });
         showToast({
           type: "success",
@@ -90,7 +114,7 @@ export const useUpdateSysSetting = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.SYS_SETTING.GET_ALL],
+          queryKey: [API_ENDPOINTS.SYS_SETTING.PAGINATION],
         });
         showToast({
           type: "success",
@@ -121,7 +145,7 @@ export const useDeleteSysSetting = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.SYS_SETTING.GET_ALL],
+          queryKey: [API_ENDPOINTS.SYS_SETTING.PAGINATION],
         });
         showToast({
           type: "success",
@@ -145,12 +169,17 @@ export const useDeleteSysSetting = () => {
 // TAX BRACKETS
 // ─────────────────────────────────────────────────
 
-export const useListTaxBrackets = (filter?: TaxBracketFilter) => {
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.TAX_BRACKET.GET_ALL, filter],
+export const useListTaxBrackets = (
+  params: PaginationDto<Record<string, any>>,
+) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.TAX_BRACKET.PAGINATION, params],
     queryFn: () =>
       rootApiService
-        .get<any>(`${API_ENDPOINTS.TAX_BRACKET.GET_ALL}?size=200`)
+        .get<any>(
+          API_ENDPOINTS.TAX_BRACKET.PAGINATION,
+          buildQueryParams(params),
+        )
         .then(toPageResult<TaxBracketDto>),
   });
   return {
@@ -158,6 +187,7 @@ export const useListTaxBrackets = (filter?: TaxBracketFilter) => {
     total: data?.totalElements ?? 0,
     isLoading,
     refetch,
+    error,
   };
 };
 
@@ -173,7 +203,7 @@ export const useCreateTaxBracket = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.TAX_BRACKET.GET_ALL],
+          queryKey: [API_ENDPOINTS.TAX_BRACKET.PAGINATION],
         });
         showToast({
           type: "success",
@@ -205,7 +235,7 @@ export const useUpdateTaxBracket = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.TAX_BRACKET.GET_ALL],
+          queryKey: [API_ENDPOINTS.TAX_BRACKET.PAGINATION],
         });
         showToast({
           type: "success",
@@ -236,7 +266,7 @@ export const useDeleteTaxBracket = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.TAX_BRACKET.GET_ALL],
+          queryKey: [API_ENDPOINTS.TAX_BRACKET.PAGINATION],
         });
         showToast({
           type: "success",
@@ -260,12 +290,17 @@ export const useDeleteTaxBracket = () => {
 // INSURANCE CONFIGS
 // ─────────────────────────────────────────────────
 
-export const useListInsuranceConfigs = (filter?: InsuranceConfigFilter) => {
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.GET_ALL, filter],
+export const useListInsuranceConfigs = (
+  params: PaginationDto<Record<string, any>>,
+) => {
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.PAGINATION, params],
     queryFn: () =>
       rootApiService
-        .get<any>(`${API_ENDPOINTS.INSURANCE_CONFIG.GET_ALL}?size=100`)
+        .get<any>(
+          API_ENDPOINTS.INSURANCE_CONFIG.PAGINATION,
+          buildQueryParams(params),
+        )
         .then(toPageResult<InsuranceConfigDto>),
   });
   return {
@@ -273,6 +308,7 @@ export const useListInsuranceConfigs = (filter?: InsuranceConfigFilter) => {
     total: data?.totalElements ?? 0,
     isLoading,
     refetch,
+    error,
   };
 };
 
@@ -288,7 +324,7 @@ export const useCreateInsuranceConfig = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.GET_ALL],
+          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.PAGINATION],
         });
         showToast({
           type: "success",
@@ -319,7 +355,7 @@ export const useUpdateInsuranceConfig = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.GET_ALL],
+          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.PAGINATION],
         });
         showToast({
           type: "success",
@@ -349,7 +385,7 @@ export const useDeleteInsuranceConfig = () => {
         ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.GET_ALL],
+          queryKey: [API_ENDPOINTS.INSURANCE_CONFIG.PAGINATION],
         });
         showToast({
           type: "success",
