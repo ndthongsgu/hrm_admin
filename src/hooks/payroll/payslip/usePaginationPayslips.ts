@@ -5,19 +5,38 @@ import rootApiService from "@/services/api.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePaginationPayslips = (params: PaginationDto<Record<string, any>>) => {
+  const page = Math.floor(params.skip / params.take);
+
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: [API_ENDPOINTS.PAYSLIP.PAGINATION, params],
-    queryFn: () =>
-      rootApiService.post<PaginationResponse<PayslipDto>>(
+    queryFn: () => {
+      const filterPayload = Object.fromEntries(
+        Object.entries(params.where || {}).filter(([, value]) => {
+          if (value === undefined || value === null) {
+            return false;
+          }
+
+          if (typeof value === "string") {
+            return value.trim() !== "";
+          }
+
+          return true;
+        }),
+      );
+
+      return rootApiService.post<PaginationResponse<PayslipDto>>(
         API_ENDPOINTS.PAYSLIP.PAGINATION,
+        Object.keys(filterPayload).length > 0 ? filterPayload : undefined,
+        undefined,
         {
-          page: Math.floor(params.skip / params.take),
-          size: params.take,
-          sortBy: "createdAt",
-          sortDirection: "DESC",
-          ...params.where,
+          params: {
+            page,
+            size: params.take,
+            sort: "createdAt,desc",
+          },
         },
-      ),
+      );
+    },
   });
 
   const mappedData = (data?.content || []).map((item: any) => ({

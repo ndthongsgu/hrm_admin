@@ -5,3 +5,4 @@ export { useUnApprovePayslip } from "./useUnApprovePayslip";
 export { useDeactivatePayslip } from "./useDeactivatePayslip";
 export { useActivatePayslip } from "./useActivatePayslip";
 export { useGeneratePayslip } from "./useGeneratePayslip";
+export { useExportMonthlyPayslipReport } from "./useExportMonthlyPayslipReport";

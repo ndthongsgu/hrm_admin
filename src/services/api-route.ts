@@ -165,6 +165,7 @@ export const API_ENDPOINTS = {
     FIND_BY_ID: (id: string) => `/api/payslips/${id}`,
     GENERATE: (payrollPeriodId: string) => `/api/payslips/generate/${payrollPeriodId}`,
     GENERATE_FOR_EMPLOYEE: (payrollPeriodId: string, employeeId: string) => `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,
+    EXPORT_MONTHLY_REPORT: (payrollPeriodId: string) => `/api/payslips/export/monthly-report/${payrollPeriodId}`,
     APPROVE: (id: string) => `/api/payslips/${id}/approve`,
     ACTIVATE: (id: string) => `/api/payslips/${id}/activate`,
     UNAPPROVE: (id: string) => `/api/payslips/${id}/unApprove`,

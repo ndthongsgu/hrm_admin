@@ -20,7 +20,7 @@ export interface AuthResponse {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
 }
 

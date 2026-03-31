@@ -40,6 +40,7 @@ export {
   useDeactivatePayslip,
   useActivatePayslip,
   useGeneratePayslip,
+  useExportMonthlyPayslipReport,
 } from "./payslip";
 
 // ===== SELECT OPTIONS HOOKS =====

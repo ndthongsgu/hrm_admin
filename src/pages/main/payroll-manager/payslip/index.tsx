@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "@/routes/hooks";
 import { ROUTES } from "@/common/constants/routes";
-import { PAYSLIP_STATUS } from "@/common/constants/payrollPeriod";
+import { PAYROLL_PERIOD_STATUS, PAYSLIP_STATUS } from "@/common/constants/payrollPeriod";
 import BaseView from "@/components/base-view/BaseView";
 import FilterComponent, { type FilterField } from "@/components/filter/FilterCustom";
 import type { TableAction } from "@/components/table/Table";
 import Table from "@/components/table/Table";
 import type { PaginationDto } from "@/dto/base.dto";
 import type { PayslipDto } from "@/dto/payroll.dto";
+import Can from "@/components/auth/Can";
+import { ModuleCode } from "@/dto/auth.dto";
 import PayslipPrintModal from "@/components/payslip-print/PayslipPrintModal";
 import {
   usePaginationPayslips,
@@ -18,6 +20,7 @@ import {
   useEmployeeSelectOptions,
   useGeneratePayslip,
   useUnApprovePayslip,
+  useExportMonthlyPayslipReport,
 } from "@/hooks/payroll";
 import { useConfirm } from "@/hooks/layout/useConfirm";
 import {
@@ -28,6 +31,7 @@ import {
   PlusOutlined,
   CloseOutlined,
   FilePdfOutlined,
+  ExportOutlined,
 } from "@ant-design/icons";
 import { Tag, Modal, Button, Form, Select, Row, Col } from "antd";
 
@@ -57,9 +61,24 @@ export default function PayslipManager() {
   const { onDeactivatePayslip } = useDeactivatePayslip();
   const { onActivatePayslip } = useActivatePayslip();
   const { onGeneratePayslip } = useGeneratePayslip();
+  const { onExportMonthlyPayslipReport, isLoading: isExportingReport } = useExportMonthlyPayslipReport();
   const { confirm } = useConfirm();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
   const { data: employeeOptions } = useEmployeeSelectOptions();
+
+  const selectedPayrollPeriod = payrollPeriodOptions?.find(
+    (option: any) => option.id === filter.payrollPeriodId,
+  );
+
+  const isPayrollPeriodApprovedForExport =
+    selectedPayrollPeriod?.status === undefined
+      ? true
+      : selectedPayrollPeriod.status === PAYROLL_PERIOD_STATUS.APPROVED.value;
+
+  const isExportDisabled =
+    !filter.payrollPeriodId ||
+    !isPayrollPeriodApprovedForExport ||
+    isExportingReport;
 
   const handleSearch = (isReset?: boolean) => {
     setPagination((prev) => ({
@@ -296,6 +315,16 @@ export default function PayslipManager() {
     }
   };
 
+  const handleExportMonthlyReport = async () => {
+    if (!filter.payrollPeriodId || isExportDisabled) {
+      return;
+    }
+
+    await onExportMonthlyPayslipReport({
+      payrollPeriodId: filter.payrollPeriodId,
+    });
+  };
+
   return (
     <BaseView>
       
@@ -318,6 +347,18 @@ export default function PayslipManager() {
           >
             Tính lương
           </Button>
+        </Col>
+        <Col>
+          <Can moduleCode={ModuleCode.PAYROLL} action="isCanExport">
+            <Button
+              icon={<ExportOutlined />}
+              loading={isExportingReport}
+              disabled={isExportDisabled}
+              onClick={handleExportMonthlyReport}
+            >
+              Xuất báo cáo PDF tháng
+            </Button>
+          </Can>
         </Col>
       </Row>
       <Table
