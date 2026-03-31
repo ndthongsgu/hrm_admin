@@ -14,7 +14,7 @@ export default function ChangePasswordPage() {
   }) => {
     try {
       await changePasswordMutation.mutateAsync({
-        currentPassword: values.currentPassword,
+        oldPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
     } catch (error) {
