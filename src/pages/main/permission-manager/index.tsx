@@ -3,8 +3,11 @@ import TableCustom from "@/components/table/Table";
 import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
+import { useGetAllPermission } from "@/hooks/permission";
 import { useSelectBoxRoles, useRoleDetail, useUpdateRole } from "@/hooks/role";
 import { useToast } from "@/hooks/layout/useToast";
+import { API_ENDPOINTS } from "@/services";
+import rootApiService from "@/services/api.service";
 import { SaveOutlined } from "@ant-design/icons";
 import {
   Alert,
@@ -13,11 +16,13 @@ import {
   Checkbox,
   Col,
   Row,
+  Select,
   Space,
+  Tabs,
   Typography,
 } from "antd";
-import { useEffect, useState } from "react";
-import { module_show_map } from "@/common/constants/module";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const { Title, Text } = Typography;
 
@@ -26,6 +31,18 @@ interface PermissionFilter {
 }
 
 const initFilter: PermissionFilter = {};
+
+type UserItem = {
+  id: string;
+  username: string;
+  roles: string[];
+  roleIds?: string[];
+};
+
+const isSamePermissions = (
+  a: Record<string, string[]>,
+  b: Record<string, string[]>,
+) => JSON.stringify(a) === JSON.stringify(b);
 
 export default function PermissionManager() {
   const [filter, setFilter] = useState<PermissionFilter>(initFilter);
@@ -36,6 +53,8 @@ export default function PermissionManager() {
   const [hasChanges, setHasChanges] = useState(false);
 
   const { data: roles, isLoading: isLoadingRoles } = useSelectBoxRoles();
+  const { data: allPermissions, isLoading: isLoadingPermissionModules } =
+    useGetAllPermission();
   const {
     data: roleDetail,
     isLoading: isLoadingRoleDetail,
@@ -47,13 +66,130 @@ export default function PermissionManager() {
   );
   const showToast = useToast();
 
+  const [selectedUserId, setSelectedUserId] = useState<string>();
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+  const [isRolesInitialized, setIsRolesInitialized] = useState(false);
+  const [isUserRoleDirty, setIsUserRoleDirty] = useState(false);
+
+  const {
+    data: users,
+    isLoading: isLoadingUsers,
+    refetch: refetchUsers,
+  } = useQuery({
+    queryKey: [API_ENDPOINTS.USER.PAGINATION, "permission-manager"],
+    queryFn: () =>
+      rootApiService.get<{ content: UserItem[] }>(
+        API_ENDPOINTS.USER.PAGINATION,
+        {
+          page: 0,
+          size: 200,
+        },
+      ),
+    select: (res) => res?.content || [],
+  });
+
+  const {
+    data: selectedUserDetail,
+    isLoading: isLoadingUserDetail,
+    refetch: refetchUserDetail,
+  } = useQuery({
+    queryKey: [API_ENDPOINTS.USER.FIND_BY_ID(selectedUserId || "")],
+    queryFn: () =>
+      rootApiService.get<UserItem>(
+        API_ENDPOINTS.USER.FIND_BY_ID(selectedUserId || ""),
+      ),
+    enabled: !!selectedUserId,
+  });
+
+  const { mutateAsync: assignUserRoles, isPending: isAssigningRoles } =
+    useMutation({
+      mutationFn: ({
+        userId,
+        roleIds,
+      }: {
+        userId: string;
+        roleIds: string[];
+      }) =>
+        rootApiService.put(API_ENDPOINTS.USER.ASSIGN_ROLES(userId), {
+          roleIds,
+        }),
+    });
+
+  const moduleConfigMap = useMemo(() => {
+    const entries = (allPermissions || []).map((item) => [item.code, item]);
+    return Object.fromEntries(entries) as Record<
+      string,
+      (typeof allPermissions)[number]
+    >;
+  }, [allPermissions]);
+
   // Update selected permissions when role detail loads
   useEffect(() => {
     if (!filter.roleId) return;
-    // roleDetail.permissions is already parsed as Record<string, string[]> from service
-    setSelectedPermissions(roleDetail?.permissions || {});
+    const nextPermissions = roleDetail?.permissions || {};
+    setSelectedPermissions((prev) =>
+      isSamePermissions(prev, nextPermissions) ? prev : nextPermissions,
+    );
     setHasChanges(false);
-  }, [filter.roleId, roleDetail?.permissions]);
+  }, [filter.roleId, roleDetail?.permissionsJson]);
+
+  // Reset selectedRoleIds when selectedUserId changes
+  useEffect(() => {
+    setSelectedRoleIds([]);
+    setIsRolesInitialized(false);
+    setIsUserRoleDirty(false);
+  }, [selectedUserId]);
+
+  // Load initial roles only once after user detail is loaded
+  useEffect(() => {
+    if (!selectedUserDetail || isRolesInitialized || isUserRoleDirty) {
+      return;
+    }
+
+    // Ưu tiên sử dụng roleIds từ API nếu có
+    if (
+      selectedUserDetail.roleIds &&
+      Array.isArray(selectedUserDetail.roleIds) &&
+      selectedUserDetail.roleIds.length > 0
+    ) {
+      setSelectedRoleIds(selectedUserDetail.roleIds);
+      setIsRolesInitialized(true);
+      return;
+    }
+
+    // Fallback: map từ roles name array nếu roleIds không có
+    if (
+      selectedUserDetail.roles &&
+      Array.isArray(selectedUserDetail.roles) &&
+      selectedUserDetail.roles.length > 0 &&
+      roles &&
+      roles.length > 0
+    ) {
+      const mappedRoleIds = (selectedUserDetail.roles || [])
+        .map((roleName) => {
+          const foundRole = (roles || []).find(
+            (role) =>
+              role.name &&
+              role.name.trim().toLowerCase() ===
+                (roleName || "").trim().toLowerCase(),
+          );
+          return foundRole?.id;
+        })
+        .filter(Boolean) as string[];
+
+      setSelectedRoleIds(mappedRoleIds);
+      setIsRolesInitialized(true);
+      return;
+    }
+
+    // Không có roles thì vẫn mark as initialized để không load lại
+    setIsRolesInitialized(true);
+  }, [selectedUserDetail, isRolesInitialized, roles]);
+
+  const handleRoleSelectionChange = (newValue: string[]) => {
+    setSelectedRoleIds(newValue || []);
+    setIsUserRoleDirty(true);
+  };
 
   const handleSearch = (isReset?: boolean) => {
     if (isReset) {
@@ -98,7 +234,7 @@ export default function PermissionManager() {
   };
 
   const handleSelectAllModule = (code: string, checked: boolean) => {
-    const moduleConfig = module_show_map[code];
+    const moduleConfig = moduleConfigMap[code];
 
     setSelectedPermissions((prev) => {
       const actions: string[] = [];
@@ -131,25 +267,25 @@ export default function PermissionManager() {
       return;
     }
 
-    try {
-      // Send permissions as object, service layer will transform to permissionsJson string
-      await onUpdateRole({
-        permissions: selectedPermissions,
-      });
-
+    if (!roleDetail?.name) {
       showToast({
-        title: "Thành công!",
-        message: "Phân quyền thành công!",
-        type: "success",
+        title: "Lỗi!",
+        message: "Không tìm thấy thông tin vai trò để cập nhật",
+        type: "error",
+      });
+      return;
+    }
+
+    try {
+      await onUpdateRole({
+        name: roleDetail.name,
+        description: roleDetail.description,
+        permissions: selectedPermissions,
       });
       setHasChanges(false);
       refetchRoleDetail();
-    } catch (error: any) {
-      showToast({
-        title: "Thất bại!",
-        message: error?.message || "Phân quyền thất bại!",
-        type: "error",
-      });
+    } catch {
+      // Toast lỗi được xử lý ở hook useUpdateRole để tránh hiển thị trùng.
     }
   };
 
@@ -163,7 +299,7 @@ export default function PermissionManager() {
       render: (_: any, record: { code: string }) => (
         <Space direction="vertical" size={0}>
           <Text strong>
-            {module_show_map[record.code]?.name || record.code}
+            {moduleConfigMap[record.code]?.name || record.code}
           </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             {record.code}
@@ -177,7 +313,7 @@ export default function PermissionManager() {
       width: 100,
       align: "center" as const,
       render: (_: any, record: { code: string }) => {
-        const moduleConfig = module_show_map[record.code];
+        const moduleConfig = moduleConfigMap[record.code];
         const selected = new Set(selectedPermissions[record.code] || []);
         const allActions = [
           moduleConfig?.isCanRead ? "READ" : null,
@@ -214,7 +350,7 @@ export default function PermissionManager() {
         <Checkbox
           checked={(selectedPermissions[record.code] || []).includes("READ")}
           onChange={(e) => toggleAction(record.code, "READ", e.target.checked)}
-          disabled={!filter.roleId || !module_show_map[record.code]?.isCanRead}
+          disabled={!filter.roleId || !moduleConfigMap[record.code]?.isCanRead}
         />
       ),
     },
@@ -231,7 +367,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "CREATE", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanCreate
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanCreate
           }
         />
       ),
@@ -249,7 +385,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "UPDATE", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanUpdate
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanUpdate
           }
         />
       ),
@@ -267,7 +403,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "DELETE", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanDelete
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanDelete
           }
         />
       ),
@@ -287,7 +423,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "ACTIVATE", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanActivate
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanActivate
           }
         />
       ),
@@ -307,7 +443,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "DEACTIVATE", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanDeactivate
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanDeactivate
           }
         />
       ),
@@ -325,7 +461,7 @@ export default function PermissionManager() {
             toggleAction(record.code, "IMPORT", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanImport
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanImport
           }
         />
       ),
@@ -343,19 +479,29 @@ export default function PermissionManager() {
             toggleAction(record.code, "EXPORT", e.target.checked)
           }
           disabled={
-            !filter.roleId || !module_show_map[record.code]?.isCanExport
+            !filter.roleId || !moduleConfigMap[record.code]?.isCanExport
           }
         />
       ),
     },
   ];
 
-  const isLoading = isLoadingRoleDetail || isLoadingRoles || isSaving;
+  const isLoading =
+    isLoadingRoleDetail ||
+    isLoadingRoles ||
+    isLoadingPermissionModules ||
+    isSaving;
+  const isSavingUserRoles = isAssigningRoles || isLoadingUserDetail;
 
-  const moduleRows = Object.keys(module_show_map).map((code) => ({ code }));
+  const moduleRows = (allPermissions || []).map((item) => ({
+    code: item.code,
+  }));
 
-  return (
-    <BaseView>
+  // Tab 1: Module permissions by role
+  const modulePermissionsTab = {
+    key: "module-permissions",
+    label: "Phân quyền theo vai trò",
+    children: (
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <FilterComponent
           fields={filterFields}
@@ -388,7 +534,7 @@ export default function PermissionManager() {
                 </Col>
               </Row>
             }
-            bordered={false}
+            variant="borderless"
           >
             {roleDetailError && (
               <Alert
@@ -428,6 +574,110 @@ export default function PermissionManager() {
           </Card>
         )}
       </Space>
+    ),
+  };
+
+  // Tab 2: User role assignment
+  const userRoleTab = {
+    key: "user-roles",
+    label: "Gán vai trò cho người dùng",
+    children: (
+      <Card>
+        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Typography.Text strong>Người dùng</Typography.Text>
+              <Select
+                style={{ width: "100%", marginTop: 8 }}
+                showSearch
+                placeholder="Chọn người dùng"
+                loading={isLoadingUsers}
+                value={selectedUserId}
+                onChange={setSelectedUserId}
+                options={(users || []).map((u) => ({
+                  value: u.id,
+                  label: `${u.username} (${(u.roles || []).join(", ") || "chưa có role"})`,
+                }))}
+                optionFilterProp="label"
+              />
+            </Col>
+            <Col span={12}>
+              <Typography.Text strong>Vai trò</Typography.Text>
+              <Select
+                mode="multiple"
+                style={{ width: "100%", marginTop: 8 }}
+                placeholder="Chọn một hoặc nhiều vai trò"
+                value={selectedRoleIds || []}
+                onChange={handleRoleSelectionChange}
+                options={(roles || []).map((r) => ({
+                  value: r.id,
+                  label: r.name,
+                }))}
+                loading={isLoadingRoles}
+                disabled={!selectedUserId || !roles || roles.length === 0}
+              />
+            </Col>
+          </Row>
+
+          {!roles || roles.length === 0 ? (
+            <Alert
+              message="Không có vai trò nào"
+              description="Vui lòng tạo vai trò trước khi gán cho người dùng"
+              type="warning"
+              showIcon
+            />
+          ) : null}
+
+          <Row justify="end">
+            <Button
+              type="primary"
+              icon={<SaveOutlined />}
+              disabled={!selectedUserId || selectedRoleIds.length === 0}
+              loading={isSavingUserRoles}
+              onClick={async () => {
+                if (!selectedUserId) return;
+                try {
+                  await assignUserRoles({
+                    userId: selectedUserId,
+                    roleIds: selectedRoleIds,
+                  });
+
+                  showToast({
+                    title: "Thành công!",
+                    message: "Đã cập nhật vai trò cho người dùng",
+                    type: "success",
+                  });
+
+                  // Reset initialization flag to reload roles from API
+                  setIsRolesInitialized(false);
+                  setIsUserRoleDirty(false);
+
+                  // Ensure refetch properly updates UI
+                  await Promise.all([refetchUserDetail(), refetchUsers()]);
+                } catch (error: any) {
+                  showToast({
+                    title: "Thất bại!",
+                    message:
+                      error?.message || "Không thể cập nhật vai trò người dùng",
+                    type: "error",
+                  });
+                }
+              }}
+            >
+              Lưu gán vai trò
+            </Button>
+          </Row>
+        </Space>
+      </Card>
+    ),
+  };
+
+  return (
+    <BaseView>
+      <Tabs
+        defaultActiveKey="module-permissions"
+        items={[modulePermissionsTab, userRoleTab]}
+      />
     </BaseView>
   );
 }

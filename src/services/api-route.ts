@@ -1,6 +1,6 @@
 export const API_ROUTES: ApiRoutes = {
   BASE_URL: import.meta.env.VITE_BE_API,
-  PYTHON_BASE_URL: 'http://localhost:8000', 
+  PYTHON_BASE_URL: "http://localhost:8000",
   TIMEOUT: 10000,
   HEADERS: {
     "Content-Type": "application/json",
@@ -33,13 +33,16 @@ export const API_ENDPOINTS = {
     DEACTIVATE: (id: string) => `/api/employees/deactivate/${id}`,
     ACTIVATE: (id: string) => `/api/employees/activate/${id}`,
     GET_KNOWN_FACES: (id: string) => `/api/employees/${id}/known-faces`,
-    UPLOAD_KNOWN_FACES: (id: string) => `/api/employees/${id}/known-faces/upload`,
-    DELETE_KNOWN_FACE: (id: string, filename: string) => `/api/employees/${id}/known-faces/${filename}`,
+    UPLOAD_KNOWN_FACES: (id: string) =>
+      `/api/employees/${id}/known-faces/upload`,
+    DELETE_KNOWN_FACE: (id: string, filename: string) =>
+      `/api/employees/${id}/known-faces/${filename}`,
   },
 
   ROLE: {
     PAGINATION: "/api/roles",
-    CREATE: "/api/roles",
+    SEARCH: "/api/roles",
+    CREATE: "/api/roles/create",
     UPDATE: (id: string) => `/api/roles/${id}`,
     DETAIL: (id: string) => `/api/roles/${id}`,
     LIST_ALL: "/api/roles",
@@ -167,9 +170,12 @@ export const API_ENDPOINTS = {
     CREATE: "/api/payslips",
     UPDATE: (id: string) => `/api/payslips/${id}`,
     FIND_BY_ID: (id: string) => `/api/payslips/${id}`,
-    GENERATE: (payrollPeriodId: string) => `/api/payslips/generate/${payrollPeriodId}`,
-    GENERATE_FOR_EMPLOYEE: (payrollPeriodId: string, employeeId: string) => `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,
-    EXPORT_MONTHLY_REPORT: (payrollPeriodId: string) => `/api/payslips/export/monthly-report/${payrollPeriodId}`,
+    GENERATE: (payrollPeriodId: string) =>
+      `/api/payslips/generate/${payrollPeriodId}`,
+    GENERATE_FOR_EMPLOYEE: (payrollPeriodId: string, employeeId: string) =>
+      `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,
+    EXPORT_MONTHLY_REPORT: (payrollPeriodId: string) =>
+      `/api/payslips/export/monthly-report/${payrollPeriodId}`,
     APPROVE: (id: string) => `/api/payslips/${id}/approve`,
     ACTIVATE: (id: string) => `/api/payslips/${id}/activate`,
     UNAPPROVE: (id: string) => `/api/payslips/${id}/unApprove`,
@@ -219,7 +225,8 @@ export const API_ENDPOINTS = {
   },
   DEPENDENT: {
     PAGINATION: "/api/dependents",
-    BY_EMPLOYEE: (employeeId: string) => `/api/dependents/employee/${employeeId}`,
+    BY_EMPLOYEE: (employeeId: string) =>
+      `/api/dependents/employee/${employeeId}`,
     GET_ALL: "/api/dependents",
     CREATE: "/api/dependents",
     UPDATE: (id: string) => `/api/dependents/${id}`,
@@ -255,6 +262,11 @@ export const API_ENDPOINTS = {
     GET_ALL: "/admin/permissions",
     GET_BY_ROLE: (roleId: string) => `/admin/permissions/by-role/${roleId}`,
     ASSIGN: (roleId: string) => `/admin/permissions/assign-to-role/${roleId}`,
+  },
+  USER: {
+    PAGINATION: "/api/users",
+    FIND_BY_ID: (id: string) => `/api/users/${id}`,
+    ASSIGN_ROLES: (id: string) => `/api/users/${id}/roles`,
   },
   ACTION_LOG: {
     PAGINATION: "/api/action-logs",

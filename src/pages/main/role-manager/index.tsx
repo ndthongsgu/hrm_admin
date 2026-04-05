@@ -26,10 +26,9 @@ export default function RoleManager() {
   };
 
   const [columnWidths] = useState<Record<string, number>>({
-    code: 120,
     name: 200,
-    email: 200,
-    phone: 150,
+    description: 260,
+    status: 120,
     createdAt: 180,
   });
 

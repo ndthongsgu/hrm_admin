@@ -76,17 +76,6 @@ const DetailView = ({
               type="secondary"
               style={{ fontSize: "14px", display: "block", color: "#06498B" }}
             >
-              Mã vai trò
-            </Text>
-            <Text strong style={{ fontSize: "18px" }}>
-              {data?.code}
-            </Text>
-          </Col>
-          <Col span={12} style={{ padding: "20px" }}>
-            <Text
-              type="secondary"
-              style={{ fontSize: "14px", display: "block", color: "#06498B" }}
-            >
               Tên vai trò
             </Text>
             <Text strong style={{ fontSize: "18px" }}>
