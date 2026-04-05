@@ -339,6 +339,53 @@ export const ROUTES = {
           key: "CONTRACTS",
           label: "Hợp đồng lao động",
           path: "/payroll/contracts",
+          children: {
+            ADD_CONTRACT: {
+              key: "ADD_CONTRACT",
+              label: "Thêm hợp đồng",
+              path: "/payroll/contracts/add",
+            },
+            EDIT_CONTRACT: {
+              key: "EDIT_CONTRACT",
+              label: "Chỉnh sửa hợp đồng",
+              path: "/payroll/contracts/edit/:id",
+            },
+            DETAIL_CONTRACT: {
+              key: "DETAIL_CONTRACT",
+              label: "Chi tiết hợp đồng",
+              path: "/payroll/contracts/detail/:id",
+            },
+            ADD_ALLOWANCE_TYPE: {
+              key: "ADD_ALLOWANCE_TYPE",
+              label: "Thêm loại phụ cấp",
+              path: "/payroll/contracts/allowance-types/add",
+            },
+            EDIT_ALLOWANCE_TYPE: {
+              key: "EDIT_ALLOWANCE_TYPE",
+              label: "Chỉnh sửa loại phụ cấp",
+              path: "/payroll/contracts/allowance-types/edit/:id",
+            },
+            DETAIL_ALLOWANCE_TYPE: {
+              key: "DETAIL_ALLOWANCE_TYPE",
+              label: "Chi tiết loại phụ cấp",
+              path: "/payroll/contracts/allowance-types/detail/:id",
+            },
+            ADD_CONTRACT_ALLOWANCE: {
+              key: "ADD_CONTRACT_ALLOWANCE",
+              label: "Thêm phụ cấp theo hợp đồng",
+              path: "/payroll/contracts/contract-allowances/add",
+            },
+            EDIT_CONTRACT_ALLOWANCE: {
+              key: "EDIT_CONTRACT_ALLOWANCE",
+              label: "Chỉnh sửa phụ cấp theo hợp đồng",
+              path: "/payroll/contracts/contract-allowances/edit/:id",
+            },
+            DETAIL_CONTRACT_ALLOWANCE: {
+              key: "DETAIL_CONTRACT_ALLOWANCE",
+              label: "Chi tiết phụ cấp theo hợp đồng",
+              path: "/payroll/contracts/contract-allowances/detail/:id",
+            },
+          },
         },
       },
     },

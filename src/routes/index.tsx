@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import Dashboard from "@/pages/main/dashboard/Dashboard";
 import RoleManager from "@/pages/main/role-manager";
+import PermissionManager from "@/pages/main/permission-manager";
 import EmployeeManager from "@/pages/main/user-manager/employee-manager";
 import AddEmployeeScreen from "@/pages/main/user-manager/employee-manager/add";
 import DetailEmployeeScreen from "@/pages/main/user-manager/employee-manager/detail";
@@ -38,6 +39,15 @@ import AddEmployeeShiftAssignmentScreen from "@/pages/main/payroll-manager/emplo
 import EditEmployeeShiftAssignmentScreen from "@/pages/main/payroll-manager/employeeShiftAssignment-manager/edit";
 import EmployeeShiftAssignmentDetailScreen from "@/pages/main/payroll-manager/employeeShiftAssignment-manager/detail";
 import ContractManagerPage from "@/pages/main/payroll-manager/contract-manager";
+import AddContractScreen from "@/pages/main/payroll-manager/contract-manager/contract/add";
+import EditContractScreen from "@/pages/main/payroll-manager/contract-manager/contract/edit";
+import DetailContractScreen from "@/pages/main/payroll-manager/contract-manager/contract/detail";
+import AddAllowanceTypeScreen from "@/pages/main/payroll-manager/contract-manager/allowance-type/add";
+import EditAllowanceTypeScreen from "@/pages/main/payroll-manager/contract-manager/allowance-type/edit";
+import DetailAllowanceTypeScreen from "@/pages/main/payroll-manager/contract-manager/allowance-type/detail";
+import AddContractAllowanceScreen from "@/pages/main/payroll-manager/contract-manager/contract-allowance/add";
+import EditContractAllowanceScreen from "@/pages/main/payroll-manager/contract-manager/contract-allowance/edit";
+import DetailContractAllowanceScreen from "@/pages/main/payroll-manager/contract-manager/contract-allowance/detail";
 import SysSettingsPage from "@/pages/main/settings-manager/sys-settings";
 import TaxBracketsPage from "@/pages/main/settings-manager/tax-brackets";
 import InsuranceConfigsPage from "@/pages/main/settings-manager/insurance-configs";
@@ -101,6 +111,10 @@ export default function AppRoutes() {
             path={ROUTES.MAIN.ROLE_MANAGER.Children.DETAIL_ROLE.path}
             element={<DetailRoleScreen />}
           />
+          <Route
+            path={ROUTES.MAIN.PERMISSION_MANAGER.path}
+            element={<PermissionManager />}
+          />
           {/* Quản lý người dùng */}
           {/* Quản lý nhân viên */}
           <Route
@@ -114,7 +128,7 @@ export default function AppRoutes() {
             }
             element={<AddEmployeeScreen />}
           />
-           <Route
+          <Route
             path={
               ROUTES.MAIN.USER_MANAGER.children.EMPLOYEE_MANAGER.children
                 .ADD_KNOWN_FACE.path
@@ -204,6 +218,69 @@ export default function AppRoutes() {
           />
           <Route
             path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .ADD_CONTRACT.path
+            }
+            element={<AddContractScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .EDIT_CONTRACT.path
+            }
+            element={<EditContractScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .DETAIL_CONTRACT.path
+            }
+            element={<DetailContractScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .ADD_ALLOWANCE_TYPE.path
+            }
+            element={<AddAllowanceTypeScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .EDIT_ALLOWANCE_TYPE.path
+            }
+            element={<EditAllowanceTypeScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .DETAIL_ALLOWANCE_TYPE.path
+            }
+            element={<DetailAllowanceTypeScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .ADD_CONTRACT_ALLOWANCE.path
+            }
+            element={<AddContractAllowanceScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .EDIT_CONTRACT_ALLOWANCE.path
+            }
+            element={<EditContractAllowanceScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+                .DETAIL_CONTRACT_ALLOWANCE.path
+            }
+            element={<DetailContractAllowanceScreen />}
+          />
+          <Route
+            path={
               ROUTES.MAIN.PAYROLL_MANAGER.children.PAYROLL_PERIODS.children
                 .ADD_PAYROLL_PERIOD.path
             }
@@ -230,33 +307,54 @@ export default function AppRoutes() {
             element={<WorkShiftManager />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.ADD_WORK_SHIFT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children
+                .ADD_WORK_SHIFT.path
+            }
             element={<AddWorkShiftScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.EDIT_WORK_SHIFT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children
+                .EDIT_WORK_SHIFT.path
+            }
             element={<EditWorkShiftScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children.DETAIL_WORK_SHIFT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.WORK_SHIFTS.children
+                .DETAIL_WORK_SHIFT.path
+            }
             element={<WorkShiftDetailScreen />}
           />
 
           {/* Quản lý gán ca làm việc */}
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS
+                .path
+            }
             element={<EmployeeShiftAssignmentManager />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.ADD_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS
+                .children.ADD_EMPLOYEE_SHIFT_ASSIGNMENT.path
+            }
             element={<AddEmployeeShiftAssignmentScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.EDIT_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS
+                .children.EDIT_EMPLOYEE_SHIFT_ASSIGNMENT.path
+            }
             element={<EditEmployeeShiftAssignmentScreen />}
           />
           <Route
-            path={ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS.children.DETAIL_EMPLOYEE_SHIFT_ASSIGNMENT.path}
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.EMPLOYEE_SHIFT_ASSIGNMENTS
+                .children.DETAIL_EMPLOYEE_SHIFT_ASSIGNMENT.path
+            }
             element={<EmployeeShiftAssignmentDetailScreen />}
           />
 

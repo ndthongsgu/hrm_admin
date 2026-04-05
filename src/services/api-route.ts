@@ -71,6 +71,7 @@ export const API_ENDPOINTS = {
   },
   CONTRACT: {
     PAGINATION: "/api/contracts",
+    SEARCH: "/api/contracts/search",
     GET_ALL: "/api/contracts",
     ACTIVE: "/api/contracts/active",
     CREATE: "/api/contracts",
@@ -83,6 +84,7 @@ export const API_ENDPOINTS = {
   },
   ALLOWANCE_TYPE: {
     PAGINATION: "/api/allowance-types",
+    SEARCH: "/api/allowance-types/search",
     GET_ALL: "/api/allowance-types",
     CREATE: "/api/allowance-types",
     UPDATE: (id: string) => `/api/allowance-types/${id}`,
@@ -94,6 +96,7 @@ export const API_ENDPOINTS = {
   },
   CONTRACT_ALLOWANCE: {
     PAGINATION: "/api/contract-allowances",
+    SEARCH: "/api/contract-allowances/search",
     GET_ALL: "/api/contract-allowances",
     BY_CONTRACT: (contractId: string) =>
       `/api/contract-allowances/by-contract/${contractId}`,
@@ -159,6 +162,7 @@ export const API_ENDPOINTS = {
   },
   PAYSLIP: {
     PAGINATION: "/api/payslips",
+    SEARCH: "/api/payslips",
     GET_ALL: "/api/payslips",
     CREATE: "/api/payslips",
     UPDATE: (id: string) => `/api/payslips/${id}`,
