@@ -19,14 +19,14 @@ const LIST_SIZE = 200;
 
 export const useContracts = (params: PaginationDto<Record<string, any>>) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.CONTRACT.PAGINATION, params],
+    queryKey: [API_ENDPOINTS.CONTRACT.SEARCH, params],
     queryFn: () =>
-      rootApiService.get<PagedResponse<ContractDto>>(
-        API_ENDPOINTS.CONTRACT.PAGINATION,
+      rootApiService.post<PagedResponse<ContractDto>>(
+        API_ENDPOINTS.CONTRACT.SEARCH,
         {
-          page: Math.floor(params.skip / params.take),
-          size: params.take,
-          ...params.where,
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
         },
       ),
   });
@@ -43,14 +43,14 @@ export const useAllowanceTypes = (
   params: PaginationDto<Record<string, any>>,
 ) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.ALLOWANCE_TYPE.PAGINATION, params],
+    queryKey: [API_ENDPOINTS.ALLOWANCE_TYPE.SEARCH, params],
     queryFn: () =>
-      rootApiService.get<PagedResponse<AllowanceTypeDto>>(
-        API_ENDPOINTS.ALLOWANCE_TYPE.PAGINATION,
+      rootApiService.post<PagedResponse<AllowanceTypeDto>>(
+        API_ENDPOINTS.ALLOWANCE_TYPE.SEARCH,
         {
-          page: Math.floor(params.skip / params.take),
-          size: params.take,
-          ...params.where,
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
         },
       ),
   });
@@ -67,14 +67,14 @@ export const useContractAllowances = (
   params: PaginationDto<Record<string, any>>,
 ) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [API_ENDPOINTS.CONTRACT_ALLOWANCE.PAGINATION, params],
+    queryKey: [API_ENDPOINTS.CONTRACT_ALLOWANCE.SEARCH, params],
     queryFn: () =>
-      rootApiService.get<PagedResponse<ContractAllowanceDto>>(
-        API_ENDPOINTS.CONTRACT_ALLOWANCE.PAGINATION,
+      rootApiService.post<PagedResponse<ContractAllowanceDto>>(
+        API_ENDPOINTS.CONTRACT_ALLOWANCE.SEARCH,
         {
-          page: Math.floor(params.skip / params.take),
-          size: params.take,
-          ...params.where,
+          skip: params.skip,
+          take: params.take,
+          where: params.where,
         },
       ),
   });
@@ -85,6 +85,43 @@ export const useContractAllowances = (
     isLoading,
     refetch,
   };
+};
+
+export const useDetailContract = (id: string) => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [API_ENDPOINTS.CONTRACT.FIND_BY_ID(id)],
+    queryFn: () =>
+      rootApiService.get<ContractDto>(API_ENDPOINTS.CONTRACT.FIND_BY_ID(id)),
+    enabled: !!id,
+  });
+
+  return { data, isLoading, refetch };
+};
+
+export const useDetailAllowanceType = (id: string) => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [API_ENDPOINTS.ALLOWANCE_TYPE.FIND_BY_ID(id)],
+    queryFn: () =>
+      rootApiService.get<AllowanceTypeDto>(
+        API_ENDPOINTS.ALLOWANCE_TYPE.FIND_BY_ID(id),
+      ),
+    enabled: !!id,
+  });
+
+  return { data, isLoading, refetch };
+};
+
+export const useDetailContractAllowance = (id: string) => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [API_ENDPOINTS.CONTRACT_ALLOWANCE.FIND_BY_ID(id)],
+    queryFn: () =>
+      rootApiService.get<ContractAllowanceDto>(
+        API_ENDPOINTS.CONTRACT_ALLOWANCE.FIND_BY_ID(id),
+      ),
+    enabled: !!id,
+  });
+
+  return { data, isLoading, refetch };
 };
 
 export const useEmployeeOptions = () => {

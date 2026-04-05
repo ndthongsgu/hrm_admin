@@ -3,6 +3,7 @@ import FilterComponent, {
   type FilterField,
 } from "@/components/filter/FilterCustom";
 import TableCustom, { type TableAction } from "@/components/table/Table";
+import { ROUTES } from "@/common/constants/routes";
 import type { PaginationDto } from "@/dto/base.dto";
 import type {
   AllowanceTypeDto,
@@ -27,7 +28,13 @@ import {
   useUpdateContractAllowance,
 } from "@/hooks/contract";
 import { useConfirm } from "@/hooks/layout/useConfirm";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { useRouter } from "@/routes/hooks";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   DatePicker,
@@ -47,6 +54,7 @@ import { useMemo, useState } from "react";
 type TabKey = "contracts" | "allowanceTypes" | "contractAllowances";
 
 const initContractFilter = {
+  keyword: "",
   contractNumber: "",
   employeeId: undefined,
   status: undefined,
@@ -77,6 +85,7 @@ const formatDate = (value?: string | null) =>
   value ? new Date(value).toLocaleDateString("vi-VN") : "-";
 
 export default function ContractManagerPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabKey>("contracts");
   const [contractFilter, setContractFilter] =
     useState<Record<string, any>>(initContractFilter);
@@ -161,13 +170,11 @@ export default function ContractManagerPage() {
   const [contractAllowanceModalOpen, setContractAllowanceModalOpen] =
     useState(false);
 
-  const [editingContract, setEditingContract] = useState<ContractDto | null>(
+  const [editingContract] = useState<ContractDto | null>(null);
+  const [editingAllowanceType] = useState<AllowanceTypeDto | null>(null);
+  const [editingContractAllowance] = useState<ContractAllowanceDto | null>(
     null,
   );
-  const [editingAllowanceType, setEditingAllowanceType] =
-    useState<AllowanceTypeDto | null>(null);
-  const [editingContractAllowance, setEditingContractAllowance] =
-    useState<ContractAllowanceDto | null>(null);
 
   const [contractForm] = Form.useForm();
   const [allowanceTypeForm] = Form.useForm();
@@ -222,6 +229,13 @@ export default function ContractManagerPage() {
   };
 
   const contractFilterFields: FilterField[] = [
+    {
+      key: "keyword",
+      label: "Từ khóa",
+      type: "input",
+      placeholder: "Số hợp đồng / nhân viên / vị trí",
+      col: 8,
+    },
     {
       key: "contractNumber",
       label: "Số hợp đồng",
@@ -311,36 +325,28 @@ export default function ContractManagerPage() {
   ];
 
   const openCreateContract = () => {
-    setEditingContract(null);
-    contractForm.resetFields();
-    contractForm.setFieldsValue({ status: "ACTIVE", isNet: false });
-    setContractModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.ADD_CONTRACT.path,
+    );
   };
 
   const openEditContract = (record: ContractDto) => {
-    setEditingContract(record);
-    contractForm.setFieldsValue({
-      employeeId: record.employee?.id,
-      contractNumber: record.contractNumber,
-      baseSalary: record.baseSalary,
-      actualSalary: record.actualSalary,
-      positionId: record.position?.id,
-      startDate: record.startDate ? dayjs(record.startDate) : null,
-      endDate: record.endDate ? dayjs(record.endDate) : null,
-      status: record.status,
-      isNet: Boolean(record.isNet),
-    });
-    setContractModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.EDIT_CONTRACT.path.replace(
+        ":id",
+        record.id,
+      ),
+    );
   };
 
   const submitContract = async () => {
     const values = await contractForm.validateFields();
     const payload = {
-      employee: { id: values.employeeId },
+      employeeId: values.employeeId,
       contractNumber: values.contractNumber,
       baseSalary: values.baseSalary,
       actualSalary: values.actualSalary,
-      position: values.positionId ? { id: values.positionId } : null,
+      positionId: values.positionId || null,
       startDate: values.startDate
         ? dayjs(values.startDate).format("YYYY-MM-DD")
         : undefined,
@@ -365,23 +371,19 @@ export default function ContractManagerPage() {
   };
 
   const openCreateAllowanceType = () => {
-    setEditingAllowanceType(null);
-    allowanceTypeForm.resetFields();
-    allowanceTypeForm.setFieldsValue({
-      isTaxable: true,
-      isInsuranceBased: true,
-    });
-    setAllowanceTypeModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.ADD_ALLOWANCE_TYPE
+        .path,
+    );
   };
 
   const openEditAllowanceType = (record: AllowanceTypeDto) => {
-    setEditingAllowanceType(record);
-    allowanceTypeForm.setFieldsValue({
-      name: record.name,
-      isTaxable: Boolean(record.isTaxable),
-      isInsuranceBased: Boolean(record.isInsuranceBased),
-    });
-    setAllowanceTypeModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.EDIT_ALLOWANCE_TYPE.path.replace(
+        ":id",
+        record.id,
+      ),
+    );
   };
 
   const submitAllowanceType = async () => {
@@ -406,19 +408,19 @@ export default function ContractManagerPage() {
   };
 
   const openCreateContractAllowance = () => {
-    setEditingContractAllowance(null);
-    contractAllowanceForm.resetFields();
-    setContractAllowanceModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children
+        .ADD_CONTRACT_ALLOWANCE.path,
+    );
   };
 
   const openEditContractAllowance = (record: ContractAllowanceDto) => {
-    setEditingContractAllowance(record);
-    contractAllowanceForm.setFieldsValue({
-      contractId: record.contract?.id,
-      allowanceTypeId: record.allowanceType?.id,
-      amount: record.amount,
-    });
-    setContractAllowanceModalOpen(true);
+    router.push(
+      ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.EDIT_CONTRACT_ALLOWANCE.path.replace(
+        ":id",
+        record.id,
+      ),
+    );
   };
 
   const submitContractAllowance = async () => {
@@ -504,6 +506,20 @@ export default function ContractManagerPage() {
 
   const contractActions: TableAction[] = [
     {
+      key: "view",
+      label: "",
+      icon: <EyeOutlined />,
+      type: "default",
+      tooltip: "Chi tiết",
+      onClick: (record: ContractDto) =>
+        router.push(
+          ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.DETAIL_CONTRACT.path.replace(
+            ":id",
+            record.id,
+          ),
+        ),
+    },
+    {
       key: "edit",
       label: "",
       icon: <EditOutlined />,
@@ -554,6 +570,20 @@ export default function ContractManagerPage() {
   ];
 
   const allowanceTypeActions: TableAction[] = [
+    {
+      key: "view",
+      label: "",
+      icon: <EyeOutlined />,
+      type: "default",
+      tooltip: "Chi tiết",
+      onClick: (record: AllowanceTypeDto) =>
+        router.push(
+          ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.DETAIL_ALLOWANCE_TYPE.path.replace(
+            ":id",
+            record.id,
+          ),
+        ),
+    },
     {
       key: "edit",
       label: "",
@@ -609,6 +639,20 @@ export default function ContractManagerPage() {
   ];
 
   const contractAllowanceActions: TableAction[] = [
+    {
+      key: "view",
+      label: "",
+      icon: <EyeOutlined />,
+      type: "default",
+      tooltip: "Chi tiết",
+      onClick: (record: ContractAllowanceDto) =>
+        router.push(
+          ROUTES.MAIN.PAYROLL_MANAGER.children.CONTRACTS.children.DETAIL_CONTRACT_ALLOWANCE.path.replace(
+            ":id",
+            record.id,
+          ),
+        ),
+    },
     {
       key: "edit",
       label: "",
