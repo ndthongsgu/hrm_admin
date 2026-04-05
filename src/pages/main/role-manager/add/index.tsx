@@ -25,13 +25,6 @@ export default function AddRoleScreen({
   const formFields = useMemo(() => {
     const fields: FormField[] = [
       {
-        name: "code",
-        label: "Mã vai trò",
-        type: "input",
-        required: true,
-        placeholder: "Nhập mã vai trò",
-      },
-      {
         name: "name",
         label: "Tên vai trò",
         type: "input",
@@ -50,13 +43,14 @@ export default function AddRoleScreen({
     return fields;
   }, []);
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = async (values: any) => {
     if (isEdit) {
       if (handleUpdate) {
-        handleUpdate(values);
+        await handleUpdate(values);
       }
     } else {
-      onCreateRole(values);
+      await onCreateRole(values);
+      router.back();
     }
   };
 

@@ -27,12 +27,16 @@ export default function EditRoleScreen() {
     }
   }, [fetchError]);
 
-  const handleUpdate = (values: RoleDto) => {
+  const handleUpdate = async (values: RoleDto) => {
     if (!id) {
       setError("Không tìm thấy ID vai trò");
       return;
     }
-    onUpdateRole({ ...values });
+    await onUpdateRole({
+      name: values.name,
+      description: values.description,
+      permissionsJson: roleData?.permissionsJson,
+    });
   };
 
   if (error) {

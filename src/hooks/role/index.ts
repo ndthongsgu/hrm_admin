@@ -6,6 +6,28 @@ import rootApiService from "@/services/api.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../layout/useToast";
 
+const parsePermissions = (value?: string) => {
+  if (!value) return {};
+  try {
+    return JSON.parse(value) as Record<string, string[]>;
+  } catch {
+    return {};
+  }
+};
+
+const mapRole = (role: RoleDto): RoleDto => ({
+  ...role,
+  permissions: parsePermissions(role.permissionsJson),
+});
+
+const toRolePayload = (body: RoleCreateDto | RoleUpdateDto) => {
+  const { permissions, ...rest } = body as RoleUpdateDto & RoleCreateDto;
+  return {
+    ...rest,
+    ...(permissions ? { permissionsJson: JSON.stringify(permissions) } : {}),
+  };
+};
+
 export const usePaginationRole = (params: PaginationDto<object>) => {
   const requestParams = {
     skip: params.skip,
@@ -14,16 +36,16 @@ export const usePaginationRole = (params: PaginationDto<object>) => {
   };
 
   const { data, isLoading, refetch, error } = useQuery({
-    queryKey: [API_ENDPOINTS.ROLE.PAGINATION, requestParams],
+    queryKey: [API_ENDPOINTS.ROLE.SEARCH, requestParams],
     queryFn: () =>
       rootApiService.post<PaginationResponse<RoleDto>>(
-        API_ENDPOINTS.ROLE.PAGINATION,
+        API_ENDPOINTS.ROLE.SEARCH,
         requestParams,
       ),
   });
 
   return {
-    data: data?.content || [],
+    data: (data?.content || []).map(mapRole),
     total: data?.totalElements || 0,
     isLoading,
     refetch,
@@ -38,7 +60,7 @@ export const useAllRoles = () => {
   });
 
   return {
-    data: data || [],
+    data: (data || []).map(mapRole),
     isLoading,
     refetch,
     error,
@@ -53,7 +75,7 @@ export const useRoleDetail = (id: string) => {
   });
 
   return {
-    data,
+    data: data ? mapRole(data) : data,
     isLoading,
     refetch,
     error,
@@ -65,10 +87,13 @@ export const useCreateRole = () => {
   const showToast = useToast();
   const { mutateAsync: onCreateRole, isPending: isLoading } = useMutation({
     mutationFn: (body: RoleCreateDto) =>
-      rootApiService.post<SuccessResponse>(API_ENDPOINTS.ROLE.CREATE, body),
+      rootApiService.post<SuccessResponse>(
+        API_ENDPOINTS.ROLE.CREATE,
+        toRolePayload(body),
+      ),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
-        queryKey: [API_ENDPOINTS.ROLE.PAGINATION],
+        queryKey: [API_ENDPOINTS.ROLE.SEARCH],
       });
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.ROLE.LIST_ALL],
@@ -97,13 +122,16 @@ export const useUpdateRole = (id: string) => {
   const showToast = useToast();
   const { mutateAsync: onUpdateRole, isPending: isLoading } = useMutation({
     mutationFn: (body: RoleUpdateDto) =>
-      rootApiService.put<SuccessResponse>(url, body),
+      rootApiService.put<SuccessResponse>(url, toRolePayload(body)),
     onSuccess: (res: SuccessResponse) => {
       queryClient.invalidateQueries({
-        queryKey: [API_ENDPOINTS.ROLE.PAGINATION],
+        queryKey: [API_ENDPOINTS.ROLE.SEARCH],
       });
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.ROLE.LIST_ALL],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.ROLE.DETAIL(id)],
       });
       showToast({
         title: "Thành công!",
@@ -129,7 +157,7 @@ export const useSelectBoxRoles = () => {
     queryFn: () => rootApiService.get<RoleDto[]>(API_ENDPOINTS.ROLE.SELECT),
   });
 
-  return { data, isLoading, refetch };
+  return { data: (data || []).map(mapRole), isLoading, refetch };
 };
 
 export const useDeActivateRole = () => {
