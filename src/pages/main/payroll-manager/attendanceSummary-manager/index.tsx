@@ -12,11 +12,14 @@ import {
   useApproveAttendance,
   usePayrollPeriodSelectOptions,
   useUnApproveAttendance,
+  useBulkApproveAttendance,
+  useBulkUnApproveAttendance,
+  useGetAttendanceSummaryIdsByFilter,
 } from "@/hooks/payroll";
 import { useRouter } from "@/routes/hooks";
 import { EditOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { Row, Space, Tag } from "antd";
-import { useState } from "react";
+import { Row, Space, Tag, Checkbox, Button, Badge } from "antd";
+import { useState, useEffect } from "react";
 
 const initFilter = {
   payrollPeriodId: "",
@@ -38,8 +41,19 @@ export default function AttendanceSummaryManager() {
     usePaginationAttendanceSummaries(pagination);
   const { onApproveAttendance } = useApproveAttendance();
   const { onUnApproveAttendance } = useUnApproveAttendance();
+  const { onBulkApproveAttendance } = useBulkApproveAttendance();
+  const { onBulkUnApproveAttendance } = useBulkUnApproveAttendance();
+  const { mutateAsync: getIdsByFilter } = useGetAttendanceSummaryIdsByFilter();
   const { confirm } = useConfirm();
   const { data: payrollPeriodOptions } = usePayrollPeriodSelectOptions();
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [allSelected, setAllSelected] = useState(false);
+
+  useEffect(() => {
+    setSelectedIds([]);
+    setAllSelected(false);
+  }, [pagination.where]);
 
   const handleSearch = (isReset?: boolean) => {
     setPagination((prev) => ({
@@ -88,7 +102,49 @@ export default function AttendanceSummaryManager() {
     actions: 200,
   });
 
+  const handleSelectAll = async (e: any) => {
+    const checked = e.target.checked;
+    if (checked) {
+      // Get all IDs by filter
+      const ids = await getIdsByFilter({
+        where: pagination.where,
+      });
+      setSelectedIds(ids || []);
+      setAllSelected(true);
+    } else {
+      setSelectedIds([]);
+      setAllSelected(false);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((selectedId) => selectedId !== id));
+      setAllSelected(false);
+    }
+  };
+
   const columns = [
+    {
+      title: (
+        <Checkbox
+          checked={allSelected}
+          onChange={handleSelectAll}
+          indeterminate={selectedIds.length > 0 && selectedIds.length < data.length}
+        />
+      ),
+      dataIndex: "checkbox",
+      key: "checkbox",
+      width: 50,
+      render: (_: any, record: any) => (
+        <Checkbox
+          checked={selectedIds.includes(record.id)}
+          onChange={(e) => handleSelectOne(record.id, e.target.checked)}
+        />
+      ),
+    },
     {
       title: "Nhân viên",
       dataIndex: "employeeName",
@@ -242,6 +298,32 @@ export default function AttendanceSummaryManager() {
     }));
   };
 
+  const handleBulkApprove = () => {
+    if (selectedIds.length === 0) return;
+    confirm({
+      title: "Xác nhận duyệt hàng loạt",
+      content: `Bạn có chắc chắn muốn duyệt ${selectedIds.length} tổng hợp công?`,
+      onOk: async () => {
+        await onBulkApproveAttendance(selectedIds);
+        setSelectedIds([]);
+        setAllSelected(false);
+      },
+    });
+  };
+
+  const handleBulkUnApprove = () => {
+    if (selectedIds.length === 0) return;
+    confirm({
+      title: "Xác nhận hủy duyệt hàng loạt",
+      content: `Bạn có chắc chắn muốn hủy duyệt ${selectedIds.length} tổng hợp công?`,
+      onOk: async () => {
+        await onBulkUnApproveAttendance(selectedIds);
+        setSelectedIds([]);
+        setAllSelected(false);
+      },
+    });
+  };
+
   return (
     <BaseView>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -255,6 +337,23 @@ export default function AttendanceSummaryManager() {
             handleSearch(true);
           }}
         />
+        {selectedIds.length > 0 && (
+          <Row justify="space-between" align="middle">
+            <span>Đã chọn {selectedIds.length} mục</span>
+            <Space>
+              <Badge count={data?.filter(record => selectedIds.includes(record.id) && record.status === ATTENDANCE_SUMMARY_STATUS.PENDING.value).length || 0}>
+                <Button type="primary" onClick={handleBulkApprove}>
+                  Duyệt hàng loạt
+                </Button>
+              </Badge>
+              <Badge count={data?.filter(record => selectedIds.includes(record.id) && record.status === ATTENDANCE_SUMMARY_STATUS.APPROVED.value).length || 0}>
+                <Button danger onClick={handleBulkUnApprove}>
+                  Hủy duyệt hàng loạt
+                </Button>
+              </Badge>
+            </Space>
+          </Row>
+        )}
         <TableCustom
           data={data}
           columns={columns}

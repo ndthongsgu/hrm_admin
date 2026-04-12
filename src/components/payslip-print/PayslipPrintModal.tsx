@@ -117,7 +117,7 @@ const PrintContent = ({ data }: { data: PayslipDto }) => (
             (3) Số ngày công thực tế
           </td>
           <td style={{ textAlign: "right", padding: "4px 6px" }}>
-            {data?.totalWorkdays || 0}
+            {data?.workdays || 0}
           </td>
         </tr>
         <tr>
@@ -299,7 +299,7 @@ const PrintContent = ({ data }: { data: PayslipDto }) => (
             (23) Thuế suất áp dụng
           </td>
           <td style={{ textAlign: "right", padding: "4px 6px" }}>
-            {data?.taxRate || 0}%
+            {data?.taxRate || 0} %
           </td>
         </tr>
         <tr>

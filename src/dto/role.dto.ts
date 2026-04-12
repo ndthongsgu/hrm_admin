@@ -5,7 +5,6 @@ interface RoleBackendDto extends BaseDto {
   name: string;
   description?: string;
   permissionsJson?: string; // Backend stores as JSON string in DB
-  isDeleted?: boolean;
 }
 
 // Frontend DTO (permissions as object - type-safe, easy to use)
@@ -14,7 +13,6 @@ export interface RoleDto extends BaseDto {
   description?: string;
   permissionsJson?: string;
   permissions?: Record<string, string[]>; // Frontend uses object format: {"EMPLOYEE": ["READ", "CREATE"], ...}
-  isDeleted?: boolean;
 }
 
 export interface RoleCreateDto {
@@ -48,6 +46,7 @@ export interface RolePageRequest {
   sortBy?: string;
   sortDirection?: string;
   name?: string;
+  code?: string;
   isActive?: boolean;
 }
 
@@ -86,7 +85,6 @@ export function transformRoleToBackend(
     permissionsJson:
       frontend.permissionsJson ||
       (frontend.permissions ? JSON.stringify(frontend.permissions) : undefined),
-    isDeleted: false,
   };
 }
 

@@ -48,7 +48,7 @@ export interface AttendanceSummaryDto {
 
 export interface AttendanceSummaryFilter {
   payrollPeriodId: string;
-  isApproved?: boolean;
+  isApproved?: string;
 }
 
 export interface SalaryAdjustmentDto {
@@ -142,4 +142,16 @@ export interface PayslipDto {
 
 export interface PayslipFilter {
   payrollPeriodId?: string;
+}
+
+export interface AttendanceSummarySearchRequest {
+  where?: any;
+}
+
+export interface SalaryAdjustmentSearchRequest {
+  where?: any;
+}
+
+export interface PayslipSearchRequest {
+  where?: any;
 }

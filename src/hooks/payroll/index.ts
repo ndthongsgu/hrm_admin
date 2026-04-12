@@ -20,6 +20,9 @@ export {
   useDetailSalaryAdjustment,
   usePaginationSalaryAdjustments,
   useUpdateSalaryAdjustment,
+  useBulkApproveSalaryAdjustment,
+  useBulkUnApproveSalaryAdjustment,
+  useGetSalaryAdjustmentIdsByFilter,
 } from "./salaryAdjustment";
 
 // ===== ATTENDANCE SUMMARY HOOKS =====
@@ -29,6 +32,9 @@ export {
   useDetailAttendanceSummary,
   usePaginationAttendanceSummaries,
   useUpdateAttendanceSummary,
+  useBulkApproveAttendance,
+  useBulkUnApproveAttendance,
+  useGetAttendanceSummaryIdsByFilter
 } from "./attendanceSummary";
 
 // ===== PAYSLIP HOOKS =====
@@ -40,7 +46,11 @@ export {
   useDeactivatePayslip,
   useActivatePayslip,
   useGeneratePayslip,
+  useGenerateBulkPayslip,
   useExportMonthlyPayslipReport,
+  useBulkApprovePayslip,
+  useBulkUnApprovePayslip,
+  useGetPayslipIdsByFilter,
 } from "./payslip";
 
 // ===== SELECT OPTIONS HOOKS =====

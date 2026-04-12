@@ -150,6 +150,9 @@ export const API_ENDPOINTS = {
     FIND_BY_ID: (id: string) => `/api/attendance-summaries/${id}`,
     UNAPPROVE: (id: string) => `/api/attendance-summaries/${id}/unApprove`,
     APPROVE: (id: string) => `/api/attendance-summaries/${id}/approve`,
+    BULK_APPROVE: "/api/attendance-summaries/bulk-approve",
+    BULK_UNAPPROVE: "/api/attendance-summaries/bulk-unapprove",
+    IDS_BY_FILTER: "/api/attendance-summaries/ids-by-filter",
   },
   PAYROLL_PERIOD: {
     PAGINATION: "/api/payroll-periods",
@@ -173,12 +176,15 @@ export const API_ENDPOINTS = {
     GENERATE: (payrollPeriodId: string) =>
       `/api/payslips/generate/${payrollPeriodId}`,
     GENERATE_FOR_EMPLOYEE: (payrollPeriodId: string, employeeId: string) =>
-      `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,
-    EXPORT_MONTHLY_REPORT: (payrollPeriodId: string) =>
+      `/api/payslips/generate/${payrollPeriodId}/employee/${employeeId}`,      GENERATE_BULK_FOR_EMPLOYEES: (payrollPeriodId: string) =>
+        `/api/payslips/generate/${payrollPeriodId}/bulk`,    EXPORT_MONTHLY_REPORT: (payrollPeriodId: string) =>
       `/api/payslips/export/monthly-report/${payrollPeriodId}`,
     APPROVE: (id: string) => `/api/payslips/${id}/approve`,
     ACTIVATE: (id: string) => `/api/payslips/${id}/activate`,
     UNAPPROVE: (id: string) => `/api/payslips/${id}/unApprove`,
+    BULK_APPROVE: "/api/payslips/bulk-approve",
+    BULK_UNAPPROVE: "/api/payslips/bulk-unapprove",
+    IDS_BY_FILTER: "/api/payslips/ids-by-filter",
   },
   SALARY_ADJUSTMENT: {
     PAGINATION: "/api/salary-adjustments",
@@ -190,6 +196,9 @@ export const API_ENDPOINTS = {
     ACTIVATE: (id: string) => `/api/salary-adjustments/${id}/activate`,
     APPROVE: (id: string) => `/api/salary-adjustments/${id}/approve`,
     UNAPPROVE: (id: string) => `/api/salary-adjustments/${id}/unApprove`,
+    BULK_APPROVE: "/api/salary-adjustments/bulk-approve",
+    BULK_UNAPPROVE: "/api/salary-adjustments/bulk-unapprove",
+    IDS_BY_FILTER: "/api/salary-adjustments/ids-by-filter",
   },
   OFFICE_LOCATION: {
     PAGINATION: "/api/office-locations",

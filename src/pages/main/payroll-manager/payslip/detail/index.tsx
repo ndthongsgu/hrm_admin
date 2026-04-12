@@ -44,7 +44,7 @@ export default function PayslipDetailScreen() {
     { key: "5", section: "II. THU NHẬP", label: "II. THU NHẬP", value: '' , bold: true  },
     { key: "6", label: "(1) Lương cơ sở", value: formatCurrency(data?.grossSalary)},
     { key: "6", label: "(2) Số ngày công tính lương", value:data?.totalWorkdays || 0},
-    { key: "6", label: "(3) Số ngày công thực tế", value:data?.totalWorkdays || 0},
+    { key: "6", label: "(3) Số ngày công thực tế", value:data?.workdays || 0},
     { key: "6", label: "(4) Lương thanh toán theo công = (1) * (3) / (2)", value: formatCurrency(data?.salaryByWorkdays) },
     { key: "7", label: "(5) Phụ cấp chịu thuế + tính bảo hiểm", value: formatCurrency(data?.taxableAndInsurableAllowance) },
     { key: "8", label: "(6) Phụ cấp chịu thuế + không tính bảo hiểm", value: formatCurrency(data?.taxableAndNonInsurableAllowance) },
@@ -68,7 +68,7 @@ export default function PayslipDetailScreen() {
     { key: "24", label: "(20) Giảm trừ cố định", value: formatCurrency(data?.taxFixedDeduction) },
     { key: "25", label: "(21) Tổng giảm trừ = (16) + (18) + (19)", value: formatCurrency(data?.totalDeductions) },
     { key: "26", label: "(22) Thu nhập tính thuế = (17) - (21)", value: formatCurrency(data?.assessableIncome), bold: true },
-    { key: "26", label: "(23) Thuế suất áp dụng", value: data?.taxRate || 0 + '%', bold: true },
+    { key: "26", label: "(23) Thuế suất áp dụng", value: '' + (data?.taxRate || 0) + ' %', bold: true },
     { key: "27", label: "(24) Tiền thuế phải nộp = (22) * (23) - (20)", value: formatCurrency(data?.taxAmount), bold: true },
     // Kết quả
     { key: "28", section: "V. KẾT QUẢ CUỐI CÙNG", label: "Thực nhận = (7) + (8) + (10) + (17) - (24)", value: formatCurrency(data?.netSalary), bold: true, highlight: true },
