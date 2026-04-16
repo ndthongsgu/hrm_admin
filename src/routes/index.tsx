@@ -68,6 +68,10 @@ import AddKnownFaceScreen from "@/pages/main/user-manager/employee-manager/addKn
 import DependentManagerScreen from "@/pages/main/user-manager/employee-manager/dependent";
 import AddDependentScreen from "@/pages/main/user-manager/employee-manager/dependent/add";
 import EditDependentScreen from "@/pages/main/user-manager/employee-manager/dependent/edit";
+import DailyAttendanceManager from "@/pages/main/payroll-manager/dailyAttendance-manager";
+import AddDailyAttendanceScreen from "@/pages/main/payroll-manager/dailyAttendance-manager/add";
+import EditDailyAttendanceScreen from "@/pages/main/payroll-manager/dailyAttendance-manager/edit";
+import DetailDailyAttendanceScreen from "@/pages/main/payroll-manager/dailyAttendance-manager/detail";
 
 export default function AppRoutes() {
   return (
@@ -299,6 +303,33 @@ export default function AppRoutes() {
                 .DETAIL_PAYROLL_PERIOD.path
             }
             element={<DetailPayrollPeriodScreen />}
+          />
+
+          {/* Quản lý chấm công hàng ngày */}
+          <Route
+            path={ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.path}
+            element={<DailyAttendanceManager />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.children
+                .ADD_DAILY_ATTENDANCE.path
+            }
+            element={<AddDailyAttendanceScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.children
+                .EDIT_DAILY_ATTENDANCE.path
+            }
+            element={<EditDailyAttendanceScreen />}
+          />
+          <Route
+            path={
+              ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.children
+                .DETAIL_DAILY_ATTENDANCE.path
+            }
+            element={<DetailDailyAttendanceScreen />}
           />
 
           {/* Quản lý ca làm việc */}

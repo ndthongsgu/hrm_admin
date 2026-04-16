@@ -51,6 +51,31 @@ export interface AttendanceSummaryFilter {
   isApproved?: string;
 }
 
+export interface DailyAttendanceDto {
+  id?: string;
+  employeeId: string;
+  employee?: EmployeeDto;
+  employeeName?: string;
+  employeeCode?: string;
+  date: string; // YYYY-MM-DD format
+  checkInTime?: string; // HH:mm:ss format
+  checkOutTime?: string; // HH:mm:ss format
+  status: string; // PRESENT, ABSENT, LATE, etc.
+  version?: number;
+  isDeleted?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface DailyAttendanceFilter {
+  employeeId?: string;
+  employeeName?: string;
+  date?: Date;
+  dateRange?: [Date, Date];
+  status?: string;
+  isDeleted?: boolean;
+}
+
 export interface SalaryAdjustmentDto {
   id?: string;
   payrollPeriodId: string;

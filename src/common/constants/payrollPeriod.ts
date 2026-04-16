@@ -47,6 +47,34 @@ export const ATTENDANCE_SUMMARY_STATUS = {
     },
 }
 
+export const DAILY_ATTENDANCE_STATUS = {
+    OK: {
+        label: "Đúng giờ",
+        value: "OK",
+        color: "green",
+    },
+    LATE: {
+        label: "Đi muộn",
+        value: "LATE",
+        color: "orange",
+    },
+    ABSENT: {
+        label: "Vắng mặt",
+        value: "ABSENT",
+        color: "red",
+    },
+    LEAVE: {
+        label: "Nghỉ phép",
+        value: "LEAVE",
+        color: "blue",
+    },
+    EARLY: {
+        label: "Về sớm",
+        value: "EARLY",
+        color: "orange",
+    },
+}
+
 export const SALARY_ADJUSTMENT_STATUS = {
     APPROVED: {
         label: "Đã duyệt",

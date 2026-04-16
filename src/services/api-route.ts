@@ -130,13 +130,6 @@ export const API_ENDPOINTS = {
     SELECT_OPTIONS: "/api/shift-assignments/select-options",
     SEARCH: "/api/shift-assignments/search",
   },
-  DAILY_ATTENDANCE: {
-    PAGINATION: "/api/daily-attendances",
-    GET_ALL: "/api/daily-attendances",
-    CREATE: "/api/daily-attendances",
-    UPDATE: (id: string) => `/api/daily-attendances/${id}`,
-    FIND_BY_ID: (id: string) => `/api/daily-attendances/${id}`,
-  },
   TIME_LOG: {
     PAGINATION: "/api/time-logs",
     GET_ALL: "/api/time-logs",
@@ -153,6 +146,14 @@ export const API_ENDPOINTS = {
     BULK_APPROVE: "/api/attendance-summaries/bulk-approve",
     BULK_UNAPPROVE: "/api/attendance-summaries/bulk-unapprove",
     IDS_BY_FILTER: "/api/attendance-summaries/ids-by-filter",
+  },
+  DAILY_ATTENDANCE: {
+    PAGINATION: "/api/daily-attendances/search",
+    CREATE: "/api/daily-attendances",
+    UPDATE: (id: string) => `/api/daily-attendances/${id}`,
+    FIND_BY_ID: (id: string) => `/api/daily-attendances/${id}`,
+    DEACTIVATE: (id: string) => `/api/daily-attendances/${id}/deactivate`,
+    ACTIVATE: (id: string) => `/api/daily-attendances/${id}/activate`,
   },
   PAYROLL_PERIOD: {
     PAGINATION: "/api/payroll-periods",

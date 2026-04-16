@@ -108,6 +108,12 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           moduleCode: ModuleCode.PAYROLL,
         },
         {
+          key: ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.key,
+          path: ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.path,
+          label: ROUTES.MAIN.PAYROLL_MANAGER.children.DAILY_ATTENDANCES.label,
+          moduleCode: ModuleCode.PAYROLL,
+        },
+        {
           key: ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.key,
           path: ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.path,
           label: ROUTES.MAIN.PAYROLL_MANAGER.children.SALARY_ADJUSTMENTS.label,

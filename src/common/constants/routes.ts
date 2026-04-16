@@ -218,6 +218,28 @@ export const ROUTES = {
             },
           },
         },
+        DAILY_ATTENDANCES: {
+          key: "DAILY_ATTENDANCES",
+          label: "Chấm công hàng ngày",
+          path: "/payroll/daily-attendances",
+          children: {
+            ADD_DAILY_ATTENDANCE: {
+              key: "ADD_DAILY_ATTENDANCE",
+              label: "Thêm chấm công",
+              path: "/payroll/daily-attendances/add",
+            },
+            EDIT_DAILY_ATTENDANCE: {
+              key: "EDIT_DAILY_ATTENDANCE",
+              label: "Chỉnh sửa chấm công",
+              path: "/payroll/daily-attendances/edit/:id",
+            },
+            DETAIL_DAILY_ATTENDANCE: {
+              key: "DETAIL_DAILY_ATTENDANCE",
+              label: "Chi tiết chấm công",
+              path: "/payroll/daily-attendances/detail/:id",
+            },
+          },
+        },
         ATTENDANCE_SUMMARY: {
           key: "ATTENDANCE_SUMMARY",
           label: "Tổng hợp công",
